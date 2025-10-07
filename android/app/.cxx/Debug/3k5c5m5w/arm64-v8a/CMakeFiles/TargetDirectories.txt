@@ -1,0 +1,2 @@
+D:/taralabaluflutter/android/app/.cxx/Debug/3k5c5m5w/arm64-v8a/CMakeFiles/edit_cache.dir
+D:/taralabaluflutter/android/app/.cxx/Debug/3k5c5m5w/arm64-v8a/CMakeFiles/rebuild_cache.dir
