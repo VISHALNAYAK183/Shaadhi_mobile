@@ -91,7 +91,7 @@ String? token = prefs.getString("token");
 
   static Future<SearchData> fetchsearchData(String matriIdOf) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? matriId1 = prefs.getString('matriId'); // Retrieve matriId
+    String? matriId1 = prefs.getString('matriId'); 
     print("My matr${matriId1}");
     print("Their matr${matriIdOf}");
 String? token = prefs.getString("token");
@@ -142,7 +142,7 @@ String? token = prefs.getString("token");
       List<String> selectedEducationList =
           prefs.getStringList("selected_education") ?? [];
 
-      //int selectedMaritalStatus = prefs.getInt("selected_marital_status");
+   
       double selectedMinAge = prefs.getDouble("selected_min_age") ?? 18.0;
       double selectedMaxAge = prefs.getDouble("selected_max_age") ?? 40.0;
       double selectedMinHeight = prefs.getDouble("selected_min_height") ?? 50.0;
@@ -175,22 +175,7 @@ String? token = prefs.getString("token");
         "min_age": selectedMinAge.toString(),
         "page_no": page,
         "sub_caste": selectedSubCasteList.join(","),
-        //  "blood_group": "A+,A-,B+,O-,AB-,AB+,B-,O+",
-        //   "city": "",
-        //   "country": "",
-        //   "education": "",
-        //   "height_max": "250",
-        //   "height_min": "0",
-        //   "income_from": "0",
-        //   "income_to": "0",
-        //   "limit": "10",
-        //   "marital_status": "",
-        //   "matri_id":"TB7681",
-        //   "max_age": "100",
-        //   "min_age": "0",
-        //   "page_no": page,
-        //   "state": "",
-        //   "sub_caste":"311"
+       
       };
 
       print("Request Body: $requestBody");
@@ -198,7 +183,7 @@ String? token = prefs.getString("token");
       final response = await http.post(
         Uri.parse("$_baseUrl/z_search2.php"),
         headers: {
-          "Content-Type": "application/json", // Ensure API accepts JSON
+          "Content-Type": "application/json", 
           "Accept": "application/json",
              "Authorization": "Bearer $token",
         },
@@ -227,15 +212,15 @@ String? token = prefs.getString("token");
           };
         } else {
           print("API Response Missing 'dataout': $responseData");
-          return {'data': [], 'totalRows': 0}; // ✅ Return empty structured data
+          return {'data': [], 'totalRows': 0};
         }
       } else {
         print("API Error: ${response.statusCode} - ${response.body}");
-        return {'data': [], 'totalRows': 0}; // ✅ Handle error properly
+        return {'data': [], 'totalRows': 0};
       }
     } catch (e) {
       print("Exception in fetchCategory: $e");
-      return {'data': [], 'totalRows': 0}; // ✅ Handle exception properly
+      return {'data': [], 'totalRows': 0}; 
     }
   }
 
@@ -246,7 +231,7 @@ String? token = prefs.getString("token");
 
   static Future<MatchedData> fetchMatchedProfiles(String dataType) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? matriId1 = prefs.getString('matriId'); // Retrieve matriId
+    String? matriId1 = prefs.getString('matriId'); 
 
     if (matriId1 == null) {
       throw Exception("Matri ID not found in SharedPreferences");
@@ -298,7 +283,7 @@ String? token = prefs.getString("token");
 
   static Future<MatchedData> fetchViewedProfiles(String dataType) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? matriId1 = prefs.getString('matriId'); // Retrieve matriId
+    String? matriId1 = prefs.getString('matriId'); 
 
     if (matriId1 == null) {
       throw Exception("Matri ID not found in SharedPreferences");
@@ -406,7 +391,7 @@ static Future<Map<String, dynamic>> loginUser(
     final response = await http.post(
       Uri.parse("$_baseUrl/login.php"),
       headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"user": number}), // Ensure correct key
+      body: jsonEncode({"user": number}), 
     );
 
     print("Raw Response: ${response.body}");
@@ -433,7 +418,7 @@ static Future<Map<String, dynamic>> loginUser(
         "category": "login_details",
         "matri_id": matri_id,
         "device": "MOBILE"
-      }), // Ensure correct key
+      }), 
     );
 
     print("Raw Response: ${response.body}");
@@ -457,7 +442,7 @@ static Future<Map<String, dynamic>> loginUser(
     final response = await http.post(
       Uri.parse("$_baseUrl/send_sms.php"),
       headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"number": number, "type": "otp"}), // Ensure correct key
+      body: jsonEncode({"number": number, "type": "otp"}), 
     );
 
     print("Raw Response: ${response.body}");
@@ -482,7 +467,7 @@ static Future<Map<String, dynamic>> loginUser(
       Uri.parse("$_baseUrl/get_data.php"),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode(
-          {"type": 'Inapp_plan', "gateway": platform}), // Ensure correct key
+          {"type": 'Inapp_plan', "gateway": platform}),
     );
 
     if (response.statusCode == 200) {
@@ -506,9 +491,9 @@ static Future<Map<String, dynamic>> loginUser(
       Uri.parse("$_baseUrl/login.php"),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
-        "matri_id": matriId, // Pass the correct matriId
+        "matri_id": matriId,
         "category": "password",
-        "password": password // Use entered password
+        "password": password 
       }),
     );
 
