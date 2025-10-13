@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:jwt_decode/jwt_decode.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +17,7 @@ import 'main_screen.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'forgot_password.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -199,58 +200,84 @@ class _LoginScreenState extends State<LoginScreen> {
     ApiService.loginEntry(id);
   }
 
-
-  void _loginWithOtp() async {
-    String enteredOtp = _otpControllers.map((c) => c.text).join();
-    if (enteredOtp.length != 4) {
-      _showMessage("Please enter a valid 4-digit OTP.");
-      return;
-    }
-
-    if (_storedOtpHash == null) {
-      _showMessage("OTP verification failed. Please request a new OTP.");
-      return;
-    }
-
-
-    setState(() => _isOtpLoading = true); // ✅ Start loading only for OTP button
-
-    try {
-      Map<String, dynamic> loginResponse =
-          await ApiService.checkNumber(_phoneController.text.trim());
-
-      print("Login API Response: $loginResponse"); // Debugging
-
-      if (loginResponse['message']['p_out_mssg_flg'] == "Y") {
-        if (loginResponse.containsKey('dataout') &&
-            loginResponse['dataout'] != null &&
-            loginResponse['dataout'].isNotEmpty) {
-          CheckNumberData userData =
-              CheckNumberData.fromJson(loginResponse['dataout'][0]);
-
-          // Save data to SharedPreferences
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setInt('id', userData.id);
-          await prefs.setString('matriId', userData.matriId);
-          await prefs.setString('phone', userData.phone);
-          //call login
-          loginEntry(userData.matriId);
-          _showMessage("Login successful!");
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => MainScreen()));
-        } else {
-          _showMessage("Login failed: No user data received.");
-        }
-      } else {
-        _showMessage("Login failed: Invalid response.");
-      }
-    } catch (e) {
-      _showMessage("Error: ${e.toString()}");
-    } finally {
-      setState(
-          () => _isOtpLoading = false); // ✅ Stop loading only for OTP button
-    }
+void _loginWithOtp() async {
+  String enteredOtp = _otpControllers.map((c) => c.text).join();
+  if (enteredOtp.length != 4) {
+    _showMessage("Please enter a valid 4-digit OTP.");
+    return;
   }
+
+  if (_storedOtpHash == null) {
+    _showMessage("OTP verification failed. Please request a new OTP.");
+    return;
+  }
+
+  setState(() => _isOtpLoading = true);
+
+  try {
+    // Call API to verify OTP
+    final response = await ApiService.checkNumber(_phoneController.text.trim());
+    print("OTP Login API Response: $response");
+
+    if (response.containsKey('dataout') &&
+        response['dataout'].isNotEmpty &&
+        response['dataout'][0]['p_out_mssg_flg'] == "Y") {
+
+      // Extract token from API response
+      final token = response['dataout'][0]['token'] ?? '';
+      if (token.isEmpty) {
+        _showMessage("Token not received from server.");
+        return;
+      }
+
+      // Decode JWT manually (same as loginUser)
+      final parts = token.split('.');
+      if (parts.length != 3) throw Exception("Invalid JWT token format");
+
+      final payload = json.decode(
+        utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))),
+      );
+
+      final data = payload["data"];
+      final int id = data["id"] ?? 0;
+      final String matriId = data["matri_id"] ?? '';
+      final String phone = data["phone"].toString();
+
+      print("Decoded ID: $id");
+      print("Decoded Matri ID: $matriId");
+      print("Decoded Phone: $phone");
+
+      // Save token & user data in SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString("token", token);
+      await prefs.setInt("id", id);
+      await prefs.setString("matriId", matriId);
+      await prefs.setString("phone", phone);
+
+      // Optional: Call login entry
+      loginEntry(matriId);
+
+      _showMessage("Login successful!");
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => MainScreen()),
+      );
+
+    } else {
+      String message = (response['dataout'] != null && response['dataout'].isNotEmpty)
+          ? response['dataout'][0]['p_out_mssg'] ?? "OTP verification failed."
+          : "OTP verification failed.";
+      _showMessage(message);
+    }
+
+  } catch (e) {
+    print("OTP Login Error: $e");
+    _showMessage("Error: $e");
+  } finally {
+    setState(() => _isOtpLoading = false);
+  }
+}
+
 
   void _generateOtp() async {
     String phone = _phoneController.text.trim();
