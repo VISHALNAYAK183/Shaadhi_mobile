@@ -55,8 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
     await prefs.setString('matriId', matriId1);
     await prefs.setInt('id', id);
     await prefs.setString('phone', phone);
-    print(
-        "Saved to SharedPreferences: Mobile=$mobile, Password=$password, MatriId=$matriId1, ID=$id, Phone=$phone");
+    print( "Saved to SharedPreferences: Mobile=$mobile, Password=$password, MatriId=$matriId1, ID=$id, Phone=$phone");
   }
 
   @override
@@ -264,7 +263,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       Map<String, dynamic> response = await ApiService.checkNumber(phone);
-      if (response['message']['p_out_mssg_flg'] == "Y") {
+     
+      if (response['dataout'][0]['p_out_mssg_flg'] == "Y") {
         await _sendOtp(phone);
 
         setState(() {
@@ -277,6 +277,8 @@ class _LoginScreenState extends State<LoginScreen> {
         _showMessage("This number is not registered.");
       }
     } catch (e) {
+      print("ed rerro");
+      print("Error: ${e.toString()}");
       _showMessage("Error: ${e.toString()}");
     } finally {
       setState(() => _isLoading = false);
