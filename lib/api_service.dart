@@ -142,47 +142,49 @@ String? token = prefs.getString("token");
   }
 
   //Search Prefernce
+static Future<SearchData> fetchsearchData(BuildContext context, String matriIdOf) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? matriId1 = prefs.getString('matriId');
 
-  static Future<SearchData> fetchsearchData(String matriIdOf) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? matriId1 = prefs.getString('matriId'); 
-    print("My matr${matriId1}");
-    print("Their matr${matriIdOf}");
-String? token = prefs.getString("token");
-    if (matriId1 == null) {
-      throw Exception("Matri ID not found in SharedPreferences");
-    }
-
-    String baseUrl = (await _getBaseUrl()) ?? '';
-
-    final response = await http.post(
-      Uri.parse("$baseUrl/z_search_preference2.php"),
-         headers: {
-    "Content-Type": "application/json",
-    "Authorization": "Bearer $token",
-  },
-      body: jsonEncode(
-          {"matri_id": matriId1, "matri_id_of": matriIdOf, "type": "matri_id"}),
-    );
-
-    debugPrint("API Response: ${response.body}");
-
-    if (response.statusCode == 200) {
-      try {
-        final decodedJson = json.decode(response.body);
-        if (decodedJson == null || !decodedJson.containsKey('dataout')) {
-          throw Exception("Invalid API response format");
-        }
-        return await SearchData.fromJsonAsync(decodedJson);
-      } catch (e) {
-        debugPrint("Error parsing API response: $e");
-        throw Exception("Error parsing data");
-      }
-    } else {
-      throw Exception(
-          "Failed to load search data, Status: ${response.statusCode}");
-    }
+  if (matriId1 == null) {
+    throw Exception("Matri ID not found in SharedPreferences");
   }
+
+  debugPrint("My matr: $matriId1");
+  debugPrint("Their matr: $matriIdOf");
+
+  // ✅ Use global _post() (handles 401 + token)
+  final response = await _post(context, "z_search_preference2.php", {
+    "matri_id": matriId1,
+    "matri_id_of": matriIdOf,
+    "type": "matri_id",
+  });
+
+  debugPrint("API Response (search): ${response.body}");
+
+  if (response.statusCode == 200) {
+    try {
+      final decodedJson = json.decode(response.body);
+
+      if (decodedJson["token"] != null) {
+        await prefs.setString("token", decodedJson["token"]);
+        debugPrint("✅ Token updated (Search)");
+      }
+
+      if (!decodedJson.containsKey('dataout')) {
+        throw Exception("Invalid API response format");
+      }
+
+      return await SearchData.fromJsonAsync(decodedJson);
+    } catch (e) {
+      debugPrint("Error parsing search data: $e");
+      throw Exception("Error parsing data");
+    }
+  } else {
+    throw Exception("Failed to load search data. Status: ${response.statusCode}");
+  }
+}
+
 
   static Future<Map<String, dynamic>> fetchCategory1(
       String page, String pageSize) async {
@@ -283,31 +285,46 @@ String? token = prefs.getString("token");
     return prefs.getString('base_url');
   }
 
-  static Future<MatchedData> fetchMatchedProfiles(String dataType) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? matriId1 = prefs.getString('matriId'); 
+ static Future<MatchedData> fetchMatchedProfiles(
+    BuildContext context, String dataType) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? matriId1 = prefs.getString('matriId');
 
-    if (matriId1 == null) {
-      throw Exception("Matri ID not found in SharedPreferences");
-    }
-String? token = prefs.getString("token");
-    final response = await http.post(
-      Uri.parse("$_baseUrl/z_matri_liked2.php"),
-         headers: {
-    "Content-Type": "application/json",
-    "Authorization": "Bearer $token",
-  },
-      body: jsonEncode({"matri_id": matriId1, "type": dataType}),
-    );
-
-    if (response.statusCode == 200) {
-      debugPrint("status code 200");
-      String baseUrl = await matchedprofile.getBaseUrl() ?? "";
-      return MatchedData.fromJson(json.decode(response.body), baseUrl);
-    } else {
-      throw Exception("Failed to load dashboard data");
-    }
+  if (matriId1 == null) {
+    throw Exception("Matri ID not found in SharedPreferences");
   }
+
+  final response = await _post(context, "z_matri_liked2.php", {
+    "matri_id": matriId1,
+    "type": dataType,
+  });
+
+  debugPrint("API Response (matched): ${response.body}");
+
+  if (response.statusCode == 200) {
+    try {
+      final decodedJson = json.decode(response.body);
+
+      if (decodedJson["token"] != null) {
+        await prefs.setString("token", decodedJson["token"]);
+        debugPrint(" Token updated (Matched Profiles)");
+      }
+
+      if (!decodedJson.containsKey('dataout')) {
+        throw Exception("Invalid API response format");
+      }
+
+      String baseUrl = await matchedprofile.getBaseUrl() ?? "";
+      return MatchedData.fromJson(decodedJson, baseUrl);
+    } catch (e) {
+      debugPrint("Error parsing matched profiles: $e");
+      throw Exception("Error parsing matched data");
+    }
+  } else {
+    throw Exception("Failed to load matched profiles. Status: ${response.statusCode}");
+  }
+}
+
 
   static Future<MatchedData> fetchContactedProfiles(String dataType) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
