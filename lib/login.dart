@@ -214,7 +214,7 @@ void _loginWithOtp() async {
 
   setState(() => _isOtpLoading = true);
 
-  try {
+  try { 
     // Call API to verify OTP
     final response = await ApiService.checkNumber(_phoneController.text.trim());
     print("OTP Login API Response: $response");
