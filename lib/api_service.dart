@@ -2,63 +2,117 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:practice/chat/chatuser_model.dart';
+import 'package:practice/login.dart';
 import 'dashboard_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'search.dart';
 import 'package:intl/intl.dart';
-
 class ApiService {
   static const String _baseUrl = "https://www.sharutech.com/matrimony";
   static String get baseUrl => _baseUrl;
+
   static const Map<String, String> _headers = {
     "Content-Type": "application/json",
   };
 
-  static Future<DashboardData> fetchDashboardData() async {
+  
+  static Future<http.Response> _post(
+      BuildContext context, String endpoint, Map<String, dynamic> body) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    // String? mobile = prefs.getString("mobile") ?? "";
-    String? matriId1 = prefs.getString('matriId');
-String? token = prefs.getString("token");
+    String? token = prefs.getString("token");
+
     final response = await http.post(
-      Uri.parse("$_baseUrl/z_dashboard2.php"),
-       headers: {
-    "Content-Type": "application/json",
-    "Authorization": "Bearer $token",
-  },
-      body: jsonEncode({
-        // "id": "7681",
-        "matri_id": matriId1
-      }), // Sending JSON body
+      Uri.parse("$_baseUrl/$endpoint"),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      },
+      body: jsonEncode(body),
     );
-    // print(response.statusCode);
+
+    if (response.statusCode == 401) {
+      _handleSessionExpiry(context);
+    }
+
+    return response;
+  }
+
+ static void _handleSessionExpiry(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text("Session Expired"),
+        content: const Text("Please login again."),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => LoginScreen()),
+                (Route<dynamic> route) => false,
+              );
+            },
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+  static Future<DashboardData> fetchDashboardData(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? matriId = prefs.getString('matriId');
+
+    final response = await _post(context, "z_dashboard2.php", {
+      "matri_id": matriId,
+    });
+
     if (response.statusCode == 200) {
-      debugPrint("status code 200");
-      return DashboardData.fromJson(json.decode(response.body));
+      final jsonData = json.decode(response.body);
+
+      if (jsonData["token"] != null) {
+        await prefs.setString("token", jsonData["token"]);
+        print("NEw token${jsonData["token"]}");
+      }
+
+      return DashboardData.fromJson(jsonData);
     } else {
       throw Exception("Failed to load dashboard data");
     }
   }
 
-  static Future<myProfileData> fetchmyProfileData() async {
+ 
+ static Future<myProfileData> fetchmyProfileData(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? matriId1 = prefs.getString('matriId');
-    String? token = prefs.getString("token");
-    final response = await http.post(
-      Uri.parse("$_baseUrl/my_profile.php"),
-         headers: {
-    "Content-Type": "application/json",
-    "Authorization": "Bearer $token",
-  },
-      body: jsonEncode({"matri_id": matriId1}), // Sending JSON body
-    );
-    // print(response.statusCode);
+    String? matriId = prefs.getString('matriId');
+
+    final response = await _post(context, "my_profile.php", {
+      "matri_id": matriId,
+    });
+
+    debugPrint("my_profile status: ${response.statusCode}");
+
     if (response.statusCode == 200) {
-      debugPrint("status code 200");
-      return myProfileData.fromJson(json.decode(response.body));
+      final jsonData = json.decode(response.body);
+
+      
+      if (jsonData["token"] != null) {
+        await prefs.setString("token", jsonData["token"]);
+        print("My profile token${jsonData["token"]}");
+        debugPrint("New token updated (MyProfile)");
+      }
+
+      return myProfileData.fromJson(jsonData);
     } else {
-      throw Exception("Failed to load dashboard data");
+      throw Exception("Failed to load profile data. Code: ${response.statusCode}");
     }
   }
+
+
 
   static Future<List<AdditionalImagesData>> fetchAdditionalImages() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

@@ -45,7 +45,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _loadDashboardData() async {
-    _dashboardDataFuture = ApiService.fetchDashboardData(); // Fetch data
+     _dashboardDataFuture = ApiService.fetchDashboardData(context); // Fetch data
   DashboardData dashboardData = await _dashboardDataFuture; // Wait for data
 
   // Access the first profile safely

@@ -42,9 +42,9 @@ class ProfilePageState extends State<ProfilePage1> {
   void initState() {
     super.initState();
     _loadStoredProfileImage();
-    _myProfileDataFuture = ApiService.fetchmyProfileData();
+    _myProfileDataFuture = ApiService.fetchmyProfileData(context);
     _myAdditionalImages = ApiService.fetchAdditionalImages();
-    _dashboardDataFuture = ApiService.fetchDashboardData();
+    _dashboardDataFuture = ApiService.fetchDashboardData(context);
   }
 
   File? profileImage;
@@ -298,7 +298,7 @@ class ProfilePageState extends State<ProfilePage1> {
                                     setState(() {
                                       profileImage = renamedMainImage;
                                       _myProfileDataFuture =
-                                          ApiService.fetchmyProfileData();
+                                          ApiService.fetchmyProfileData(context);
                                       _myAdditionalImages =
                                           ApiService.fetchAdditionalImages();
                                     });
@@ -833,7 +833,7 @@ class ProfilePageState extends State<ProfilePage1> {
                                                     setState(() {
                                                       _myProfileDataFuture =
                                                           ApiService
-                                                              .fetchmyProfileData();
+                                                              .fetchmyProfileData(context);
                                                       _myAdditionalImages =
                                                           ApiService
                                                               .fetchAdditionalImages();
@@ -912,7 +912,7 @@ class ProfilePageState extends State<ProfilePage1> {
 
                                                           _myProfileDataFuture =
                                                               ApiService
-                                                                  .fetchmyProfileData();
+                                                                  .fetchmyProfileData(context);
                                                           _myAdditionalImages =
                                                               ApiService
                                                                   .fetchAdditionalImages();
@@ -1004,7 +1004,7 @@ class ProfilePageState extends State<ProfilePage1> {
         _storeProfileImage(newProfileImage);
 
         setState(() {
-          _myProfileDataFuture = ApiService.fetchmyProfileData();
+          _myProfileDataFuture = ApiService.fetchmyProfileData(context);
         });
       } else {
         Fluttertoast.showToast(

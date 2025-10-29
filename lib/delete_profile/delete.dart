@@ -139,7 +139,7 @@ class _ChangeStatusPageState extends State<ChangeStatusPage> {
 
    Future<void> _fetchProfileStatus() async {
     try {
-      myProfileData profileData = await ApiService.fetchmyProfileData();
+      myProfileData profileData = await ApiService.fetchmyProfileData(context);
       if (profileData.dataout.isNotEmpty) {
         setState(() {
           _selectedStatus = profileData.dataout[0].profileStatus;
