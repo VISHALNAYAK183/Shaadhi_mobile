@@ -65,7 +65,7 @@ void didChangeDependencies() {
             Duration(milliseconds: 500)); // Wait before retrying
       }
 
-      final matchedData = await ApiService.fetchMatchedProfiles(dataType);
+      final matchedData = await ApiService.fetchMatchedProfiles(context,dataType);
       _controller.addListener(_filterProfiles);
 
       setState(() {
@@ -103,7 +103,7 @@ void didChangeDependencies() {
 
   Future<void> fetchViewedProfiles(String dataType) async {
     try {
-      final matchedData = await ApiService.fetchViewedProfiles(dataType);
+      final matchedData = await ApiService.fetchViewedProfiles(context,dataType);
       String baseUrl = (await matchedprofile.getBaseUrl()) ?? "";
 
       _controller.addListener(_filterProfiles);
@@ -132,7 +132,7 @@ void didChangeDependencies() {
 
   Future<void> fetchContactedProfiles(String dataType) async {
     try {
-      final matchedData = await ApiService.fetchContactedProfiles(dataType);
+      final matchedData = await ApiService.fetchContactedProfiles(context,dataType);
       String baseUrl = (await matchedprofile.getBaseUrl()) ?? "";
 
       _controller.addListener(_filterProfiles);

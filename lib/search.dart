@@ -814,7 +814,7 @@ Widget _buildMatriSearchResults() {
 
   _debounce = Timer(const Duration(milliseconds: 500), () async {
     try {
-      var result = await ApiService.fetchsearchData(query);
+      var result = await ApiService.fetchsearchData(context,query);
       print("API Response: ${result.dataout}");
 
       // ✅ Explicitly clear UI when no results are found

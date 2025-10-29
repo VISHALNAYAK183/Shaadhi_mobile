@@ -326,57 +326,92 @@ String? token = prefs.getString("token");
 }
 
 
-  static Future<MatchedData> fetchContactedProfiles(String dataType) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? matriId1 = prefs.getString('matriId'); // Retrieve matriId
+ static Future<MatchedData> fetchContactedProfiles(
+    BuildContext context, String dataType) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? matriId1 = prefs.getString('matriId');
 
-    if (matriId1 == null) {
-      throw Exception("Matri ID not found in SharedPreferences");
-    }
-String? token = prefs.getString("token");
-    final response = await http.post(
-      Uri.parse("$_baseUrl/z_contacted_profile2.php"),
-        headers: {
-    "Content-Type": "application/json",
-    "Authorization": "Bearer $token",
-  },
-      body: jsonEncode({"matri_id": matriId1, "type": dataType}),
-    );
-
-    if (response.statusCode == 200) {
-      debugPrint("status code 200");
-      String baseUrl = await matchedprofile.getBaseUrl() ?? "";
-      return MatchedData.fromJson(json.decode(response.body), baseUrl);
-    } else {
-      throw Exception("Failed to load dashboard data");
-    }
+  if (matriId1 == null) {
+    throw Exception("Matri ID not found in SharedPreferences");
   }
 
-  static Future<MatchedData> fetchViewedProfiles(String dataType) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? matriId1 = prefs.getString('matriId'); 
+  final response = await _post(context, "z_contacted_profile2.php", {
+    "matri_id": matriId1,
+    "type": dataType,
+  });
 
-    if (matriId1 == null) {
-      throw Exception("Matri ID not found in SharedPreferences");
-    }
-String? token = prefs.getString("token");
-    final response = await http.post(
-      Uri.parse("$_baseUrl/z_profile_viewed2.php"),
-      headers: {
-    "Content-Type": "application/json",
-    "Authorization": "Bearer $token",
-  },
-      body: jsonEncode({"matri_id": matriId1, "type": dataType}),
-    );
+  debugPrint("API Response (contacted): ${response.body}");
 
-    if (response.statusCode == 200) {
-      debugPrint("status code 200");
+  if (response.statusCode == 200) {
+    try {
+      final decodedJson = json.decode(response.body);
+
+      final newToken = decodedJson["newToken"] ?? decodedJson["token"];
+      if (newToken != null) {
+        await prefs.setString("token", newToken);
+        debugPrint("Token updated (Contacted Profiles)");
+      }
+
+      if (!decodedJson.containsKey('dataout')) {
+        throw Exception("Invalid API response format");
+      }
+
       String baseUrl = await matchedprofile.getBaseUrl() ?? "";
-      return MatchedData.fromJson(json.decode(response.body), baseUrl);
-    } else {
-      throw Exception("Failed to load dashboard data");
+      return MatchedData.fromJson(decodedJson, baseUrl);
+    } catch (e) {
+      debugPrint("Error parsing contacted profiles: $e");
+      throw Exception("Error parsing contacted data");
     }
+  } else {
+    throw Exception("Failed to load contacted profiles. Status: ${response.statusCode}");
   }
+}
+
+
+  static Future<MatchedData> fetchViewedProfiles(
+    BuildContext context, String dataType) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? matriId1 = prefs.getString('matriId');
+
+  if (matriId1 == null) {
+    throw Exception("Matri ID not found in SharedPreferences");
+  }
+
+  // ✅ Use global _post() (handles 401 + token expiry)
+  final response = await _post(context, "z_profile_viewed2.php", {
+    "matri_id": matriId1,
+    "type": dataType,
+  });
+
+  debugPrint("API Response (viewed): ${response.body}");
+
+  if (response.statusCode == 200) {
+    try {
+      final decodedJson = json.decode(response.body);
+
+     
+      final newToken = decodedJson["newToken"] ?? decodedJson["token"];
+      if (newToken != null) {
+        await prefs.setString("token", newToken);
+        print("New toke in profil view${newToken}");
+        debugPrint("Token updated (Viewed Profiles)");
+      }
+
+      if (!decodedJson.containsKey('dataout')) {
+        throw Exception("Invalid API response format");
+      }
+
+      String baseUrl = await matchedprofile.getBaseUrl() ?? "";
+      return MatchedData.fromJson(decodedJson, baseUrl);
+    } catch (e) {
+      debugPrint("Error parsing viewed profiles: $e");
+      throw Exception("Error parsing viewed data");
+    }
+  } else {
+    throw Exception("Failed to load viewed profiles. Status: ${response.statusCode}");
+  }
+}
+
 
   
 
