@@ -31,7 +31,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     print("profilepage");
-    _profileDataFuture = ApiService.fetchProfileViewData(widget.matriId);
+    _profileDataFuture = ApiService.fetchProfileViewData(context,widget.matriId);
     _checkIfShortlisted(widget.matriId);
     _checkIfLiked(widget.matriId);
   }
@@ -48,7 +48,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _checkIfShortlisted(String matriId) async {
     try {
       ShortlistData shortlistData =
-          await ApiService.fetchShortlistedProfiles(); // ✅ Corrected type
+          await ApiService.fetchShortlistedProfiles(context); // ✅ Corrected type
 
       setState(() {
         _isShortlisted =
@@ -65,7 +65,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _checkIfLiked(String matriId) async {
     try {
       Map<String, dynamic> response =
-          await ApiService.fetchLikedProfiles(matriId);
+          await ApiService.fetchLikedProfiles(context);
       LikeData likedata = LikeData.fromJson(response, ApiService.baseUrl);
 
       setState(() {
@@ -284,7 +284,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 if (_isLiked) {
                   // Call remove shortlist API
                   Removelike response =
-                      await ApiService.fetchRemovelikeData(widget.matriId);
+                      await ApiService.fetchRemovelikeData(context,widget.matriId);
                   debugPrint("Removed from Liked: ${response.message}");
 
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -293,7 +293,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 } else {
                   // Call add shortlist API
                   Addlike response =
-                      await ApiService.fetchAddlikeData(widget.matriId);
+                      await ApiService.fetchAddlikeData(context,widget.matriId);
                   debugPrint("Liked Successfully: ${response.message}");
 
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -323,7 +323,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 if (_isShortlisted) {
                   // Call remove shortlist API
                   RemoveShortlist response =
-                      await ApiService.fetchRemoveShortlistData(widget.matriId);
+                      await ApiService.fetchRemoveShortlistData(context,widget.matriId);
                   debugPrint("Removed from Shortlist: ${response.message}");
 
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -332,7 +332,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 } else {
                   // Call add shortlist API
                   AddShortlist response =
-                      await ApiService.fetchAddShortlistData(widget.matriId);
+                      await ApiService.fetchAddShortlistData(context,widget.matriId);
                   debugPrint("Shortlisted Successfully: ${response.message}");
 
                   ScaffoldMessenger.of(context).showSnackBar(

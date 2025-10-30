@@ -212,7 +212,7 @@ class AdditionalDetailsPageState extends State<AdditionalDetailsPage> {
       String? updatedState = stateMap[selectedState];
       String? updatedCity = cityMap[selectedCity];
 
-      bool success = await ApiService.updateAdditionalDetails(
+      bool success = await ApiService.updateAdditionalDetails(context,
         matriID: widget.profile.matriId,
         id: widget.profile.id,
         height: heightController.text,

@@ -620,31 +620,49 @@ static Future<Map<String, dynamic>> loginUser(
   }
 
   //Profile View
-  static Future<ProfileViewData> fetchProfileViewData(String matriIdTo) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    //String? mobile = prefs.getString("mobile") ?? "";
-    String? matriId1 = prefs.getString('matriId');
-    print("MAtri di ${matriId1}");
-    String? token = prefs.getString("token");
-    final response = await http.post(
-      Uri.parse("$_baseUrl/z_my_profile2.php"),
-        headers: {
-    "Content-Type": "application/json",
-    "Authorization": "Bearer $token",
-  },
-      body: jsonEncode({
-        "matri_id": matriId1,
-        "matri_id_to": matriIdTo, // Send the clicked user's matriId
-      }),
-    );
+ static Future<ProfileViewData> fetchProfileViewData(
+    BuildContext context, String matriIdTo) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? matriId1 = prefs.getString('matriId');
 
-    if (response.statusCode == 200) {
-      debugPrint("status code 200");
-      return ProfileViewData.fromJson(json.decode(response.body));
-    } else {
-      throw Exception("Failed to load profile data");
-    }
+  if (matriId1 == null) {
+    throw Exception("Matri ID not found in SharedPreferences");
   }
+
+  debugPrint("My Matri ID: $matriId1");
+  debugPrint("Viewed Matri ID: $matriIdTo");
+
+  final response = await _post(context, "z_my_profile2.php", {
+    "matri_id": matriId1,
+    "matri_id_to": matriIdTo,
+  });
+
+  debugPrint("API Response (profile view): ${response.body}");
+
+  if (response.statusCode == 200) {
+    try {
+      final decodedJson = json.decode(response.body);
+
+      final newToken = decodedJson["newToken"] ?? decodedJson["token"];
+      if (newToken != null) {
+        await prefs.setString("token", newToken);
+        debugPrint("✅ Token updated (Profile View)");
+      }
+
+      if (!decodedJson.containsKey('dataout')) {
+        throw Exception("Invalid API response format");
+      }
+
+      return ProfileViewData.fromJson(decodedJson);
+    } catch (e) {
+      debugPrint("Error parsing profile view data: $e");
+      throw Exception("Error parsing profile view data");
+    }
+  } else {
+    throw Exception(
+        "Failed to load profile view data. Status: ${response.statusCode}");
+  }
+}
 
   //Sub Caste dropdown ge
 
@@ -849,110 +867,95 @@ static Future<Map<String, dynamic>> loginUser(
   }
 
  
-  static Future<List<searchcategory>> fetchcategory() async {
-    try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
+ static Future<List<searchcategory>> fetchcategory(BuildContext context) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? matriId1 = prefs.getString('matriId');
 
-      String? matriId1 = prefs.getString('matriId');
-      print("matridddd${matriId1}");
-      List<String> selectedSubCasteList =
-          prefs.getStringList("selected_sub_caste") ?? [];
-      List<String> selectedEducationList =
-          prefs.getStringList("selected_education") ?? [];
-      int selectedMaritalStatus = prefs.getInt("selected_marital_status") ?? 1;
-      double selectedMinAge = prefs.getDouble("selected_min_age") ?? 18.0;
-      double selectedMaxAge = prefs.getDouble("selected_max_age") ?? 40.0;
-      double selectedMinheight = prefs.getDouble("selected_min_height") ?? 50.0;
-      double selectedMaxheight =
-          prefs.getDouble("selected_max_height") ?? 250.0;
-      double selectedIncome = prefs.getDouble("selected_income") ?? 10.0;
-
-      searchcountry selectedCountry = searchcountry(
-        country_id: prefs.getString("selected_country_id") ?? "",
-        country_name: prefs.getString("selected_country_name") ?? "",
-        country_code: "", // Add an empty string or a valid default value
-      );
-
-      searchstate selectedState = searchstate(
-        state_id: prefs.getString("selected_state_id") ?? "",
-        state_name: prefs.getString("selected_state_name") ?? "",
-        state_code: "", // Add an empty string or a valid default value
-        country_id: "", // Add an empty string or a valid default value
-      );
-
-      searchcity selectedCity = searchcity(
-        city_id: prefs.getString("selected_city_id") ?? "",
-        city_name: prefs.getString("selected_city_name") ?? "",
-        state_id: "", // Add an empty string or a valid default value
-        country_id: "", // Add an empty string or a valid default value
-      );
-
-      var tdata = {
-        "height_min": selectedMinheight,
-        "height_max": selectedMaxheight,
-        "matri_id": matriId1,
-        "marital_status": selectedMaritalStatus,
-        "sub_caste": selectedSubCasteList.join(","),
-        "city": selectedCity.city_id,
-        "country": selectedCountry.country_id,
-        "state": selectedState.state_id,
-        "education": selectedEducationList.join(","),
-        "min_age": selectedMinAge,
-        "max_age": selectedMaxAge,
-        "income_from": "",
-        "income_to": ""
-      };
-      print(tdata);
-
-      final response = await http.post(
-        Uri.parse("$_baseUrl/z_search_preference2.php"),
-        headers: _headers,
-        body: jsonEncode({
-          // "matri_id": "TB7681",
-          // "marital_status": "1",
-          // "sub_caste": "311",
-          // "city": "",
-          // "country": "",
-          // "state": "",
-          "height_min": selectedMinheight,
-          "height_max": selectedMaxheight,
-          "matri_id": matriId1,
-          "marital_status": selectedMaritalStatus,
-          "sub_caste": selectedSubCasteList.join(","),
-          "city": selectedCity.city_id,
-          "country": selectedCountry.country_id,
-          "state": selectedState.state_id,
-          "education": selectedEducationList.join(","),
-          "min_age": selectedMinAge,
-          "max_age": selectedMaxAge,
-          "income_from": "",
-          "income_to": ""
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = json.decode(response.body);
-
-        // Ensure "data" exists and is a list
-        if (responseData.containsKey('dataout') &&
-            responseData['dataout'] != null) {
-          final Map<String, dynamic> responseData = json.decode(response.body);
-          final List<dynamic> data = responseData['dataout'] ?? [];
-
-          return data.map((e) => searchcategory.fromJson(e, baseUrl)).toList();
-        } else {
-          print("API response missing 'data' key or null: $responseData");
-          return [];
-        }
-      } else {
-        print("API Error: ${response.statusCode} - ${response.body}");
-        return [];
-      }
-    } catch (e) {
-      print("Exception in fetchcategory: $e");
-      return [];
-    }
+  if (matriId1 == null) {
+    throw Exception("Matri ID not found in SharedPreferences");
   }
+
+  // 🔹 Retrieve filter values from prefs
+  List<String> selectedSubCasteList =
+      prefs.getStringList("selected_sub_caste") ?? [];
+  List<String> selectedEducationList =
+      prefs.getStringList("selected_education") ?? [];
+  int selectedMaritalStatus = prefs.getInt("selected_marital_status") ?? 1;
+  double selectedMinAge = prefs.getDouble("selected_min_age") ?? 18.0;
+  double selectedMaxAge = prefs.getDouble("selected_max_age") ?? 40.0;
+  double selectedMinheight = prefs.getDouble("selected_min_height") ?? 50.0;
+  double selectedMaxheight = prefs.getDouble("selected_max_height") ?? 250.0;
+
+  searchcountry selectedCountry = searchcountry(
+    country_id: prefs.getString("selected_country_id") ?? "",
+    country_name: prefs.getString("selected_country_name") ?? "",
+    country_code: "",
+  );
+
+  searchstate selectedState = searchstate(
+    state_id: prefs.getString("selected_state_id") ?? "",
+    state_name: prefs.getString("selected_state_name") ?? "",
+    state_code: "",
+    country_id: "",
+  );
+
+  searchcity selectedCity = searchcity(
+    city_id: prefs.getString("selected_city_id") ?? "",
+    city_name: prefs.getString("selected_city_name") ?? "",
+    state_id: "",
+    country_id: "",
+  );
+
+  final Map<String, dynamic> requestBody = {
+    "matri_id": matriId1,
+    "marital_status": selectedMaritalStatus,
+    "sub_caste": selectedSubCasteList.join(","),
+    "city": selectedCity.city_id,
+    "country": selectedCountry.country_id,
+    "state": selectedState.state_id,
+    "education": selectedEducationList.join(","),
+    "height_min": selectedMinheight,
+    "height_max": selectedMaxheight,
+    "min_age": selectedMinAge,
+    "max_age": selectedMaxAge,
+    "income_from": "",
+    "income_to": ""
+  };
+
+  debugPrint("🔹 Search Preference Request Body: $requestBody");
+
+  final response = await _post(context, "z_search_preference2.php", requestBody);
+
+  debugPrint("🔹 API Response (Search Category): ${response.body}");
+
+  if (response.statusCode == 200) {
+    try {
+      final decodedJson = json.decode(response.body);
+
+      final newToken = decodedJson["newToken"] ?? decodedJson["token"];
+      if (newToken != null) {
+        await prefs.setString("token", newToken);
+        debugPrint("Token updated (Search Category)");
+      }
+
+      if (!decodedJson.containsKey('dataout')) {
+        throw Exception("Invalid API response format (missing 'dataout')");
+      }
+
+      final List<dynamic> dataList = decodedJson['dataout'] ?? [];
+      //String baseUrl = await searchcategory.getBaseUrl() ?? "";
+
+      return dataList.map((e) => searchcategory.fromJson(e, baseUrl)).toList();
+    } catch (e) {
+      debugPrint(" Error parsing Search Category: $e");
+      throw Exception("Error parsing Search Category");
+    }
+  } else {
+    throw Exception(
+        "Failed to load search categories. Status: ${response.statusCode}");
+  }
+}
+
 
   //Partner Preference
 
@@ -1075,31 +1078,47 @@ static Future<Map<String, dynamic>> loginUser(
     }
   }
 
-  static Future<ShortlistData> fetchShortlistedProfiles() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    // String? mobile = prefs.getString("mobile") ?? "";
-    String? matriId1 = prefs.getString('matriId');
-String? token = prefs.getString("token");
-    final response = await http.post(
-      Uri.parse("$_baseUrl/z_shortlisted2.php"),
-        headers: {
-    "Content-Type": "application/json",
-    "Authorization": "Bearer $token",
-  },
-      body: jsonEncode({"matri_id": matriId1, "type": "listed"}),
-    );
+  static Future<ShortlistData> fetchShortlistedProfiles(BuildContext context) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? matriId1 = prefs.getString('matriId');
 
-    if (response.statusCode == 200) {
-      try {
-        return ShortlistData.fromJson(json.decode(response.body), _baseUrl);
-      } catch (e) {
-        throw Exception("Invalid JSON response: ${response.body}");
-      }
-    } else {
-      throw Exception(
-          "Failed to load shortlisted profiles: ${response.statusCode}");
-    }
+  if (matriId1 == null) {
+    throw Exception("Matri ID not found in SharedPreferences");
   }
+
+  final response = await _post(context, "z_shortlisted2.php", {
+    "matri_id": matriId1,
+    "type": "listed",
+  });
+
+  debugPrint(" API Response (Shortlisted): ${response.body}");
+
+  if (response.statusCode == 200) {
+    try {
+      final decodedJson = json.decode(response.body);
+
+      final newToken = decodedJson["newToken"] ?? decodedJson["token"];
+      if (newToken != null) {
+        await prefs.setString("token", newToken);
+        debugPrint("✅ Token updated (Shortlisted Profiles)");
+      }
+
+      if (!decodedJson.containsKey('dataout')) {
+        throw Exception("Invalid API response format — 'dataout' missing");
+      }
+
+      return ShortlistData.fromJson(decodedJson, _baseUrl);
+    } catch (e) {
+      debugPrint(" Error parsing Shortlisted profiles: $e");
+      throw Exception("Error parsing shortlisted data");
+    }
+  } else {
+    throw Exception(
+      "Failed to load shortlisted profiles. Status: ${response.statusCode}",
+    );
+  }
+}
+
 
   //BLock or report
 
@@ -1130,60 +1149,78 @@ String? token = prefs.getString("token");
     }
   }
 
-  static Future<bool> updateAdditionalDetails({
-    String? matriID,
-    String? id,
-    String? height,
-    String? weight,
-    String? bloodGroup,
-    String? complexion,
-    String? country,
-    String? state,
-    String? city,
-    String? disability,
-    String? address,
-    String? remark,
-  }) async {
-    try {
-      Map<String, dynamic> requestBody = {
-        "type": "physical_attributes",
-        "matri_id": matriID,
-        "id": id,
-        "height": height,
-        "weight": weight,
-        "blood_group": bloodGroup,
-        "complexion": complexion,
-        "country": country,
-        "state": state,
-        "city": city,
-        "disability": disability,
-        "address": address,
-        "remark": remark,
-      };
+static Future<bool> updateAdditionalDetails(
+  BuildContext context, {
+  String? matriID,
+  String? id,
+  String? height,
+  String? weight,
+  String? bloodGroup,
+  String? complexion,
+  String? country,
+  String? state,
+  String? city,
+  String? disability,
+  String? address,
+  String? remark,
+}) async {
+  try {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? matriId1 = prefs.getString('matriId');
+    if (matriId1 == null) {
+      throw Exception("Matri ID not found in SharedPreferences");
+    }
 
-      print("Sending API Request: ${jsonEncode(requestBody)}");
+    // Prepare request body
+    Map<String, dynamic> requestBody = {
+      "type": "physical_attributes",
+      "matri_id": matriId1,
+      "id": id,
+      "height": height,
+      "weight": weight,
+      "blood_group": bloodGroup,
+      "complexion": complexion,
+      "country": country,
+      "state": state,
+      "city": city,
+      "disability": disability,
+      "address": address,
+      "remark": remark,
+    };
 
-      final response = await http.post(
-        Uri.parse("$_baseUrl/update_profile.php"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(requestBody),
-      );
+    debugPrint("Sending API Request: ${jsonEncode(requestBody)}");
 
-      print("API Response Code: ${response.statusCode}");
-      print("API Response Body: ${response.body}");
+    final response = await _post(context, "update_profile.php", requestBody);
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return data["message"]["p_out_mssg_flg"] == "Y";
+    debugPrint("API Response Code: ${response.statusCode}");
+    debugPrint("API Response Body: ${response.body}");
+
+    if (response.statusCode == 200) {
+      final decodedJson = jsonDecode(response.body);
+
+      // 🔹 Save new token if received
+      final newToken = decodedJson["newToken"] ?? decodedJson["token"];
+      if (newToken != null) {
+        await prefs.setString("token", newToken);
+        debugPrint("Token updated after additional details update");
+      }
+
+      if (decodedJson["message"] != null &&
+          decodedJson["message"]["p_out_mssg_flg"] == "Y") {
+        debugPrint(decodedJson["message"]["p_out_mssg"]);
+        return true;
       } else {
-        print("Failed to update additional details: ${response.body}");
+        debugPrint("Update failed: ${decodedJson["message"]}");
         return false;
       }
-    } catch (e) {
-      print("Error updating additional details: $e");
-      return false;
+    } else {
+      throw Exception("Failed to update additional details. Status: ${response.statusCode}");
     }
+  } catch (e) {
+    debugPrint("Error updating additional details: $e");
+    return false;
   }
+}
 
   //register additional details:
 
@@ -1243,148 +1280,242 @@ String? token = prefs.getString("token");
   }
 
   //Shortlist Add
-
-  static Future<AddShortlist> fetchAddShortlistData(String matriIdTo) async {
+static Future<AddShortlist> fetchAddShortlistData(
+  BuildContext context,
+  String matriIdTo,
+) async {
+  try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    // String? mobile = prefs.getString("mobile") ?? "";
     String? matriId1 = prefs.getString('matriId');
-    String? token = prefs.getString("token");
-    final response = await http.post(
-      Uri.parse("$_baseUrl/shortlisted.php"),
-       headers: {
-    "Content-Type": "application/json",
-    "Authorization": "Bearer $token",
-  },
-      body: jsonEncode({
-        "matri_id_by": matriId1,
-        "matri_id_to": matriIdTo,
-        "type": "shortlisted",
-      }),
-    );
+
+    if (matriId1 == null) {
+      throw Exception("Matri ID not found in SharedPreferences");
+    }
+
+    final response = await _post(context, "shortlisted.php", {
+      "matri_id_by": matriId1,
+      "matri_id_to": matriIdTo,
+      "type": "shortlisted",
+    });
+
+    debugPrint(" API Response (Add Shortlist): ${response.body}");
 
     if (response.statusCode == 200) {
-      debugPrint("status code 200");
-      return AddShortlist.fromJson(json.decode(response.body));
+      final decodedJson = json.decode(response.body);
+
+      final newToken = decodedJson["newToken"] ?? decodedJson["token"];
+      if (newToken != null) {
+        await prefs.setString("token", newToken);
+        debugPrint("Token updated (Add Shortlist)");
+      }
+
+      if (!decodedJson.containsKey('message')) {
+        throw Exception("Invalid API response format — 'message' missing");
+      }
+
+      return AddShortlist.fromJson(decodedJson);
     } else {
-      debugPrint("API Error Response: ${response.body}");
-      throw Exception("Failed to shortlist profile");
+      throw Exception(
+        "Failed to add shortlist. Status: ${response.statusCode}",
+      );
     }
+  } catch (e) {
+    debugPrint(" Error adding shortlist: $e");
+    rethrow;
   }
+}
+
 
   //Remove Shortlist
 
   static Future<RemoveShortlist> fetchRemoveShortlistData(
-      String matriIdTo) async {
+  BuildContext context,
+  String matriIdTo,
+) async {
+  try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    // String? mobile = prefs.getString("mobile") ?? "";
     String? matriId1 = prefs.getString('matriId');
-    String? token = prefs.getString("token");
-    final response = await http.post(
-      Uri.parse("$_baseUrl/shortlisted.php"),
-       headers: {
-    "Content-Type": "application/json",
-    "Authorization": "Bearer $token",
-  },
-      body: jsonEncode({
-        "matri_id_by": matriId1,
-        "matri_id_to": matriIdTo,
-        "type": "unlist",
-      }),
-    );
+
+    if (matriId1 == null) {
+      throw Exception("Matri ID not found in SharedPreferences");
+    }
+
+    final response = await _post(context, "shortlisted.php", {
+      "matri_id_by": matriId1,
+      "matri_id_to": matriIdTo,
+      "type": "unlist",
+    });
+
+    debugPrint("🔹 API Response (Remove Shortlist): ${response.body}");
 
     if (response.statusCode == 200) {
-      debugPrint("status code 200");
-      return RemoveShortlist.fromJson(json.decode(response.body));
+      final decodedJson = json.decode(response.body);
+
+      final newToken = decodedJson["newToken"] ?? decodedJson["token"];
+      if (newToken != null) {
+        await prefs.setString("token", newToken);
+        debugPrint(" Token updated (Remove Shortlist)");
+      }
+
+      if (!decodedJson.containsKey('message')) {
+        throw Exception("Invalid API response format — 'message' missing");
+      }
+
+      return RemoveShortlist.fromJson(decodedJson);
     } else {
-      debugPrint("API Error Response: ${response.body}");
-      throw Exception("Failed to shortlist profile");
+      throw Exception(
+        "Failed to remove shortlist. Status: ${response.statusCode}",
+      );
     }
+  } catch (e) {
+    debugPrint(" Error removing shortlist: $e");
+    rethrow;
   }
+}
 
   //Add like
 
-  static Future<Addlike> fetchAddlikeData(String matriIdTo) async {
+ static Future<Addlike> fetchAddlikeData(
+  BuildContext context,
+  String matriIdTo,
+) async {
+  try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    // String? mobile = prefs.getString("mobile") ?? "";
     String? matriId1 = prefs.getString('matriId');
-    String? token = prefs.getString("token");
-    final response = await http.post(
-      Uri.parse("$_baseUrl/matri_liked.php"),
-       headers: {
-    "Content-Type": "application/json",
-    "Authorization": "Bearer $token",
-  },
-      body: jsonEncode({
-        "matri_id_by": matriId1,
-        "matri_id_to": matriIdTo,
-        "type": "liked",
-      }),
-    );
+
+    if (matriId1 == null) {
+      throw Exception("Matri ID not found in SharedPreferences");
+    }
+
+    final response = await _post(context, "matri_liked.php", {
+      "matri_id_by": matriId1,
+      "matri_id_to": matriIdTo,
+      "type": "liked",
+    });
+
+    debugPrint("🔹 API Response (Add Like): ${response.body}");
 
     if (response.statusCode == 200) {
-      debugPrint("status code 200");
-      return Addlike.fromJson(json.decode(response.body));
+      final decodedJson = json.decode(response.body);
+
+      final newToken = decodedJson["newToken"] ?? decodedJson["token"];
+      if (newToken != null) {
+        await prefs.setString("token", newToken);
+        debugPrint("Token updated (Add Like)");
+      }
+
+      if (!decodedJson.containsKey('message')) {
+        throw Exception("Invalid API response format — 'message' missing");
+      }
+
+      return Addlike.fromJson(decodedJson);
     } else {
-      debugPrint("API Error Response: ${response.body}");
-      throw Exception("Failed to shortlist profile");
+      throw Exception(
+        "Failed to like profile. Status: ${response.statusCode}",
+      );
     }
+  } catch (e) {
+    debugPrint(" Error adding like: $e");
+    rethrow;
   }
+}
+
 
   //Remiove Like
 
-  static Future<Removelike> fetchRemovelikeData(String matriIdTo) async {
+ static Future<Removelike> fetchRemovelikeData(
+  BuildContext context,
+  String matriIdTo,
+) async {
+  try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    // String? mobile = prefs.getString("mobile") ?? "";
     String? matriId1 = prefs.getString('matriId');
-    String? token = prefs.getString("token");
-    final response = await http.post(
-      Uri.parse("$_baseUrl/matri_liked.php"),
-       headers: {
-    "Content-Type": "application/json",
-    "Authorization": "Bearer $token",
-  },
-      body: jsonEncode({
-        "matri_id_by": matriId1,
-        "matri_id_to": matriIdTo,
-        "type": "disliked",
-      }),
-    );
 
-    if (response.statusCode == 200) {
-      debugPrint("status code 200");
-      return Removelike.fromJson(json.decode(response.body));
-    } else {
-      debugPrint("API Error Response: ${response.body}");
-      throw Exception("Failed to shortlist profile");
+    if (matriId1 == null) {
+      throw Exception("Matri ID not found in SharedPreferences");
     }
-  }
 
-  //likes
-  static Future<Map<String, dynamic>> fetchLikedProfiles(String matriId) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    // String? mobile = prefs.getString("mobile") ?? "";
-    String? matriId1 = prefs.getString('matriId');
-String? token = prefs.getString("token");
-    final response = await http.post(
-      Uri.parse("$_baseUrl/matri_liked.php"),
-       headers: {
-    "Content-Type": "application/json",
-    "Authorization": "Bearer $token",
-  },
-      body: jsonEncode({"matri_id": matriId1, "type": "iliked"}),
-    );
+  
+    final response = await _post(context, "matri_liked.php", {
+      "matri_id_by": matriId1,
+      "matri_id_to": matriIdTo,
+      "type": "disliked",
+    });
+
+    debugPrint("🔹 API Response (Remove Like): ${response.body}");
 
     if (response.statusCode == 200) {
-      try {
-        return jsonDecode(response.body);
-      } catch (e) {
-        throw Exception("Invalid JSON response: ${response.body}");
+      final decodedJson = json.decode(response.body);
+
+    
+      final newToken = decodedJson["newToken"] ?? decodedJson["token"];
+      if (newToken != null) {
+        await prefs.setString("token", newToken);
+        debugPrint(" Token updated (Remove Like)");
       }
+
+     
+      if (!decodedJson.containsKey('message')) {
+        throw Exception("Invalid API response format — 'message' missing");
+      }
+
+      return Removelike.fromJson(decodedJson);
     } else {
       throw Exception(
-          "Failed to load shortlisted profiles: ${response.statusCode}");
+        "Failed to dislike profile. Status: ${response.statusCode}",
+      );
     }
+  } catch (e) {
+    debugPrint(" Error removing like: $e");
+    rethrow;
   }
+}
+
+
+  //likes
+ static Future<Map<String, dynamic>> fetchLikedProfiles(
+  BuildContext context,
+) async {
+  try {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? matriId1 = prefs.getString('matriId');
+
+    if (matriId1 == null) {
+      throw Exception("Matri ID not found in SharedPreferences");
+    }
+
+    final response = await _post(context, "matri_liked.php", {
+      "matri_id": matriId1,
+      "type": "iliked",
+    });
+
+    debugPrint(" API Response (Liked Profiles): ${response.body}");
+
+    if (response.statusCode == 200) {
+      final decodedJson = json.decode(response.body);
+
+      final newToken = decodedJson["newToken"] ?? decodedJson["token"];
+      if (newToken != null) {
+        await prefs.setString("token", newToken);
+        debugPrint(" Token updated (Liked Profiles)");
+      }
+
+      if (!decodedJson.containsKey('dataout')) {
+        throw Exception("Invalid API response format — 'dataout' missing");
+      }
+
+      return decodedJson;
+    } else {
+      throw Exception(
+        "Failed to fetch liked profiles. Status: ${response.statusCode}",
+      );
+    }
+  } catch (e) {
+    debugPrint(" Error fetching liked profiles: $e");
+    rethrow;
+  }
+}
+
 
   //Sharath
   static Future<Map<String, dynamic>> profileViewed(String candidateId) async {
