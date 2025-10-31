@@ -373,7 +373,7 @@ class _ProfilePageState extends State<ProfilePage> {
           _buildIconButton(Icons.phone, localizations.translate('contact_info'),
               onPressed: () async {
             String status =
-                await _maxLimit.checkContactedProfiles(widget.matriId);
+                await _maxLimit.checkContactedProfiles(widget.matriId,context);
             if (status == "Y") {
               _showContactInfoDialog(context, profile);
             } else {

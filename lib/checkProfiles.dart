@@ -28,7 +28,7 @@ class MaxLimit {
 
     if (planStatus == "paid" || planStatus == "not paid") {
       if (maxProfile > usedProfile) {
-        getResponse = await profileViewed(candidateId);
+        getResponse = await profileViewed(candidateId,context);
       } else {
         getResponse = await masterCount(candidateId, "profile");
       }
@@ -42,7 +42,7 @@ class MaxLimit {
     } else {}
   }
 
-  Future<String> checkContactedProfiles(String candidateId) async {
+  Future<String> checkContactedProfiles(String candidateId,BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String max = prefs.getString('maxContact').toString();
     String used = prefs.getString('usedContact').toString();
@@ -61,7 +61,8 @@ class MaxLimit {
     if (planStatus == "paid" || planStatus == "not paid") {
       if (maxProfile > usedProfile) {
         print("$planStatus maxProfile > usedProfile");
-        return await contactViewed(candidateId);
+     return await contactViewed(candidateId,context);
+
       } else {
         print("$planStatus maxProfile < usedProfile");
         return await masterCount(candidateId, "contact");
@@ -125,8 +126,10 @@ class MaxLimit {
     }
   }
 
-  Future<String> profileViewed(String candidateId) async {
-    Map<String, dynamic> response = await ApiService.profileViewed(candidateId);
+  Future<String> profileViewed(String candidateId, BuildContext context) async {
+  Map<String, dynamic> response =
+    await ApiService.profileViewed( candidateId,context);
+
 
     if (response.containsKey('message')) {
       var messageData = response['message'];
@@ -163,46 +166,48 @@ class MaxLimit {
     }
   }
 
-  Future<String> contactViewed(String candidateId) async {
-    print("contact viewed");
-    Map<String, dynamic> response = await ApiService.contactViewed(candidateId);
+ Future<String> contactViewed(String candidateId, BuildContext context) async {
+  print("contact viewed");
+  Map<String, dynamic> response =
+      await ApiService.contactViewed(context, candidateId);
 
-    if (response.containsKey('message')) {
-      var messageData = response['message'];
-      String? statusFlag = '';
-      if (messageData is Map<String, dynamic>) {
-        statusFlag = messageData['p_out_mssg_flg']?.toString();
-        String? messageText = messageData['p_out_mssg']?.toString();
+  if (response.containsKey('message')) {
+    var messageData = response['message'];
+    String? statusFlag = '';
+    if (messageData is Map<String, dynamic>) {
+      statusFlag = messageData['p_out_mssg_flg']?.toString();
+      String? messageText = messageData['p_out_mssg']?.toString();
 
-        print("Status Flag: $statusFlag");
-        print("Message Text: $messageText");
+      print("Status Flag: $statusFlag");
+      print("Message Text: $messageText");
 
-        if (statusFlag == "Y") {
-          if (response["dataout"] is List && response["dataout"].isNotEmpty) {
-            print("getProfileData--++ ${response['dataout'][0]}");
-            dynamic getProfileData = response['dataout'][0];
-            getProfileData = {
-              "profile_viewed": getProfileData['viewed_count'],
-              "contact_viewed": getProfileData['contact_count'],
-              "message_viewed": getProfileData['message_count'],
-              "max_profile": getProfileData['max_profile'],
-              "max_contact": getProfileData['max_contact'],
-              "max_message": getProfileData['max_message'],
-            };
-            print("getProfileData--++$getProfileData");
-            await setCounts(getProfileData);
-          }
-          return "Y";
-        } else {
-          return "N - flag N";
+      if (statusFlag == "Y") {
+        if (response["dataout"] is List && response["dataout"].isNotEmpty) {
+          print("getProfileData--++ ${response['dataout'][0]}");
+          dynamic getProfileData = response['dataout'][0];
+          getProfileData = {
+            "profile_viewed": getProfileData['viewed_count'],
+            "contact_viewed": getProfileData['contact_count'],
+            "message_viewed": getProfileData['message_count'],
+            "max_profile": getProfileData['max_profile'],
+            "max_contact": getProfileData['max_contact'],
+            "max_message": getProfileData['max_message'],
+          };
+          print("getProfileData--++$getProfileData");
+          await setCounts(getProfileData);
         }
+        return "Y";
       } else {
-        return 'N - invalid format';
+        return "N - flag N";
       }
     } else {
-      return 'N - no message';
+      return 'N - invalid format';
     }
+  } else {
+    return 'N - no message';
   }
+}
+
 
   showProfiles(String profileId, BuildContext context) {
     Navigator.push(

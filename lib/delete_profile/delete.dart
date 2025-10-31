@@ -84,7 +84,7 @@ class _ChangeStatusPageState extends State<ChangeStatusPage> {
     setState(() {
       isLoading = true;
     });
-    Map<String, dynamic> response = await ApiService.changeStatus(data);
+    Map<String, dynamic> response = await ApiService.changeStatus(context,data);
     print("Final API Response in Login: $response");
 
     if (response.containsKey('message')) {

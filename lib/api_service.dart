@@ -1518,37 +1518,49 @@ static Future<AddShortlist> fetchAddShortlistData(
 
 
   //Sharath
-  static Future<Map<String, dynamic>> profileViewed(String candidateId) async {
+static Future<Map<String, dynamic>> profileViewed(
+     String candidateId,BuildContext context) async {
+  try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? matriId = prefs.getString('matriId');
-    String? token = prefs.getString("token");
-    final response = await http.post(
-      Uri.parse("$_baseUrl/profile_viewed.php"),
-      headers: {
-    "Content-Type": "application/json",
-    "Authorization": "Bearer $token",
-  },
-      body: jsonEncode({
+
+    if (matriId == null) {
+      throw Exception("Matri ID not found in SharedPreferences");
+    }
+
+    final response = await _post(
+      context,
+      "profile_viewed.php",
+      {
         "matri_id_by": matriId,
         "matri_id_to": candidateId,
-        "type": "viewed"
-      }),
+        "type": "viewed",
+      },
     );
-    print("Raw Response: ${response.body}");
+
+    debugPrint("🔹 Raw Response (Profile Viewed): ${response.body}");
 
     if (response.statusCode == 200) {
-      try {
-        final Map<String, dynamic> jsonResponse = json.decode(response.body);
-        print("Parsed Response: $jsonResponse");
-        return jsonResponse;
-      } catch (e) {
-        throw Exception("Invalid JSON response: ${response.body}");
+      final decodedJson = json.decode(response.body);
+
+      final newToken = decodedJson["newToken"] ?? decodedJson["token"];
+      if (newToken != null) {
+        await prefs.setString("token", newToken);
+        debugPrint("Token updated (Profile Viewed)");
       }
+
+      return decodedJson;
     } else {
       throw Exception(
-          "Profile failed with status code: ${response.statusCode}");
+          "Failed to view profile. Status code: ${response.statusCode}");
     }
+  } catch (e) {
+    debugPrint("Error in profileViewed: $e");
+    rethrow;
   }
+}
+
+
 
   static Future<Map<String, dynamic>> masterCount(
       String candidateId, String type) async {
@@ -1576,61 +1588,86 @@ static Future<AddShortlist> fetchAddShortlistData(
     }
   }
 
-  static Future<Map<String, dynamic>> contactViewed(String candidateId) async {
+  static Future<Map<String, dynamic>> contactViewed(
+    BuildContext context, String candidateId) async {
+  try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? matriId = prefs.getString('matriId');
-    final response = await http.post(
-      Uri.parse("$_baseUrl/contacted_profile.php"),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
+
+    if (matriId == null) {
+      throw Exception("Matri ID not found in SharedPreferences");
+    }
+
+    final response = await _post(
+      context,
+      "contacted_profile.php",
+      {
         "matri_id_by": matriId,
         "matri_id_to": candidateId,
-        "type": "contacted"
-      }),
+        "type": "contacted",
+      },
     );
-    print("Raw Response: ${response.body}");
+
+    debugPrint("🔹 Raw Response (Contact Viewed): ${response.body}");
 
     if (response.statusCode == 200) {
-      try {
-        final Map<String, dynamic> jsonResponse = json.decode(response.body);
-        print("Parsed Response: $jsonResponse");
-        return jsonResponse;
-      } catch (e) {
-        throw Exception("Invalid JSON response: ${response.body}");
+      final decodedJson = json.decode(response.body);
+
+      // Update token if new one is returned
+      final newToken = decodedJson["newToken"] ?? decodedJson["token"];
+      if (newToken != null) {
+        await prefs.setString("token", newToken);
+        debugPrint("Token updated (Contact Viewed)");
       }
+
+      if (!decodedJson.containsKey("message")) {
+        throw Exception("Invalid API response format — 'message' missing");
+      }
+
+      return decodedJson;
     } else {
       throw Exception(
-          "Contact failed with status code: ${response.statusCode}");
+          "Failed to contact profile. Status: ${response.statusCode}");
     }
+  } catch (e) {
+    debugPrint(" Error in contactViewed: $e");
+    rethrow;
   }
+}
 
-  static Future<Map<String, dynamic>> messageViewed(String candidateId) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? matriId = prefs.getString('matriId');
-    final response = await http.post(
-      Uri.parse("$_baseUrl/contacted_profile.php"),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        "matri_id_by": matriId,
-        "matri_id_to": candidateId,
-        "type": "contacted"
-      }),
-    );
-    print("Raw Response: ${response.body}");
 
-    if (response.statusCode == 200) {
-      try {
-        final Map<String, dynamic> jsonResponse = json.decode(response.body);
-        print("Parsed Response: $jsonResponse");
-        return jsonResponse;
-      } catch (e) {
-        throw Exception("Invalid JSON response: ${response.body}");
-      }
-    } else {
-      throw Exception(
-          "Contact failed with status code: ${response.statusCode}");
+
+ static Future<Map<String, dynamic>> messageViewed(
+    BuildContext context, String candidateId) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? matriId = prefs.getString('matriId');
+
+  final response = await _post(
+    context,
+    "contacted_profile.php",
+    {
+      "matri_id_by": matriId,
+      "matri_id_to": candidateId,
+      "type": "contacted",
+    },
+  );
+
+  print("Raw Response: ${response.body}");
+
+  if (response.statusCode == 200) {
+    try {
+      final Map<String, dynamic> jsonResponse = json.decode(response.body);
+      print("Parsed Response: $jsonResponse");
+      return jsonResponse;
+    } catch (e) {
+      throw Exception("Invalid JSON response: ${response.body}");
     }
+  } else {
+    throw Exception(
+        "Contact failed with status code: ${response.statusCode}");
   }
+}
+
 
   static Future<Map<String, dynamic>> sendOtp(String mobile) async {
     final response = await http.post(
@@ -1654,33 +1691,47 @@ static Future<AddShortlist> fetchAddShortlistData(
     }
   }
 
-  static Future<Map<String, dynamic>> changeStatus(String statusId) async {
+ static Future<Map<String, dynamic>> changeStatus(
+  BuildContext context,
+  String statusId,
+) async {
+  try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? matriId1 = prefs.getString('matriId'); // Retrieve matriId
+    String? matriId1 = prefs.getString('matriId');
+
     if (matriId1 == null) {
       throw Exception("Matri ID not found in SharedPreferences");
     }
-    final response = await http.post(
-      Uri.parse("$_baseUrl/profile_status.php"),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"matri_id": matriId1, "status": statusId}),
-    );
 
-    print("Raw Response: ${response.body}");
+    final response = await _post(context, "profile_status.php", {
+      "matri_id": matriId1,
+      "status": statusId,
+    });
+
+    debugPrint(" API Response (Change Status): ${response.body}");
 
     if (response.statusCode == 200) {
-      try {
-        final Map<String, dynamic> jsonResponse = json.decode(response.body);
-        print("Parsed Response: $jsonResponse");
-        return jsonResponse;
-      } catch (e) {
-        throw Exception("Invalid JSON response: ${response.body}");
+      final decodedJson = json.decode(response.body);
+
+      final newToken = decodedJson["token"] ?? decodedJson["newToken"];
+      if (newToken != null) {
+        await prefs.setString("token", newToken);
+        debugPrint("Token refreshed and saved (Change Status)");
       }
+
+      
+      return decodedJson;
     } else {
       throw Exception(
-          "Profile status change failed with status code: ${response.statusCode}");
+        "Failed to change status. Status code: ${response.statusCode}",
+      );
     }
+  } catch (e) {
+    debugPrint("⚠️ Error in changeStatus(): $e");
+    rethrow;
   }
+}
+
 
   //Tickets
   static Future<AddTicket> fetchAddTicketData(
