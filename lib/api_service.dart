@@ -959,106 +959,103 @@ static Future<Map<String, dynamic>> loginUser(
 
   //Partner Preference
 
-  static Future<List<searchpartner>> fetchpartner() async {
-    try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? matriIdnew = prefs.getString("matri_id_new");
-      //String? matriId1 = prefs.getString('matriId');
-      //print("matridddd${matriId1}");
-      List<String> selectedSubCasteList =
-          prefs.getStringList("selected_sub_caste") ?? [];
-      List<String> selectedEducationList =
-          prefs.getStringList("selected_education") ?? [];
-      int selectedMaritalStatus = prefs.getInt("selected_marital_status") ?? 1;
-      double selectedMinAge = prefs.getDouble("selected_min_age") ?? 18.0;
-      double selectedMaxAge = prefs.getDouble("selected_max_age") ?? 40.0;
-      double selectedMinheight = prefs.getDouble("selected_min_height") ?? 50.0;
-      double selectedMaxheight =
-          prefs.getDouble("selected_max_height") ?? 250.0;
-      double selectedIncome = prefs.getDouble("selected_income") ?? 10.0;
+ static Future<List<searchpartner>> fetchpartner() async {
+  try {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? matriIdnew = prefs.getString("matri_id_new");
 
-      searchcountry selectedCountry = searchcountry(
-        country_id: prefs.getString("selected_country_id") ?? "",
-        country_name: prefs.getString("selected_country_name") ?? "",
-        country_code: "", // Add an empty string or a valid default value
-      );
+    List<String> selectedSubCasteList =
+        prefs.getStringList("selected_sub_caste") ?? [];
+    List<String> selectedEducationList =
+        prefs.getStringList("selected_education") ?? [];
+    int selectedMaritalStatus = prefs.getInt("selected_marital_status") ?? 1;
+    double selectedMinAge = prefs.getDouble("selected_min_age") ?? 18.0;
+    double selectedMaxAge = prefs.getDouble("selected_max_age") ?? 40.0;
+    double selectedMinheight = prefs.getDouble("selected_min_height") ?? 50.0;
+    double selectedMaxheight = prefs.getDouble("selected_max_height") ?? 250.0;
+    double selectedIncome = prefs.getDouble("selected_income") ?? 10.0;
 
-      searchstate selectedState = searchstate(
-        state_id: prefs.getString("selected_state_id") ?? "",
-        state_name: prefs.getString("selected_state_name") ?? "",
-        state_code: "", // Add an empty string or a valid default value
-        country_id: "", // Add an empty string or a valid default value
-      );
+    searchcountry selectedCountry = searchcountry(
+      country_id: prefs.getString("selected_country_id") ?? "",
+      country_name: prefs.getString("selected_country_name") ?? "",
+      country_code: "",
+    );
 
-      searchcity selectedCity = searchcity(
-        city_id: prefs.getString("selected_city_id") ?? "",
-        city_name: prefs.getString("selected_city_name") ?? "",
-        state_id: "", // Add an empty string or a valid default value
-        country_id: "", // Add an empty string or a valid default value
-      );
+    searchstate selectedState = searchstate(
+      state_id: prefs.getString("selected_state_id") ?? "",
+      state_name: prefs.getString("selected_state_name") ?? "",
+      state_code: "",
+      country_id: "",
+    );
 
-      var tdata = {
-        "height_min": selectedMinheight,
-        "height_max": selectedMaxheight,
-        "matri_id": matriIdnew,
-        "marital_status": selectedMaritalStatus,
-        "sub_caste": selectedSubCasteList.join(","),
-        "city": selectedCity.city_id,
-        "country": selectedCountry.country_id,
-        "state": selectedState.state_id,
-        "education": selectedEducationList.join(","),
-        "min_age": selectedMinAge,
-        "max_age": selectedMaxAge
-      };
-      print(tdata);
+    searchcity selectedCity = searchcity(
+      city_id: prefs.getString("selected_city_id") ?? "",
+      city_name: prefs.getString("selected_city_name") ?? "",
+      state_id: "",
+      country_id: "",
+    );
 
-      final response = await http.post(
-        Uri.parse("$_baseUrl/search_preference.php"),
-        headers: _headers,
-        body: jsonEncode({
-          // "matri_id": "TB7681",
-          // "marital_status": "1",
-          // "sub_caste": "311",
-          // "city": "",
-          // "country": "",
-          // "state": "",
-          "height_min": selectedMinheight,
-          "height_max": selectedMaxheight,
-          "matri_id": matriIdnew,
-          "marital_status": selectedMaritalStatus,
-          "sub_caste": selectedSubCasteList.join(","),
-          "city": selectedCity.city_id,
-          "country": selectedCountry.country_id,
-          "state": selectedState.state_id,
-          "education": selectedEducationList.join(","),
-          "min_age": selectedMinAge,
-          "max_age": selectedMaxAge
-        }),
-      );
+    // 🔹 Prepare request body
+    Map<String, dynamic> requestBody = {
+      "height_min": selectedMinheight,
+      "height_max": selectedMaxheight,
+      "matri_id": matriIdnew,
+      "marital_status": selectedMaritalStatus,
+      "sub_caste": selectedSubCasteList.join(","),
+      "city": selectedCity.city_id,
+      "country": selectedCountry.country_id,
+      "state": selectedState.state_id,
+      "education": selectedEducationList.join(","),
+      "min_age": selectedMinAge,
+      "max_age": selectedMaxAge
+    };
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = json.decode(response.body);
+    debugPrint("Sending API Request: ${jsonEncode(requestBody)}");
 
-        // Ensure "data" exists and is a list
-        if (responseData.containsKey('dataout') &&
-            responseData['dataout'] != null) {
-          final Map<String, dynamic> responseData = json.decode(response.body);
-          final List<dynamic> data = responseData['dataout'] ?? [];
+    // 🔹 Make API call (no Authorization header required)
+    final response = await http.post(
+      Uri.parse("$_baseUrl/search_preference.php"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(requestBody),
+    );
 
-          return data.map((e) => searchpartner.fromJson(e, baseUrl)).toList();
-        } else {
-          print("API response missing 'data' key or null: $responseData");
-          return [];
+    debugPrint("API Response Code: ${response.statusCode}");
+    debugPrint("API Response Body: ${response.body}");
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+
+      // 🔹 Store token if present inside dataout[0]
+      if (responseData.containsKey('dataout') &&
+          responseData['dataout'] is List &&
+          responseData['dataout'].isNotEmpty) {
+        final firstItem = responseData['dataout'][0];
+        final token = firstItem["token"];
+        if (token != null) {
+          await prefs.setString("token", token);
+          debugPrint("Token stored after fetchpartner()");
         }
+      }
+
+      // 🔹 Parse partner list
+      if (responseData.containsKey('dataout') &&
+          responseData['dataout'] != null) {
+        final List<dynamic> data = responseData['dataout'];
+        return data.map((e) => searchpartner.fromJson(e, baseUrl)).toList();
       } else {
-        print("API Error: ${response.statusCode} - ${response.body}");
+        debugPrint("API response missing 'dataout' key or null: $responseData");
         return [];
       }
-    } catch (e) {
-      print("Exception in fetchcategory: $e");
+    } else {
+      debugPrint("API Error: ${response.statusCode} - ${response.body}");
       return [];
     }
+  } catch (e) {
+    debugPrint("Exception in fetchpartner: $e");
+    return [];
   }
+}
+
 
   //Images
   static Future<List<searchimages>> fetchimages(String matriIdTo) async {

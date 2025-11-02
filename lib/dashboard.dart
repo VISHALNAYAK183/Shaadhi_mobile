@@ -432,7 +432,7 @@ String notification_url = notification?.notiurl ?? "N/A";
                             .map((e) => e.notiurl)
                             .toList()),
                     _buildSectionTitle(
-                        (localizations.translate('loggedInMember')).toString()),
+                        (localizations.translate('Recently Active Members')).toString()),
                     _buildHorizontalCardList(data.recentlyLoggedIn),
                     SizedBox(height: 15),
                     _buildSectionTitle(
