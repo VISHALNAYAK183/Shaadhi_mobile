@@ -34,7 +34,7 @@ class _FamilyDetailsPageState extends State<FamilyDetailsPage> {
   String? selectedFamilyType;
   String selectedFatherLivingStatus="0";
   String selectedMotherLivingStatus="0";
-   Color appcolor = Color(0xFF8A2727);
+   Color appcolor = Color(0xFFC3A38C);
 
   String marriedBrothersController="1";
   String marriedSistersController="1";

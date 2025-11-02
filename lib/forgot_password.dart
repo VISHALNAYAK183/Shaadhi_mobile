@@ -11,10 +11,10 @@ class ForgetPasswordPage extends StatefulWidget {
 }
 
 class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
-  final Color _signColor = Color(0xFF8A2727);
+  final Color _signColor = Color(0xFFC3A38C);
   bool showOtpSection = false;
   bool showPasswordSection = false;
-    Color appcolor = Color(0xFF8A2727);
+    Color appcolor = Color(0xFFC3A38C);
   TextEditingController phoneController = TextEditingController();
   TextEditingController otpController = TextEditingController();
   TextEditingController newPasswordController = TextEditingController();

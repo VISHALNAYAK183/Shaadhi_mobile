@@ -9,12 +9,12 @@ class ContactFormPage extends StatefulWidget {
 }
 
 class _ContactFormPageState extends State<ContactFormPage> {
-  Color appcolor = Color(0xFF8A2727);
+  Color appcolor = Color(0xFFC3A38C);
   final TextEditingController _nameController = TextEditingController();
    final TextEditingController _matriController= TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _issuesController = TextEditingController();
-  final Color _signColor = Color(0xFF8A2727);
+  final Color _signColor = Color(0xFFC3A38C);
   bool _isLoading = false;
   List<supportnumberdata> _supportNumbers=[];
 
@@ -149,7 +149,7 @@ void initState(){
                           : ElevatedButton(
                               onPressed: _submitForm,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xFF8A2727),
+                                backgroundColor: Color(0xFFC3A38C),
                                 padding: EdgeInsets.symmetric(vertical: 12),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(5),

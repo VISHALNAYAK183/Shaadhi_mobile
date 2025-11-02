@@ -34,7 +34,7 @@ class AdditionalDetailsPageState extends State<AdditionalDetailsPage> {
   String? countryError;
   String? stateError;
   String? cityError;
-  Color appcolor = Color(0xFF8A2727);
+  Color appcolor = Color(0xFFC3A38C);
 
   final List<String> bloodGroups = [
     'A+',

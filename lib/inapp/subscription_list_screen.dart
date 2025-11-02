@@ -18,7 +18,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   List<ProductDetails> _products = [];
   bool _isFeatureUnlocked = false;
   bool _isLoading = false;
-  Color appcolor = Color(0xFF8A2727);
+  Color appcolor = Color(0xFFC3A38C);
 
   @override
   void initState() {

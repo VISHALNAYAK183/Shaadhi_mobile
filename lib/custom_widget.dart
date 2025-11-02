@@ -1,7 +1,7 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 
-final Color _signColor = Color(0xFF8A2727);
+final Color _signColor = Color(0xFFC3A38C);
 
 
 
@@ -10,7 +10,7 @@ Widget customElevatedButton(VoidCallback onPressed, String label) {
     onPressed: onPressed,
     style: ElevatedButton.styleFrom(
       minimumSize: const Size(double.infinity, 50),
-      backgroundColor: const Color(0xFF8A2727),
+      backgroundColor: const Color(0xFFC3A38C),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),

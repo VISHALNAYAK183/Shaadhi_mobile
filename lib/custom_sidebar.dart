@@ -88,7 +88,7 @@ class _CustomSidebarState extends State<CustomSidebar> {
         children: [
           Container(
             width: double.infinity, // Full width
-            color: Color(0xFF8A2727), // Background color
+            color: Color(0xFFC3A38C), // Background color
             child: Padding(
               padding: EdgeInsets.all(20),
               child: Column(
@@ -148,7 +148,7 @@ Widget _buildLoadingSidebar() {
     padding: EdgeInsets.zero,
     children: [
       DrawerHeader(
-        decoration: BoxDecoration(color: Color(0xFF8A2727)),
+        decoration: BoxDecoration(color: Color(0xFFC3A38C)),
         child: Center(
           child: CircularProgressIndicator(color: Colors.white),
         ),
@@ -162,7 +162,7 @@ Widget _buildErrorSidebar() {
     padding: EdgeInsets.zero,
     children: [
       DrawerHeader(
-        decoration: BoxDecoration(color: Color(0xFF8A2727)),
+        decoration: BoxDecoration(color: Color(0xFFC3A38C)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

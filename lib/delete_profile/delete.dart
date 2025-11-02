@@ -19,7 +19,7 @@ class _ChangeStatusPageState extends State<ChangeStatusPage> {
   bool _showOtpField = false;
   bool _otpVerified = false;
   bool isLoading = false;
-  Color appcolor = Color(0xFF8A2727);
+  Color appcolor = Color(0xFFC3A38C);
   String otp = '';
   bool _isLoading = true;
 

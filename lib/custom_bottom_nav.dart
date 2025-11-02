@@ -16,7 +16,7 @@ class CustomBottomNavBar extends StatelessWidget {
     var localizations = AppLocalizations.of(context);
     return BottomNavigationBar(
       currentIndex: selectedIndex,
-      selectedItemColor: Color(0xFF8A2727),
+      selectedItemColor: Color(0xFFC3A38C),
       onTap: onTap, // Calls the function from the controller
       type: BottomNavigationBarType.fixed,
       items: [

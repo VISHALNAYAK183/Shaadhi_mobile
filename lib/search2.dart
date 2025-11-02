@@ -133,11 +133,11 @@
 //                         },
 //                         style: ElevatedButton.styleFrom(
 //                           backgroundColor: _isMatriSearch == true
-//                               ? Color(0xFF8A2727)
+//                               ? Color(0xFFC3A38C)
 //                               : Colors.white,
 //                           foregroundColor: _isMatriSearch == true
 //                               ? Colors.white
-//                               : Color(0xFF8A2727),
+//                               : Color(0xFFC3A38C),
 //                           shape: RoundedRectangleBorder(
 //                               borderRadius: BorderRadius.circular(6)),
 //                         ),
@@ -153,11 +153,11 @@
 //                         },
 //                         style: ElevatedButton.styleFrom(
 //                           backgroundColor: _isMatriSearch == false
-//                               ? Color(0xFF8A2727) // Active button color
+//                               ? Color(0xFFC3A38C) // Active button color
 //                               : Colors.white, // Default unselected color
 //                           foregroundColor: _isMatriSearch == false
 //                               ? Colors.white // Text color for selected
-//                               : Color(0xFF8A2727), // Text color for unselected
+//                               : Color(0xFFC3A38C), // Text color for unselected
 //                           shape: RoundedRectangleBorder(
 //                             borderRadius: BorderRadius.circular(6),
 //                           ),
@@ -791,7 +791,7 @@
 //                   await prefs.setDouble("selected_min_age", _selectedMinAge);
 //                   await prefs.setDouble("selected_max_age", _selectedMaxAge);
 //                 },
-//                 activeColor: Color(0xFF8A2727), // Your main color
+//                 activeColor: Color(0xFFC3A38C), // Your main color
 //                 inactiveColor:
 //                     Colors.white, // Change the inactive side to white
 //               ),
@@ -821,9 +821,9 @@
 //                   await prefs.setDouble(
 //                       "selected_max_height", _selectedMaxheight);
 //                 },
-//                 activeColor: Color(0xFF8A2727), // Apply the specified color
+//                 activeColor: Color(0xFFC3A38C), // Apply the specified color
 //                 inactiveColor: Colors.white,
-//                 //  thumbColor: Color(0xFF8A2727),
+//                 //  thumbColor: Color(0xFFC3A38C),
 //               ),
 
 //               Center(
@@ -831,7 +831,7 @@
 //                   onPressed: _onSearch,
 //                   style: ElevatedButton.styleFrom(
 //                     backgroundColor:
-//                         Color(0xFF8A2727), // Apply the specified color
+//                         Color(0xFFC3A38C), // Apply the specified color
 //                     shape: RoundedRectangleBorder(
 //                       borderRadius:
 //                           BorderRadius.circular(5), // Reduce border radius

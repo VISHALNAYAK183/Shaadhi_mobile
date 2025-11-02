@@ -63,7 +63,7 @@ class _SearchPageState extends State<SearchPage> {
   double _selectedMaxAge = 40;
   double _selectedMinHeight = 50;
   double _selectedMaxHeight = 250;
-  Color appcolor = Color(0xFF8A2727);
+  Color appcolor = Color(0xFFC3A38C);
 
   @override
   void initState() {
@@ -162,7 +162,8 @@ class _SearchPageState extends State<SearchPage> {
                       items: maritalStatusMap.keys.map((ms) {
                         return DropdownMenuItem(value: ms, child: Text(ms));
                       }).toList(),
-                      decoration: InputDecoration(labelText: localizations.translate('marital_status')),
+                      decoration: InputDecoration(
+                          labelText: localizations.translate('marital_status')),
                     ),
 
                     // Subcaste Dropdown
@@ -242,9 +243,12 @@ class _SearchPageState extends State<SearchPage> {
 
                     // Age Range
                     Text(
-                       localizations.translate('age_range')
-      .replaceAll('{min}', _selectedMinAge.round().toString())
-      .replaceAll('{max}', _selectedMaxAge.round().toString()),
+                      localizations
+                          .translate('age_range')
+                          .replaceAll(
+                              '{min}', _selectedMinAge.round().toString())
+                          .replaceAll(
+                              '{max}', _selectedMaxAge.round().toString()),
                     ),
                     RangeSlider(
                       values: RangeValues(_selectedMinAge, _selectedMaxAge),
@@ -268,16 +272,18 @@ class _SearchPageState extends State<SearchPage> {
                         await prefs.setDouble(
                             "selected_max_age", _selectedMaxAge);
                       },
-                      activeColor: Color(0xFF8A2727),
+                      activeColor: Color(0xFFC3A38C),
                       inactiveColor: Colors.white,
                     ),
 
                     // Height Range _selectedMinHeight
                     Text(
-                      localizations.translate('height_range')
-      .replaceAll('{min}', _selectedMinHeight.round().toString())
-      .replaceAll('{max}', _selectedMaxHeight.round().toString()),
-                     
+                      localizations
+                          .translate('height_range')
+                          .replaceAll(
+                              '{min}', _selectedMinHeight.round().toString())
+                          .replaceAll(
+                              '{max}', _selectedMaxHeight.round().toString()),
                     ),
                     RangeSlider(
                       values:
@@ -301,9 +307,9 @@ class _SearchPageState extends State<SearchPage> {
                             "selected_max_height", _selectedMaxHeight);
                       },
                       activeColor:
-                          Color(0xFF8A2727), // Apply the specified color
+                          Color(0xFFC3A38C), // Apply the specified color
                       inactiveColor: Colors.white,
-                      //  thumbColor: Color(0xFF8A2727),
+                      //  thumbColor: Color(0xFFC3A38C),
                     ),
                     SizedBox(height: 20),
                     Align(
@@ -318,11 +324,11 @@ class _SearchPageState extends State<SearchPage> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: isMatriSearch == false
-                              ? Color(0xFF8A2727)
+                              ? Color(0xFFC3A38C)
                               : Colors.white,
                           foregroundColor: isMatriSearch == false
                               ? Colors.white
-                              : Color(0xFF8A2727),
+                              : Color(0xFFC3A38C),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(6),
                           ),
@@ -358,7 +364,8 @@ class _SearchPageState extends State<SearchPage> {
       itemAsString: (searchcountry c) => "${c.country_name}",
       selectedItem: _selectedCountry,
       dropdownDecoratorProps: DropDownDecoratorProps(
-        dropdownSearchDecoration: InputDecoration(labelText: localizations.translate('country')),
+        dropdownSearchDecoration:
+            InputDecoration(labelText: localizations.translate('country')),
       ),
       onChanged: (searchcountry? value) async {
         if (value == null) return;
@@ -400,7 +407,8 @@ class _SearchPageState extends State<SearchPage> {
       itemAsString: (searchstate s) => s.state_name,
       selectedItem: _selectedState,
       dropdownDecoratorProps: DropDownDecoratorProps(
-        dropdownSearchDecoration: InputDecoration(labelText: localizations.translate('state')),
+        dropdownSearchDecoration:
+            InputDecoration(labelText: localizations.translate('state')),
       ),
       onChanged: (searchstate? value) async {
         if (value == null) return;
@@ -437,7 +445,8 @@ class _SearchPageState extends State<SearchPage> {
       itemAsString: (searchcity c) => c.city_name,
       selectedItem: _selectedCity,
       dropdownDecoratorProps: DropDownDecoratorProps(
-        dropdownSearchDecoration: InputDecoration(labelText: localizations.translate('city')),
+        dropdownSearchDecoration:
+            InputDecoration(labelText: localizations.translate('city')),
       ),
       onChanged: (searchcity? value) async {
         if (value == null) return;
@@ -504,9 +513,9 @@ class _SearchPageState extends State<SearchPage> {
             }),
             style: ElevatedButton.styleFrom(
               backgroundColor:
-                  isMatriSearch == true ? Color(0xFF8A2727) : Colors.white,
+                  isMatriSearch == true ? Color(0xFFC3A38C) : Colors.white,
               foregroundColor:
-                  isMatriSearch == true ? Colors.white : Color(0xFF8A2727),
+                  isMatriSearch == true ? Colors.white : Color(0xFFC3A38C),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6)),
             ),
@@ -522,9 +531,9 @@ class _SearchPageState extends State<SearchPage> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor:
-                  isMatriSearch == false ? Color(0xFF8A2727) : Colors.white,
+                  isMatriSearch == false ? Color(0xFFC3A38C) : Colors.white,
               foregroundColor:
-                  isMatriSearch == false ? Colors.white : Color(0xFF8A2727),
+                  isMatriSearch == false ? Colors.white : Color(0xFFC3A38C),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(6),
               ),
@@ -605,31 +614,30 @@ class _SearchPageState extends State<SearchPage> {
     _showFilterModal();
   }
 
+  Widget _buildMatriSearchResults() {
+    var localizations = AppLocalizations.of(context);
 
-Widget _buildMatriSearchResults() {
-  var localizations = AppLocalizations.of(context);
+    if (_matriSearchResults == null) {
+      return SizedBox.shrink();
+    }
 
-  
-  if (_matriSearchResults == null) {
-    return SizedBox.shrink(); 
+    return FutureBuilder<SearchData>(
+      future: _matriSearchResults,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError ||
+            !snapshot.hasData ||
+            snapshot.data!.dataout.isEmpty) {
+          return SizedBox.shrink();
+        }
+
+        final List<searchprofile> profiles = snapshot.data!.dataout;
+        return _buildProfileGrid(profiles);
+      },
+    );
   }
-
-  return FutureBuilder<SearchData>(
-    future: _matriSearchResults,
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return Center(child: CircularProgressIndicator());
-      }
-      if (snapshot.hasError || !snapshot.hasData || snapshot.data!.dataout.isEmpty) {
-        return SizedBox.shrink(); 
-      }
-
-      final List<searchprofile> profiles = snapshot.data!.dataout;
-      return _buildProfileGrid(profiles);
-    },
-  );
-}
-
 
   Widget _buildProfileGrid(List<searchprofile> profiles) {
     return GridView.builder(
@@ -662,101 +670,108 @@ Widget _buildMatriSearchResults() {
             //   );
             // }
           },
-          child: Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            // child: Padding(
-            //   padding: EdgeInsets.all(5),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.network(
-                        isValidImageUrl(profile.url)
-                            ? profile.url
-                            : (profile.gender == 2
-                                ? "assets/1.png"
-                                : "assets/2.png"),
-                        height: 160,
-                        width: 150,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Image.asset(
-                            profile.gender == 2
-                                ? "assets/1.png"
-                                : "assets/2.png",
-                            height: 160,
-                            width: 150,
-                            fit: BoxFit.cover,
-                          );
-                        },
-                      ),
-                    ),
-                    if (profile.planStatus == "Paid")
-                      Positioned(
-                        top: 5,
-                        right: 5,
-                        child: Image.asset(
-                          "assets/verification_new.png",
-                          width: 25,
-                          height: 25,
+          child: Container(
+            margin: const EdgeInsets.symmetric(
+                horizontal: 8, vertical: 10), // gap between cards
+            child: Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(20), // smoother round corners
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.network(
+                          isValidImageUrl(profile.url)
+                              ? profile.url
+                              : (profile.gender == 2
+                                  ? "assets/1.png"
+                                  : "assets/2.png"),
+                          height: 180, // slightly increased height
+                          width: 160,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Image.asset(
+                              profile.gender == 2
+                                  ? "assets/1.png"
+                                  : "assets/2.png",
+                              height: 180,
+                              width: 160,
+                              fit: BoxFit.cover,
+                            );
+                          },
                         ),
                       ),
-                  ],
-                ),
-                //  SizedBox(height: 20),
-                Text(
-                  "${(profile.firstName + " " + profile.lastName).length > 15 ? (profile.firstName + " " + profile.lastName).substring(0, 12) + "..." : profile.firstName + " " + profile.lastName}",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 1),
-                Text("Age: ${profile.age}", style: TextStyle(fontSize: 10)),
-                SizedBox(height: 10),
-                Text(
-                  " ${profile.matriId} ",
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red,
+                      if (profile.planStatus == "Paid")
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: Image.asset(
+                            "assets/verification_new.png",
+                            width: 28,
+                            height: 28,
+                          ),
+                        ),
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 8),
+                  Text(
+                    "${(profile.firstName + " " + profile.lastName).length > 15 ? (profile.firstName + " " + profile.lastName).substring(0, 12) + "..." : profile.firstName + " " + profile.lastName}",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 4),
+                  Text("Age: ${profile.age}",
+                      style: const TextStyle(fontSize: 11)),
+                  const SizedBox(height: 6),
+                  Text(
+                    " ${profile.matriId} ",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                ],
+              ),
             ),
-            //),
           ),
         );
       },
     );
   }
 
- Widget search() {
-  var localizations = AppLocalizations.of(context);
-  return Padding(
-    padding: const EdgeInsets.all(10.0),
-    child: SizedBox(
-      height: 40,
-      width: 250, // Adjust the height as needed
-      child: TextField(
-        controller: _searchController,
-        decoration: InputDecoration(
-          labelText: localizations.translate('enter_id'),
-          border: OutlineInputBorder(),
-          contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+  Widget search() {
+    var localizations = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: SizedBox(
+        height: 40,
+        width: 250, // Adjust the height as needed
+        child: TextField(
+          controller: _searchController,
+          decoration: InputDecoration(
+            labelText: localizations.translate('enter_id'),
+            border: OutlineInputBorder(),
+            contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+          ),
+          style: TextStyle(fontSize: 14),
+          onChanged: (value) {
+            _performSearch(value); // Pass the updated value for search
+          },
         ),
-        style: TextStyle(fontSize: 14),
-        onChanged: (value) {
-          _performSearch(value); // Pass the updated value for search
-        },
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _searchbox(TextEditingController controller) {
     return Row(
@@ -800,39 +815,38 @@ Widget _buildMatriSearchResults() {
     );
   }
 
- void _performSearch(String query) {
-  query = query.trim();
+  void _performSearch(String query) {
+    query = query.trim();
 
-  // ✅ Clear old results immediately when typing
-  setState(() {
-    _matriSearchResults = null;
-  });
+    // ✅ Clear old results immediately when typing
+    setState(() {
+      _matriSearchResults = null;
+    });
 
-  if (query.isEmpty) return; // Stop if input is empty
+    if (query.isEmpty) return; // Stop if input is empty
 
-  if (_debounce?.isActive ?? false) _debounce!.cancel();
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
 
-  _debounce = Timer(const Duration(milliseconds: 500), () async {
-    try {
-      var result = await ApiService.fetchsearchData(context,query);
-      print("API Response: ${result.dataout}");
+    _debounce = Timer(const Duration(milliseconds: 500), () async {
+      try {
+        var result = await ApiService.fetchsearchData(context, query);
+        print("API Response: ${result.dataout}");
 
-      // ✅ Explicitly clear UI when no results are found
-      setState(() {
-        _matriSearchResults =
-            result.dataout.isNotEmpty ? Future.value(result) : null;
-      });
-    } catch (e) {
-      print("Search Error: $e");
+        // ✅ Explicitly clear UI when no results are found
+        setState(() {
+          _matriSearchResults =
+              result.dataout.isNotEmpty ? Future.value(result) : null;
+        });
+      } catch (e) {
+        print("Search Error: $e");
 
-      // ✅ Ensure UI is cleared on API error
-      setState(() {
-        _matriSearchResults = null;
-      });
-    }
-  });
-}
-
+        // ✅ Ensure UI is cleared on API error
+        setState(() {
+          _matriSearchResults = null;
+        });
+      }
+    });
+  }
 
   Widget _buildResults() {
     var localizations = AppLocalizations.of(context);
@@ -856,86 +870,80 @@ Widget _buildMatriSearchResults() {
         return GestureDetector(
           onTap: () async {
             await _maxLimit.checkProfileView(profile.matriId, context);
-            // String status = await _maxLimit.checkProfileView(profile.matriId);
-            // if (status == "Y") {
-            //   Navigator.push(
-            //     context,
-            //     MaterialPageRoute(
-            //         builder: (context) =>
-            //             ProfilePage(matriId: profile.matriId)),
-            //   );
-            // } else {
-            //   Navigator.push(
-            //     context,
-            //     MaterialPageRoute(builder: (context) => SubscriptionScreen()),
-            //   );
-            // }
           },
           child: Card(
-            elevation: 4,
+            elevation: 0, // remove shadow
+            color: Colors.transparent, // no background border color
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(0),
             ),
-            child: Padding(
-              padding: EdgeInsets.all(5),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.network(
-                          isValidImageUrl(profile.url)
-                              ? profile.url
-                              : (profile.gender == 2
-                                  ? "assets/1.png"
-                                  : "assets/2.png"),
-                          height: 160,
-                          width: 150,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Image.asset(
-                              profile.gender == 2
-                                  ? "assets/1.png"
-                                  : "assets/2.png",
-                              height: 160,
-                              width: 150,
-                              fit: BoxFit.cover,
-                            );
-                          },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start, // left aligned
+              children: [
+                Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(0),
+                      child: Image.network(
+                        isValidImageUrl(profile.url)
+                            ? profile.url
+                            : (profile.gender == 2
+                                ? "assets/1.png"
+                                : "assets/2.png"),
+                        height: 200,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            profile.gender == 2
+                                ? "assets/1.png"
+                                : "assets/2.png",
+                            height: 200,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          );
+                        },
+                      ),
+                    ),
+                    if (profile.planStatus == "Paid")
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: Image.asset(
+                          "assets/verification_new.png",
+                          width: 28,
+                          height: 28,
                         ),
                       ),
-                      if (profile.planStatus == "Paid")
-                        Positioned(
-                          top: 5,
-                          right: 5,
-                          child: Image.asset(
-                            "assets/verification_new.png",
-                            width: 25, // Adjust size as needed
-                            height: 25,
-                          ),
-                        ),
-                    ],
+                  ],
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  "${(profile.firstName + " " + profile.lastName).length > 15 ? (profile.firstName + " " + profile.lastName).substring(0, 12) + "..." : profile.firstName + " " + profile.lastName}",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
                   ),
-                  SizedBox(height: 3),
-                  Text(
-                    "${(profile.firstName + " " + profile.lastName).length > 15 ? (profile.firstName + " " + profile.lastName).substring(0, 12) + "..." : profile.firstName + " " + profile.lastName}",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 1),
-                  Text("Age: ${profile.age}", style: TextStyle(fontSize: 10)),
-                  Text(
-                    " ${profile.matriId} ",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold, // ✅ Makes text bold
-                      color: Colors.red, // ✅ Sets text color to red
+                ),
+                const SizedBox(height: 3),
+                Row(
+                  children: [
+                    Text(
+                      "${profile.age} yrs, ",
+                      style:
+                          const TextStyle(fontSize: 12, color: Colors.black87),
                     ),
-                  ),
-                ],
-              ),
+                    Text(
+                      "${profile.matriId}",
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         );

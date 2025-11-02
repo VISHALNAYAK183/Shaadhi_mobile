@@ -75,7 +75,7 @@ class RegisterPersonalDetailsState extends State<RegisterPersonalDetails> {
   List<String> filteredSubCasteOptions = [];
   TextEditingController subCasteSearchController = TextEditingController();
   String? selectedValue;
-   Color appcolor = Color(0xFF8A2727);
+   Color appcolor = Color(0xFFC3A38C);
 
   @override
   void initState() {

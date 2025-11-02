@@ -28,7 +28,7 @@ class _RegisterHoroscopeDetailsPageState
   final TextEditingController familyDeityController = TextEditingController();
 
   String? selectedNakshatra;
-   Color appcolor = Color(0xFF8A2727);
+   Color appcolor = Color(0xFFC3A38C);
   String? selectedRashi;
   String? birthTimeError;
   String? birthPlaceError;

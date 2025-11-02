@@ -17,7 +17,7 @@ class PersonalDetails extends StatefulWidget {
 
 class PersonalDetailsState extends State<PersonalDetails> {
   String selectedGender = "";
-   Color appcolor = Color(0xFF8A2727);
+   Color appcolor = Color(0xFFC3A38C);
 
   String? selectedMaritalStatus;
   String? selectedSubCaste;

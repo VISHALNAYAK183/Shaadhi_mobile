@@ -23,7 +23,7 @@ class EducationProfessionPageState extends State<EducationProfessionPage> {
   String? selectedProfession;
   String? selectedSalaryRange;
   String? selectedSpecialisation;
-   Color appcolor = Color(0xFF8A2727);
+   Color appcolor = Color(0xFFC3A38C);
 
   Map<String, String> qualificationMap = {}; // Map to store name -> ID
   List<String> qualifications = [];
@@ -317,13 +317,13 @@ salaryError = (selectedSalaryRange == null || selectedSalaryRange!.trim().isEmpt
                     maxLines: null,
                     decoration: InputDecoration(
                       labelText: localizations.translate('qualification'),
-                      labelStyle: TextStyle(color: Color(0xFF8A2727)),
+                      labelStyle: TextStyle(color: Color(0xFFC3A38C)),
                       border: OutlineInputBorder(),
                       errorText: qualificationError,
                     ),
                     style: TextStyle(
                       fontSize: 16,
-                      color: Color(0xFF8A2727),
+                      color: Color(0xFFC3A38C),
                     ),
                     readOnly: true,
                   ),
@@ -353,13 +353,13 @@ salaryError = (selectedSalaryRange == null || selectedSalaryRange!.trim().isEmpt
                     maxLines: null,
                     decoration: InputDecoration(
                       labelText: localizations.translate('specialisation'),
-                      labelStyle: TextStyle(color: Color(0xFF8A2727)),
+                      labelStyle: TextStyle(color: Color(0xFFC3A38C)),
                       border: OutlineInputBorder(),
                       errorText: specialisationError,
                     ),
                     style: TextStyle(
                       fontSize: 16,
-                      color: Color(0xFF8A2727),
+                      color: Color(0xFFC3A38C),
                     ),
                     readOnly: true,
                   ),

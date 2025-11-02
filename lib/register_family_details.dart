@@ -54,7 +54,7 @@ class _RegisterFamilyDetailsPageState extends State<RegisterFamilyDetailsPage> {
   ];
 
   String? fatherNameError;
-   Color appcolor = Color(0xFF8A2727);
+   Color appcolor = Color(0xFFC3A38C);
   String? motherNameError;
   String? kidsError;
   String? brothersError;

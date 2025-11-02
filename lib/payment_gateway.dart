@@ -34,7 +34,7 @@ class _SubscriptionPaymentPageState extends State<SubscriptionPaymentPage> {
   bool isPlanSelected = false;
   String orderId = "";
   String paymentSessionId = "";
-  Color appcolor = Color(0xFF8A2727);
+  Color appcolor = Color(0xFFC3A38C);
 
   @override
   void initState() {

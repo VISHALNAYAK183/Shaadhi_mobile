@@ -14,7 +14,7 @@ class _PendingCountsPageState extends State<PendingCountsPage> {
   int usedViewed = 0;
   int usedContacted = 0;
   int usedMessaged = 0;
-  Color appcolor = Color(0xFF8A2727);
+  Color appcolor = Color(0xFFC3A38C);
 
   @override
   void initState() {

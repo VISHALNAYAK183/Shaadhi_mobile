@@ -27,14 +27,14 @@ class MatchedPageState extends State<MatchedPage> {
   final TextEditingController _controller = TextEditingController();
   final MaxLimit _maxLimit = MaxLimit();
   @override
-void didChangeDependencies() {
-  super.didChangeDependencies();
-  var localizations = AppLocalizations.of(context);
-  setState(() {
-    selectedtypeName = localizations.translate('liked_by_me');
-  });
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    var localizations = AppLocalizations.of(context);
+    setState(() {
+      selectedtypeName = localizations.translate('liked_by_me');
+    });
 
-    fetchMatchedProfiles("iliked"); 
+    fetchMatchedProfiles("iliked");
   }
 
   bool isValidImageUrl(String url) {
@@ -65,7 +65,8 @@ void didChangeDependencies() {
             Duration(milliseconds: 500)); // Wait before retrying
       }
 
-      final matchedData = await ApiService.fetchMatchedProfiles(context,dataType);
+      final matchedData =
+          await ApiService.fetchMatchedProfiles(context, dataType);
       _controller.addListener(_filterProfiles);
 
       setState(() {
@@ -103,7 +104,8 @@ void didChangeDependencies() {
 
   Future<void> fetchViewedProfiles(String dataType) async {
     try {
-      final matchedData = await ApiService.fetchViewedProfiles(context,dataType);
+      final matchedData =
+          await ApiService.fetchViewedProfiles(context, dataType);
       String baseUrl = (await matchedprofile.getBaseUrl()) ?? "";
 
       _controller.addListener(_filterProfiles);
@@ -132,7 +134,8 @@ void didChangeDependencies() {
 
   Future<void> fetchContactedProfiles(String dataType) async {
     try {
-      final matchedData = await ApiService.fetchContactedProfiles(context,dataType);
+      final matchedData =
+          await ApiService.fetchContactedProfiles(context, dataType);
       String baseUrl = (await matchedprofile.getBaseUrl()) ?? "";
 
       _controller.addListener(_filterProfiles);
@@ -338,91 +341,108 @@ void didChangeDependencies() {
                                   final profile = filteredProfiles[index];
 
                                   return GestureDetector(
-                                    onTap: () async {
-                                      await _maxLimit.checkProfileView(
-                                          profile.matriId, context);
-                                    },
-                                    child: Card(
-                                      elevation: 4,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      // child: Padding(
-                                      //   padding: EdgeInsets.all(5),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Stack(
-                                            children: [
-                                              ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                child: Image.network(
-                                                  isValidImageUrl(profile.url)
-                                                      ? profile.url
-                                                      : (int.tryParse(profile
-                                                                  .gender
-                                                                  .toString()) ==
-                                                              2
-                                                          ? "assets/1.png"
-                                                          : "assets/2.png"),
-                                                  height: 160,
-                                                  width: 150,
-                                                  fit: BoxFit.cover,
-                                                  errorBuilder: (context, error,
-                                                      stackTrace) {
-                                                    return Image.asset(
-                                                      int.tryParse(profile
-                                                                  .gender
-                                                                  .toString()) ==
-                                                              2
-                                                          ? "assets/1.png"
-                                                          : "assets/2.png",
-                                                      height: 160,
-                                                      width: 150,
-                                                      fit: BoxFit.cover,
-                                                    );
-                                                  },
-                                                ),
-                                              ),
-                                              if (profile.planStatus == "Paid")
-                                                Positioned(
-                                                  top: 5,
-                                                  right: 5,
-                                                  child: Image.asset(
-                                                    "assets/verification_new.png",
-                                                    width:
-                                                        25, // Adjust size as needed
-                                                    height: 25,
+                                      onTap: () async {
+                                        await _maxLimit.checkProfileView(
+                                            profile.matriId, context);
+                                      },
+                                      child: Container(
+                                        width:
+                                            130, // slightly wider for better balance
+                                        margin: const EdgeInsets.only(
+                                            right: 12), // space between cards
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Stack(
+                                              children: [
+                                                // Profile Image
+                                                ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          20), // smooth rounded edges
+                                                  child: Image.network(
+                                                    isValidImageUrl(profile.url)
+                                                        ? profile.url
+                                                        : (int.tryParse(profile
+                                                                    .gender
+                                                                    .toString()) ==
+                                                                2
+                                                            ? "assets/1.png"
+                                                            : "assets/2.png"),
+                                                    height: 150,
+                                                    width: 130,
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder: (context,
+                                                        error, stackTrace) {
+                                                      return Image.asset(
+                                                        int.tryParse(profile
+                                                                    .gender
+                                                                    .toString()) ==
+                                                                2
+                                                            ? "assets/1.png"
+                                                            : "assets/2.png",
+                                                        height: 150,
+                                                        width: 130,
+                                                        fit: BoxFit.cover,
+                                                      );
+                                                    },
                                                   ),
                                                 ),
-                                            ],
-                                          ),
-                                          SizedBox(height: 3),
-                                          Text(
-                                            "${(profile.firstName + " " + profile.lastName).length > 15 ? (profile.firstName + " " + profile.lastName).substring(0, 12) + "..." : profile.firstName + " " + profile.lastName}",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 12),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                          SizedBox(height: 1),
-                                          Text("Age: ${profile.age}",
-                                              style: TextStyle(fontSize: 10)),
-                                          Text(
-                                            " ${profile.matriId} ",
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.red,
+
+                                                // Verification icon for Paid users
+                                                if (profile.planStatus ==
+                                                    "Paid")
+                                                  Positioned(
+                                                    top: 6,
+                                                    right: 6,
+                                                    child: Image.asset(
+                                                      "assets/verification_new.png",
+                                                      width: 24,
+                                                      height: 24,
+                                                    ),
+                                                  ),
+                                              ],
                                             ),
-                                          ),
-                                        ],
-                                        // ),
-                                      ),
-                                    ),
-                                  );
+
+                                            const SizedBox(height: 6),
+
+                                            // Name
+                                            Text(
+                                              "${(profile.firstName + " " + profile.lastName).length > 15 ? (profile.firstName + " " + profile.lastName).substring(0, 12) + "..." : (profile.firstName + " " + profile.lastName)}",
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 13,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                            ),
+
+                                            const SizedBox(height: 2),
+
+                                            // Age and Matri ID in one line
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  "${profile.age} yrs",
+                                                  style: const TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.grey),
+                                                ),
+                                                const SizedBox(width: 6),
+                                                Text(
+                                                  profile.matriId,
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ));
                                 },
                               );
                       },

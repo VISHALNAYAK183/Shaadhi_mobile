@@ -27,7 +27,7 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _sendLoading = false;
   bool chatLoad = true;
   final ScrollController _scrollController = ScrollController();
-  Color appcolor = Color(0xFF8A2727);
+  Color appcolor = Color(0xFFC3A38C);
   final MaxLimit _maxLimit = MaxLimit();
 
   @override

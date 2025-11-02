@@ -30,7 +30,7 @@ class _HoroscopeDetailsPageState extends State<HoroscopeDetailsPage> {
   String? rashiError;
   String horoscopeController = "1";
   String sunSignController = "6";
-   Color appcolor = Color(0xFF8A2727);
+   Color appcolor = Color(0xFFC3A38C);
 
   final List<String> nakshatraOptions = [
     "Anuradha",

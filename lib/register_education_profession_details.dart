@@ -35,7 +35,7 @@ class RegisterEducationProfessionPageState
   String? specialisationError;
   String? professionError;
   String? salaryError;
-   Color appcolor = Color(0xFF8A2727);
+   Color appcolor = Color(0xFFC3A38C);
 
   List<String> filteredQualification = [];
   TextEditingController qualificationSearchController = TextEditingController();
@@ -253,13 +253,13 @@ class RegisterEducationProfessionPageState
                     maxLines: null,
                     decoration: InputDecoration(
                       labelText: localizations.translate('qualification'),
-                      labelStyle: const TextStyle(color: Color(0xFF8A2727)),
+                      labelStyle: const TextStyle(color: Color(0xFFC3A38C)),
                       border: OutlineInputBorder(),
                       errorText: qualificationError,
                     ),
                     style: const TextStyle(
                       fontSize: 16,
-                      color: Color(0xFF8A2727),
+                      color: Color(0xFFC3A38C),
                     ),
                     readOnly: true,
                   ),
@@ -289,13 +289,13 @@ class RegisterEducationProfessionPageState
                     maxLines: null,
                     decoration: InputDecoration(
                       labelText: localizations.translate('specialisation'),
-                      labelStyle: const TextStyle(color: Color(0xFF8A2727)),
+                      labelStyle: const TextStyle(color: Color(0xFFC3A38C)),
                       border: OutlineInputBorder(),
                       errorText: specialisationError,
                     ),
                     style: const TextStyle(
                       fontSize: 16,
-                      color: Color(0xFF8A2727),
+                      color: Color(0xFFC3A38C),
                     ),
                     readOnly: true,
                   ),

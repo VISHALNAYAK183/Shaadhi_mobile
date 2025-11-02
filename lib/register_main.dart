@@ -29,7 +29,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   int resendTimer = 30;
   Timer? _timer;
-  Color appcolor = Color(0xFF8A2727);
+  Color appcolor = Color(0xFFC3A38C);
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
@@ -55,7 +55,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final FocusNode otp3Focus = FocusNode();
   final FocusNode otp4Focus = FocusNode();
 
-  final Color _signColor = Color(0xFF8A2727);
+  final Color _signColor = Color(0xFFC3A38C);
 
   Map<String, String> profileCreatorMap = {
     "1": "1",

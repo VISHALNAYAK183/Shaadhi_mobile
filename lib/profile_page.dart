@@ -36,7 +36,7 @@ class ProfilePageState extends State<ProfilePage1> {
   late Future<DashboardData> _dashboardDataFuture;
   String profileImageUrl = "";
   String storedProfileUrl = "";
-   Color appcolor = Color(0xFF8A2727);
+   Color appcolor = Color(0xFFC3A38C);
 
   @override
   void initState() {

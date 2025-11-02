@@ -30,7 +30,7 @@ class RegisterAdditionalDetailsPageState
   final TextEditingController remarksController = TextEditingController();
 
   String? selectedBloodGroup;
-   Color appcolor = Color(0xFF8A2727);
+   Color appcolor = Color(0xFFC3A38C);
   String? selectedComplexion;
   String? selectedDisability;
   String? selectedCountry;

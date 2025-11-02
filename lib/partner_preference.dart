@@ -391,7 +391,7 @@ class _FilterDialogState extends State<FilterDialog> {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF8A2727),
+                backgroundColor: Color(0xFFC3A38C),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5)),
               ),

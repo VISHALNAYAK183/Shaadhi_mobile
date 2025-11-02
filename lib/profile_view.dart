@@ -26,7 +26,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final MaxLimit _maxLimit = MaxLimit();
   late Future<ProfileViewData> _profileDataFuture;
 
-  final Color _signColor = Color(0xFF8A2727);
+  final Color _signColor = Color(0xFFC3A38C);
   @override
   void initState() {
     super.initState();

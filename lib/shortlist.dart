@@ -19,14 +19,14 @@ class ShortlistsPageState extends State<ShortlistsPage> {
   final MaxLimit _maxLimit = MaxLimit();
   bool _isExpanded = false; // Track expansion state
   final TextEditingController _controller = TextEditingController();
-  final Color _signColor = Color(0xFF8A2727);
-  Color appcolor = Color(0xFF8A2727);
+  final Color _signColor = Color(0xFFC3A38C);
+  Color appcolor = Color(0xFFC3A38C);
   bool isLoading = true;
   int _selectedIndex = 0;
   @override
   void initState() {
     super.initState();
-    
+
     _controller.addListener(_filterProfiles);
     fetchshortlistedProfiles();
   }
@@ -185,7 +185,8 @@ class ShortlistsPageState extends State<ShortlistsPage> {
                               : 2;
                       return filteredProfiles.isEmpty
                           ? Center(
-                              child: Text(localizations.translate('no_matches')))
+                              child:
+                                  Text(localizations.translate('no_matches')))
                           : GridView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
@@ -201,92 +202,108 @@ class ShortlistsPageState extends State<ShortlistsPage> {
                                 final profile = filteredProfiles[index];
 
                                 return GestureDetector(
-                                  onTap: () async {
-                                    await _maxLimit.checkProfileView(
-                                        profile.matriId, context);
-                                  },
-                                  child: Card(
-                                    elevation: 4,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    // child: Padding(
-                                    //   padding: EdgeInsets.all(5),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Stack(
-                                          children: [
-                                            ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              child: Image.network(
-                                                isValidImageUrl(
-                                                        profile.imageUrl)
-                                                    ? profile.imageUrl
-                                                    : (int.tryParse(profile
-                                                                .gender
-                                                                .toString()) ==
-                                                            2
-                                                        ? "assets/1.png"
-                                                        : "assets/2.png"),
-                                                height: 160,
-                                                width: 150,
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (context, error,
-                                                    stackTrace) {
-                                                  return Image.asset(
-                                                    int.tryParse(profile.gender
-                                                                .toString()) ==
-                                                            2
-                                                        ? "assets/1.png"
-                                                        : "assets/2.png",
-                                                    height: 160,
-                                                    width: 150,
-                                                    fit: BoxFit.cover,
-                                                  );
-                                                },
-                                              ),
-                                            ),
-                                            if (profile.planStatus ==
-                                                "Paid") // ✅ Show badge only if Paid
-                                              Positioned(
-                                                top: 5,
-                                                right: 5,
-                                                child: Image.asset(
-                                                  "assets/verification_new.png",
-                                                  width:
-                                                      25, // Adjust size as needed
-                                                  height: 25,
+                                    onTap: () async {
+                                      await _maxLimit.checkProfileView(
+                                          profile.matriId, context);
+                                    },
+                                    child: Container(
+                                      width: 120,
+                                      margin: const EdgeInsets.only(
+                                          right: 12), // space between cards
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Stack(
+                                            children: [
+                                              // Profile Image
+                                              ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                child: Image.network(
+                                                  isValidImageUrl(
+                                                          profile.imageUrl)
+                                                      ? profile.imageUrl
+                                                      : (int.tryParse(profile
+                                                                  .gender
+                                                                  .toString()) ==
+                                                              2
+                                                          ? "assets/1.png"
+                                                          : "assets/2.png"),
+                                                  height: 140,
+                                                  width: 120,
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder: (context, error,
+                                                      stackTrace) {
+                                                    return Image.asset(
+                                                      int.tryParse(profile
+                                                                  .gender
+                                                                  .toString()) ==
+                                                              2
+                                                          ? "assets/1.png"
+                                                          : "assets/2.png",
+                                                      height: 140,
+                                                      width: 120,
+                                                      fit: BoxFit.cover,
+                                                    );
+                                                  },
                                                 ),
                                               ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 3),
-                                        Text(
-                                          "${(profile.name).length > 15 ? (profile.name).substring(0, 12) + "..." : profile.name}",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 12),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        SizedBox(height: 1),
-                                        Text("Age: ${profile.age}",
-                                            style: TextStyle(fontSize: 10)),
-                                        Text(
-                                          " ${profile.matriId} ",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.red,
+
+                                              // Verification badge (for Paid)
+                                              if (profile.planStatus == "Paid")
+                                                Positioned(
+                                                  top: 6,
+                                                  right: 6,
+                                                  child: Image.asset(
+                                                    "assets/verification_new.png",
+                                                    width: 22,
+                                                    height: 22,
+                                                  ),
+                                                ),
+                                            ],
                                           ),
-                                        ),
-                                      ],
-                                      // ),
-                                    ),
-                                  ),
-                                );
+
+                                          const SizedBox(height: 6),
+
+                                          // Name
+                                          Text(
+                                            profile.name.length > 15
+                                                ? "${profile.name.substring(0, 12)}..."
+                                                : profile.name,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 13,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                          ),
+
+                                          const SizedBox(height: 2),
+
+                                          // Age + Matri ID horizontally
+                                          Row(
+                                            children: [
+                                              Text(
+                                                "${profile.age} yrs",
+                                                style: const TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.grey),
+                                              ),
+                                              const SizedBox(width: 6),
+                                              Text(
+                                                profile.matriId,
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ));
                               },
                             );
                     },
@@ -295,7 +312,6 @@ class ShortlistsPageState extends State<ShortlistsPage> {
               ],
             ),
           ),
-        ) 
-        );
+        ));
   }
 }

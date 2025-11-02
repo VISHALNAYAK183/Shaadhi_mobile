@@ -5,7 +5,7 @@ class TermsAndConditionsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var localizations = AppLocalizations.of(context);
-    Color appcolor = Color(0xFF8A2727);
+    Color appcolor = Color(0xFFC3A38C);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: appcolor,

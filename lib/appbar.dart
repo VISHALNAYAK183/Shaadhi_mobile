@@ -61,7 +61,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: const Color(0xFF8A2727),
+      backgroundColor: const Color(0xFFC3A38C),
       iconTheme: const IconThemeData(color: Colors.white),
       title: GestureDetector(
         onTap: () {

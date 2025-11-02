@@ -45,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
       List.generate(4, (index) => TextEditingController());
   List<FocusNode> _otpFocusNodes = List.generate(4, (index) => FocusNode());
 
-  final Color _signColor = Color(0xFF8A2727);
+  final Color _signColor = Color(0xFFC3A38C);
   final Color _backgroundColor = Color(0xFFF1F1F1);
 
   Future<void> _saveLoginData(String mobile, String password, String matriId1,

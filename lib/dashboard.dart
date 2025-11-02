@@ -21,7 +21,7 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final Color _signColor = Color(0xFF8A2727);
+  final Color _signColor = Color(0xFFC3A38C);
   final Color _backgroundColor = Color(0xFFF1F1F1);
   final Color _progressColor = Color(0xFF4CAF50);
   final Color _boxBackground = Color(0xFFF0F0F0);
@@ -548,126 +548,111 @@ String notification_url = notification?.notiurl ?? "N/A";
     );
   }
 
-  Widget _buildHorizontalCardList(List<User> users) {
-    // print("plan${planStatus}");
-    return Container(
-      height: 170,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: users.length,
-        itemBuilder: (context, index) {
-          User user = users[index];
+Widget _buildHorizontalCardList(List<User> users) {
+  return SizedBox(
+    height: 190, // increased height
+    child: ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemCount: users.length,
+      itemBuilder: (context, index) {
+        User user = users[index];
 
-          String imageUrl = user.imageUrl.isNotEmpty
-              ? user.imageUrl
-              : int.tryParse(user.gender.toString()) == 1
-                  ? 'assets/1.png'
-                  : 'assets/2.png';
-          //print("GEnder${user.gender}");
-          return GestureDetector(
-            onTap: () async {
-              await _maxLimit.checkProfileView(user.matriId, context);
-              // String status = await _maxLimit.checkProfileView(user.matriId);
-              // if (status == "Y") {
-              //   Navigator.push(
-              //     context,
-              //     MaterialPageRoute(
-              //       builder: (context) => ProfilePage(matriId: user.matriId),
-              //     ),
-              //   );
-              // } else {
-              //   Navigator.push(
-              //     context,
-              //     MaterialPageRoute(
-              //       builder: (context) => SubscriptionScreen(),
-              //     ),
-              //   );
-              // }
-            },
-            child: Container(
-              width: 100,
-              margin: EdgeInsets.only(right: 6),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(6),
-                boxShadow: [
-                  BoxShadow(color: Colors.grey.shade300, blurRadius: 3)
-                ],
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Stack(
-                    children: [
-                      // Profile Image
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(6),
-                        child: imageUrl.startsWith('http')
-                            ? Image.network(
-                                imageUrl,
-                                width: 90,
-                                height: 100,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Image.asset(
-                                    int.tryParse(user.gender.toString()) == 1
-                                        ? 'assets/2.png'
-                                        : 'assets/1.png',
-                                    width: 90,
-                                    height: 100,
-                                    fit: BoxFit.cover,
-                                  );
-                                },
-                              )
-                            : Image.asset(
-                                imageUrl,
-                                width: 90,
-                                height: 100,
-                                fit: BoxFit.cover,
-                              ),
-                      ),
+        String imageUrl = user.imageUrl.isNotEmpty
+            ? user.imageUrl
+            : int.tryParse(user.gender.toString()) == 1
+                ? 'assets/1.png'
+                : 'assets/2.png';
 
-                      // Display verification badge only if planStatus is "paid"
-                      if (user.planStatus == "Paid")
-                        Positioned(
-                          top: 4,
-                          right: 4,
-                          child: Image.asset(
-                            'assets/verification_new.png', // Verification icon
-                            width: 20, // Adjust size as needed
-                            height: 20,
-                          ),
-                        ),
-                    ],
-                  ),
-                  SizedBox(height: 5),
-                  Text(
-                    user.name,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: _signColor,
-                      fontWeight: FontWeight.bold,
+        return GestureDetector(
+          onTap: () async {
+            await _maxLimit.checkProfileView(user.matriId, context);
+          },
+          child: Container(
+            width: 110,
+            margin: const EdgeInsets.only(right: 12), // gap between cards
+            color: Colors.transparent,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Profile Image
+                Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(20), // round corners
+                      child: imageUrl.startsWith('http')
+                          ? Image.network(
+                              imageUrl,
+                              width: 110,
+                              height: 120,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Image.asset(
+                                  int.tryParse(user.gender.toString()) == 1
+                                      ? 'assets/2.png'
+                                      : 'assets/1.png',
+                                  width: 110,
+                                  height: 120,
+                                  fit: BoxFit.cover,
+                                );
+                              },
+                            )
+                          : Image.asset(
+                              imageUrl,
+                              width: 110,
+                              height: 120,
+                              fit: BoxFit.cover,
+                            ),
                     ),
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
+
+                    // Verification icon
+                    if (user.planStatus == "Paid")
+                      Positioned(
+                        top: 6,
+                        right: 6,
+                        child: Image.asset(
+                          'assets/verification_new.png',
+                          width: 20,
+                          height: 20,
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+
+                // Name
+                Text(
+                  user.name,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: _signColor,
+                    fontWeight: FontWeight.bold,
                   ),
-                  Text(
-                    "Age: ${user.age}",
-                    style: TextStyle(fontSize: 11, color: Colors.grey),
-                  ),
-                  Text(
-                    "ID: ${user.matriId}",
-                    style: TextStyle(fontSize: 11, color: Colors.grey),
-                  ),
-                ],
-              ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+
+                // Age & Matri ID (horizontal)
+                Row(
+                  children: [
+                    Text(
+                      "${user.age}yrs",
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      user.matriId,
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          );
-        },
-      ),
-    );
-  }
+          ),
+        );
+      },
+    ),
+  );
+}
 
   Widget _buildDrawerItem(IconData icon, String title, VoidCallback onTap) {
     return ListTile(

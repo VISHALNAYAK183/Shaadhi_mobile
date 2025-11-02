@@ -179,7 +179,7 @@ class _BlockReportCardState extends State<BlockReportCard> {
             child: ElevatedButton(
               onPressed: _handleSubmit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF8A2727),
+                backgroundColor: Color(0xFFC3A38C),
                 padding: const EdgeInsets.symmetric(
                     vertical: 2.0), // Reduced button padding
                 shape: RoundedRectangleBorder(
