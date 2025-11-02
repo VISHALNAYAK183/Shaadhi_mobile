@@ -244,7 +244,7 @@ salaryError = (selectedSalaryRange == null || selectedSalaryRange!.trim().isEmpt
 
       print('Sending qualifications: $qualificationIDs');
 
-      bool success = await ApiService.updateEducationDetails(
+      bool success = await ApiService.updateEducationDetails(context,
         matriID: widget.profile.matriId,
         id: widget.profile.id,
         qualification: qualificationIDs.join(", "),

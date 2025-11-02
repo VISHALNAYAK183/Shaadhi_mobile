@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:practice/dashboard_model.dart';
+import 'package:practice/login.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'api_models.dart';
 
 class ApiService {
@@ -9,222 +12,327 @@ class ApiService {
   static const Map<String, String> _headers = {
     "Content-Type": "application/json",
   };
+ static Future<http.Response> _post(
+      BuildContext context, String endpoint, Map<String, dynamic> body) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString("token");
 
+    final response = await http.post(
+      Uri.parse("$_baseUrl/$endpoint"),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      },
+      body: jsonEncode(body),
+    );
 
-  static Future<bool> updateProfile({
-    String? matriID,
-    String? maritalStatus,
-    String? subCaste,
-  }) async {
-    try {
-      Map<String, dynamic> requestBody = {
-        "type": "basic_data",
-        "matri_id": matriID,
-      };
+    if (response.statusCode == 401) {
+      _handleSessionExpiry(context);
+    }
 
-      if (maritalStatus != null && maritalStatus.isNotEmpty) {
-        requestBody["marital_status"] = maritalStatus;
+    return response;
+  }
+
+ static void _handleSessionExpiry(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text("Session Expired"),
+        content: const Text("Please login again."),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => LoginScreen()),
+                (Route<dynamic> route) => false,
+              );
+            },
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
+static Future<bool> updateProfile(
+  BuildContext context, {
+  String? matriID,
+  String? maritalStatus,
+  String? subCaste,
+}) async {
+  try {
+  
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? matriId1 = prefs.getString('matriId');
+    if (matriId1 == null) {
+      throw Exception("Matri ID not found in SharedPreferences");
+    }
+
+    Map<String, dynamic> requestBody = {
+      "type": "basic_data",
+      "matri_id": matriId1,
+      "marital_status": maritalStatus,
+      "sub_caste": subCaste,
+    };
+
+    debugPrint("Sending API Request: ${jsonEncode(requestBody)}");
+
+    final response = await _post(context, "update_profile.php", requestBody);
+
+    debugPrint("API Response Code: ${response.statusCode}");
+    debugPrint("API Response Body: ${response.body}");
+
+    if (response.statusCode == 200) {
+      final decodedJson = jsonDecode(response.body);
+
+      final newToken = decodedJson["newToken"] ?? decodedJson["token"];
+      if (newToken != null) {
+        await prefs.setString("token", newToken);
+        debugPrint("Token updated after profile update");
       }
-      if (subCaste != null && subCaste.isNotEmpty) {
-        requestBody["sub_caste"] = subCaste;
-      }
 
-      if (requestBody.length == 2) {
-        print("No changes detected, skipping API call.");
+      if (decodedJson["message"] != null &&
+          decodedJson["message"]["p_out_mssg_flg"] == "Y") {
+        debugPrint(decodedJson["message"]["p_out_mssg"]);
         return true;
-      }
-
-      // Debugging: Print API Request
-      print("Sending API Request: ${jsonEncode(requestBody)}");
-
-      final response = await http.post(
-        Uri.parse("$_baseUrl/update_profile.php"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(requestBody),
-      );
-
-      // Debugging: Print API Response
-      print("API Response Code: ${response.statusCode}");
-      print("API Response Body: ${response.body}");
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return data["message"]["p_out_mssg_flg"] == "Y";
       } else {
-        print("Failed to update profile: ${response.body}");
+        debugPrint("Update failed: ${decodedJson["message"]}");
         return false;
       }
-    } catch (e) {
-      print("Error updating profile: $e");
-      return false;
+    } else {
+      throw Exception("Failed to update profile. Status: ${response.statusCode}");
     }
+  } catch (e) {
+    debugPrint("Error updating profile: $e");
+    return false;
   }
+}
 
-  static Future<bool> updateEducationDetails({
-    String? matriID,
-    String? id,
-    String? qualification,
-    String? specialization,
-    String? profession,
-    String? companyName,
-    String? companyCity,
-    String? salaryRange,
-  }) async {
-    try {
-      Map<String, dynamic> requestBody = {
-        "type": "education",
-        "matri_id": matriID,
-        "id": id,
-        "qualification": qualification,
-        "specialization": specialization,
-        "profession": profession,
-        "company_name": companyName,
-        "company_city": companyCity,
-        "salary_range": salaryRange,
-      };
+ static Future<bool> updateEducationDetails(
+  BuildContext context, {
+  String? matriID,
+  String? id,
+  String? qualification,
+  String? specialization,
+  String? profession,
+  String? companyName,
+  String? companyCity,
+  String? salaryRange,
+}) async {
+  try {
+   
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? matriId1 = prefs.getString('matriId');
+    if (matriId1 == null) {
+      throw Exception("Matri ID not found in SharedPreferences");
+    }
 
-      print("Sending API Request: ${jsonEncode(requestBody)}");
+    Map<String, dynamic> requestBody = {
+      "type": "education",
+      "matri_id": matriId1,
+      "id": id,
+      "qualification": qualification,
+      "specialization": specialization,
+      "profession": profession,
+      "company_name": companyName,
+      "company_city": companyCity,
+      "salary_range": salaryRange,
+    };
 
-      final response = await http.post(
-        Uri.parse(
-            "$_baseUrl/update_profile.php"), 
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(requestBody),
-      );
+    debugPrint("Sending API Request: ${jsonEncode(requestBody)}");
 
-      print("API Response Code: ${response.statusCode}");
-      print("API Response Body: ${response.body}");
+  
+    final response = await _post(context, "update_profile.php", requestBody);
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return data["message"]["p_out_mssg_flg"] == "Y";
+    debugPrint("API Response Code: ${response.statusCode}");
+    debugPrint("API Response Body: ${response.body}");
+
+    if (response.statusCode == 200) {
+      final decodedJson = jsonDecode(response.body);
+
+      final newToken = decodedJson["newToken"] ?? decodedJson["token"];
+      if (newToken != null) {
+        await prefs.setString("token", newToken);
+        debugPrint("Token updated after education details update");
+      }
+
+      if (decodedJson["message"] != null &&
+          decodedJson["message"]["p_out_mssg_flg"] == "Y") {
+        debugPrint(decodedJson["message"]["p_out_mssg"]);
+        return true;
       } else {
-        print("Failed to update education details: ${response.body}");
+        debugPrint("Update failed: ${decodedJson["message"]}");
         return false;
       }
-    } catch (e) {
-      print("Error updating education details: $e");
-      return false;
+    } else {
+      throw Exception(
+          "Failed to update education details. Status: ${response.statusCode}");
     }
+  } catch (e) {
+    debugPrint("Error updating education details: $e");
+    return false;
   }
+}
 
-  static Future<bool> updateHoroscopeDetails({
-    String? matriID,
-    String? id,
-    String? rashi,
-    String? nakshatra,
-    String? sunSign,
-    String? birthTime,
-    String? birthPlace,
-    String? horoscope,
-    String? gothra,
-    String? familyDiety,
-  }) async {
-    try {
-      Map<String, dynamic> requestBody = {
-        "type": "horoscope",
-        "matri_id": matriID,
-        "id": id,
-        "rashi": rashi,
-        "nakshatra": nakshatra,
-        "sun_sign": sunSign,
-        "birth_time": birthTime,
-        "birth_place": birthPlace,
-        "horoscope": horoscope,
-        "gothra": gothra,
-        "family_diety": familyDiety,
-      };
+ static Future<bool> updateHoroscopeDetails(
+  BuildContext context, {
+  String? matriID,
+  String? id,
+  String? rashi,
+  String? nakshatra,
+  String? sunSign,
+  String? birthTime,
+  String? birthPlace,
+  String? horoscope,
+  String? gothra,
+  String? familyDiety,
+}) async {
+  try {
+   
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? matriId1 = prefs.getString('matriId');
+    if (matriId1 == null) {
+      throw Exception("Matri ID not found in SharedPreferences");
+    }
 
-      print("Sending API Request: ${jsonEncode(requestBody)}");
+    Map<String, dynamic> requestBody = {
+      "type": "horoscope",
+      "matri_id": matriId1,
+      "id": id,
+      "rashi": rashi,
+      "nakshatra": nakshatra,
+      "sun_sign": sunSign,
+      "birth_time": birthTime,
+      "birth_place": birthPlace,
+      "horoscope": horoscope,
+      "gothra": gothra,
+      "family_diety": familyDiety,
+    };
 
-      final response = await http.post(
-        Uri.parse("$_baseUrl/update_profile.php"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(requestBody),
-      );
+    debugPrint("Sending API Request: ${jsonEncode(requestBody)}");
 
-      print("API Response Code: ${response.statusCode}");
-      print("API Response Body: ${response.body}");
+    final response = await _post(context, "update_profile.php", requestBody);
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return data["message"]["p_out_mssg_flg"] == "Y";
+    debugPrint("API Response Code: ${response.statusCode}");
+    debugPrint("API Response Body: ${response.body}");
+
+    if (response.statusCode == 200) {
+      final decodedJson = jsonDecode(response.body);
+
+      final newToken = decodedJson["newToken"] ?? decodedJson["token"];
+      if (newToken != null) {
+        await prefs.setString("token", newToken);
+        debugPrint("Token updated after horoscope details update");
+      }
+
+      if (decodedJson["message"] != null &&
+          decodedJson["message"]["p_out_mssg_flg"] == "Y") {
+        debugPrint(decodedJson["message"]["p_out_mssg"]);
+        return true;
       } else {
-        print("Failed to update horoscope details: ${response.body}");
+        debugPrint("Update failed: ${decodedJson["message"]}");
         return false;
       }
-    } catch (e) {
-      print("Error updating horoscope details: $e");
-      return false;
+    } else {
+      throw Exception(
+          "Failed to update horoscope details. Status: ${response.statusCode}");
     }
+  } catch (e) {
+    debugPrint("Error updating horoscope details: $e");
+    return false;
   }
+}
 
-  static Future<bool> updateFamilyDetails({
-    String? matriID,
-    String? id,
-    String? fatherName,
-    String? motherName,
-    String? fatherLivingStatus,
-    String? motherLivingStatus,
-    String? fatherOccupation,
-    String? motherOccupation,
-    String? numberOfBrothers,
-    String? numberOfSisters,
-    String? numberOfMarriedBrothers,
-    String? numberOfMarriedSisters,
-    String? referenceNumber,
-    String? reference,
-    String? place,
-    String? familyType,
-    String? kidsCount,
-    String? motherTongue,
-  }) async {
-    try {
-      Map<String, dynamic> requestBody = {
-        "type": "family_details",
-        "matri_id": matriID,
-        "id": id,
-        "kids_count": kidsCount,
-        "father_name": fatherName,
-        "mother_name": motherName,
-        "father_living_status": fatherLivingStatus,
-        "mother_living_status": motherLivingStatus,
-        "father_ocupation": fatherOccupation,
-        "mother_occupation": motherOccupation,
-        "number_of_brothers": numberOfBrothers,
-        "number_of_sisters": numberOfSisters,
-        "number_married_brother": numberOfMarriedBrothers,
-        "number_of_married_sister": numberOfMarriedSisters,
-        "reference_number": referenceNumber,
-        "reference": reference,
-        "place": place,
-        "family_type": familyType,
-        "mother_tongue": motherTongue,
-      };
 
-      print("Sending API Request: ${jsonEncode(requestBody)}");
+static Future<bool> updateFamilyDetails(
+  BuildContext context, {
+  String? matriID,
+  String? id,
+  String? fatherName,
+  String? motherName,
+  String? fatherLivingStatus,
+  String? motherLivingStatus,
+  String? fatherOccupation,
+  String? motherOccupation,
+  String? numberOfBrothers,
+  String? numberOfSisters,
+  String? numberOfMarriedBrothers,
+  String? numberOfMarriedSisters,
+  String? referenceNumber,
+  String? reference,
+  String? place,
+  String? familyType,
+  String? kidsCount,
+  String? motherTongue,
+}) async {
+  try {
+   
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? matriId1 = prefs.getString('matriId');
+    if (matriId1 == null) {
+      throw Exception("Matri ID not found in SharedPreferences");
+    }
 
-      final response = await http.post(
-        Uri.parse("$_baseUrl/update_profile.php"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(requestBody),
-      );
+    Map<String, dynamic> requestBody = {
+      "type": "family_details",
+      "matri_id": matriId1,
+      "id": id,
+      "kids_count": kidsCount,
+      "father_name": fatherName,
+      "mother_name": motherName,
+      "father_living_status": fatherLivingStatus,
+      "mother_living_status": motherLivingStatus,
+      "father_ocupation": fatherOccupation,
+      "mother_occupation": motherOccupation,
+      "number_of_brothers": numberOfBrothers,
+      "number_of_sisters": numberOfSisters,
+      "number_married_brother": numberOfMarriedBrothers,
+      "number_of_married_sister": numberOfMarriedSisters,
+      "reference_number": referenceNumber,
+      "reference": reference,
+      "place": place,
+      "family_type": familyType,
+      "mother_tongue": motherTongue,
+    };
 
-      print("API Response Code: ${response.statusCode}");
-      print("API Response Body: ${response.body}");
+    debugPrint("Sending API Request: ${jsonEncode(requestBody)}");
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return data["message"]["p_out_mssg_flg"] == "Y";
+    final response = await _post(context, "update_profile.php", requestBody);
+
+    debugPrint("API Response Code: ${response.statusCode}");
+    debugPrint("API Response Body: ${response.body}");
+
+    if (response.statusCode == 200) {
+      final decodedJson = jsonDecode(response.body);
+
+      final newToken = decodedJson["newToken"] ?? decodedJson["token"];
+      if (newToken != null) {
+        await prefs.setString("token", newToken);
+        debugPrint("Token updated after family details update");
+      }
+
+      if (decodedJson["message"] != null &&
+          decodedJson["message"]["p_out_mssg_flg"] == "Y") {
+        debugPrint(decodedJson["message"]["p_out_mssg"]);
+        return true;
       } else {
-        print("Failed to update family details: ${response.body}");
+        debugPrint("Update failed: ${decodedJson["message"]}");
         return false;
       }
-    } catch (e) {
-      print("Error updating family details: $e");
-      return false;
+    } else {
+      throw Exception(
+          "Failed to update family details. Status: ${response.statusCode}");
     }
+  } catch (e) {
+    debugPrint("Error updating family details: $e");
+    return false;
   }
+}
+
 
   static Future<List<searchsubcaste>> fetchSubCaste(String casteId) async {
     try {

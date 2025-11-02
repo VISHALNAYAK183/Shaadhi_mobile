@@ -210,7 +210,7 @@ class PersonalDetailsState extends State<PersonalDetails> {
       print(
           "Sending API update: MaritalStatus ID: $updatedMaritalStatus, SubCaste ID: $updatedSubCaste");
 
-      bool success = await ApiService.updateProfile(
+      bool success = await ApiService.updateProfile(context,
         matriID: widget.profile.matriId,
         maritalStatus: updatedMaritalStatus,
         subCaste: updatedSubCaste,

@@ -181,7 +181,7 @@ class _HoroscopeDetailsPageState extends State<HoroscopeDetailsPage> {
           ? _getRashiCode(selectedRashi)
           : _getRashiCode(widget.profile.rashi);
 
-      bool success = await ApiService.updateHoroscopeDetails(
+      bool success = await ApiService.updateHoroscopeDetails(context,
         matriID: widget.profile.matriId,
         id: widget.profile.id,
         rashi: updatedRashi,
