@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:practice/checkProfiles.dart';
-import 'package:practice/inapp/subscription_list_screen.dart';
-import 'package:practice/lang.dart';
-import 'package:practice/profile_view.dart';
+import 'package:buntsmatrimony/checkProfiles.dart';
+import 'package:buntsmatrimony/inapp/subscription_list_screen.dart';
+import 'package:buntsmatrimony/lang.dart';
+import 'package:buntsmatrimony/profile_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:practice/api_service.dart';
-import 'package:practice/dashboard_model.dart';
+import 'package:buntsmatrimony/api_service.dart';
+import 'package:buntsmatrimony/dashboard_model.dart';
 
 class SearchPage extends StatefulWidget {
   @override
@@ -63,7 +63,7 @@ class _SearchPageState extends State<SearchPage> {
   double _selectedMaxAge = 40;
   double _selectedMinHeight = 50;
   double _selectedMaxHeight = 250;
-  Color appcolor = Color(0xFFC3A38C);
+  Color appcolor = Color(0xFFea4a57);
 
   @override
   void initState() {
@@ -74,19 +74,22 @@ class _SearchPageState extends State<SearchPage> {
     String query = _controller.text.toLowerCase();
     setState(() {
       filteredProfiles = searchResults
-          .where((profile) =>
-                  profile.firstName.toLowerCase().contains(query) ||
-                  profile.matriId
-                      .toLowerCase()
-                      .contains(query) // Add more filters if needed
-              )
+          .where(
+            (profile) =>
+                profile.firstName.toLowerCase().contains(query) ||
+                profile.matriId.toLowerCase().contains(
+                      query,
+                    ), // Add more filters if needed
+          )
           .toList();
     });
   }
 
   Future<void> _searchByCategory(int page) async {
-    var result =
-        await ApiService.fetchCategory1(page.toString(), _pageSize.toString());
+    var result = await ApiService.fetchCategory1(
+      page.toString(),
+      _pageSize.toString(),
+    );
     _controller.addListener(_filterProfiles);
 
     setState(() {
@@ -100,7 +103,8 @@ class _SearchPageState extends State<SearchPage> {
         _isPaginationFetched = true;
       }
       print(
-          "$_totalPages  ${result['totalRows']}  $_pageSize ${searchResults.length}");
+        "$_totalPages  ${result['totalRows']}  $_pageSize ${searchResults.length}",
+      );
     });
   }
 
@@ -133,9 +137,13 @@ class _SearchPageState extends State<SearchPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(localizations.translate('apply_filters'),
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text(
+                      localizations.translate('apply_filters'),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     Divider(),
 
                     DropdownButtonFormField<String>(
@@ -150,20 +158,24 @@ class _SearchPageState extends State<SearchPage> {
 
                         if (value != null &&
                             maritalStatusMap.containsKey(value)) {
-                          await prefs.setInt("selected_marital_status",
-                              maritalStatusMap[value]!);
+                          await prefs.setInt(
+                            "selected_marital_status",
+                            maritalStatusMap[value]!,
+                          );
                         } else {
                           await prefs.remove("selected_marital_status");
                         }
 
                         print(
-                            "Selected marital status: ${maritalStatusMap[value] ?? 'None'}");
+                          "Selected marital status: ${maritalStatusMap[value] ?? 'None'}",
+                        );
                       },
                       items: maritalStatusMap.keys.map((ms) {
                         return DropdownMenuItem(value: ms, child: Text(ms));
                       }).toList(),
                       decoration: InputDecoration(
-                          labelText: localizations.translate('marital_status')),
+                        labelText: localizations.translate('marital_status'),
+                      ),
                     ),
 
                     // Subcaste Dropdown
@@ -174,19 +186,26 @@ class _SearchPageState extends State<SearchPage> {
                       buttonText: Text(
                         localizations.translate('sub_caste'),
                         style: TextStyle(
-                            fontSize: 16, color: Colors.grey.shade800),
+                          fontSize: 16,
+                          color: Color(0xFF2d2d2d),
+                        ),
                         textAlign: TextAlign.left,
                       ),
 
                       chipDisplay: MultiSelectChipDisplay(),
                       onConfirm: (values) {
-                        setState(() => _selectedSubCasteList =
-                            List<searchsubcaste>.from(values));
+                        setState(
+                          () => _selectedSubCasteList =
+                              List<searchsubcaste>.from(values),
+                        );
                         _saveFilters();
                       },
                       initialValue: _selectedSubCasteList,
-                      buttonIcon: Icon(Icons.arrow_drop_down,
-                          color: Colors.black, size: 24), // Increase icon size
+                      buttonIcon: Icon(
+                        Icons.arrow_drop_down,
+                        color: Colors.black,
+                        size: 24,
+                      ), // Increase icon size
                       dialogWidth: MediaQuery.of(context).size.width * 0.85,
                       searchable: true,
                       searchHint: "Search Subcaste...",
@@ -202,16 +221,22 @@ class _SearchPageState extends State<SearchPage> {
                       buttonText: Text(
                         localizations.translate('education'),
                         style: TextStyle(
-                            fontSize: 16, color: Colors.grey.shade800),
+                          fontSize: 16,
+                          color: Color(0xFF2d2d2d),
+                        ),
                       ),
                       chipDisplay: MultiSelectChipDisplay(),
                       onConfirm: (values) {
-                        setState(() => _selectedEducationList =
-                            List<searcheducation>.from(values));
+                        setState(
+                          () => _selectedEducationList =
+                              List<searcheducation>.from(values),
+                        );
                         _saveFilters();
                       },
-                      buttonIcon:
-                          Icon(Icons.arrow_drop_down, color: Colors.black),
+                      buttonIcon: Icon(
+                        Icons.arrow_drop_down,
+                        color: Colors.black,
+                      ),
                       dialogWidth: MediaQuery.of(context).size.width * 0.85,
                       searchable: true,
                       searchHint: "Search Education...",
@@ -219,8 +244,8 @@ class _SearchPageState extends State<SearchPage> {
                     ),
 
                     SizedBox(height: 10),
-                    // Country Dropdown
 
+                    // Country Dropdown
                     _buildCountryDropdown(setModalState),
 
                     SizedBox(height: 10),
@@ -246,9 +271,13 @@ class _SearchPageState extends State<SearchPage> {
                       localizations
                           .translate('age_range')
                           .replaceAll(
-                              '{min}', _selectedMinAge.round().toString())
+                            '{min}',
+                            _selectedMinAge.round().toString(),
+                          )
                           .replaceAll(
-                              '{max}', _selectedMaxAge.round().toString()),
+                            '{max}',
+                            _selectedMaxAge.round().toString(),
+                          ),
                     ),
                     RangeSlider(
                       values: RangeValues(_selectedMinAge, _selectedMaxAge),
@@ -268,11 +297,15 @@ class _SearchPageState extends State<SearchPage> {
                         SharedPreferences prefs =
                             await SharedPreferences.getInstance();
                         await prefs.setDouble(
-                            "selected_min_age", _selectedMinAge);
+                          "selected_min_age",
+                          _selectedMinAge,
+                        );
                         await prefs.setDouble(
-                            "selected_max_age", _selectedMaxAge);
+                          "selected_max_age",
+                          _selectedMaxAge,
+                        );
                       },
-                      activeColor: Color(0xFFC3A38C),
+                      activeColor: Color(0xFFea4a57),
                       inactiveColor: Colors.white,
                     ),
 
@@ -281,18 +314,26 @@ class _SearchPageState extends State<SearchPage> {
                       localizations
                           .translate('height_range')
                           .replaceAll(
-                              '{min}', _selectedMinHeight.round().toString())
+                            '{min}',
+                            _selectedMinHeight.round().toString(),
+                          )
                           .replaceAll(
-                              '{max}', _selectedMaxHeight.round().toString()),
+                            '{max}',
+                            _selectedMaxHeight.round().toString(),
+                          ),
                     ),
                     RangeSlider(
-                      values:
-                          RangeValues(_selectedMinHeight, _selectedMaxHeight),
+                      values: RangeValues(
+                        _selectedMinHeight,
+                        _selectedMaxHeight,
+                      ),
                       min: 50,
                       max: 250,
                       divisions: 82,
-                      labels: RangeLabels("${_selectedMinHeight.round()}",
-                          "${_selectedMaxHeight.round()}"),
+                      labels: RangeLabels(
+                        "${_selectedMinHeight.round()}",
+                        "${_selectedMaxHeight.round()}",
+                      ),
                       onChanged: (values) async {
                         setModalState(() {
                           _selectedMinHeight = values.start;
@@ -302,14 +343,19 @@ class _SearchPageState extends State<SearchPage> {
                         SharedPreferences prefs =
                             await SharedPreferences.getInstance();
                         await prefs.setDouble(
-                            "selected_min_height", _selectedMinHeight);
+                          "selected_min_height",
+                          _selectedMinHeight,
+                        );
                         await prefs.setDouble(
-                            "selected_max_height", _selectedMaxHeight);
+                          "selected_max_height",
+                          _selectedMaxHeight,
+                        );
                       },
-                      activeColor:
-                          Color(0xFFC3A38C), // Apply the specified color
+                      activeColor: Color(
+                        0xFFea4a57,
+                      ), // Apply the specified color
                       inactiveColor: Colors.white,
-                      //  thumbColor: Color(0xFFC3A38C),
+                      //  thumbColor: Color(0xFFea4a57),
                     ),
                     SizedBox(height: 20),
                     Align(
@@ -324,11 +370,11 @@ class _SearchPageState extends State<SearchPage> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: isMatriSearch == false
-                              ? Color(0xFFC3A38C)
+                              ? Color(0xFFea4a57)
                               : Colors.white,
                           foregroundColor: isMatriSearch == false
                               ? Colors.white
-                              : Color(0xFFC3A38C),
+                              : Color(0xFFea4a57),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(6),
                           ),
@@ -349,11 +395,15 @@ class _SearchPageState extends State<SearchPage> {
   Future<void> _saveFilters() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    await prefs.setStringList("selected_sub_caste",
-        _selectedSubCasteList.map((sc) => sc.id).toList());
+    await prefs.setStringList(
+      "selected_sub_caste",
+      _selectedSubCasteList.map((sc) => sc.id).toList(),
+    );
 
-    await prefs.setStringList("selected_education",
-        _selectedEducationList.map((ed) => ed.id).toList());
+    await prefs.setStringList(
+      "selected_education",
+      _selectedEducationList.map((ed) => ed.id).toList(),
+    );
   }
 
   Widget _buildCountryDropdown(Function setModalState) {
@@ -364,8 +414,9 @@ class _SearchPageState extends State<SearchPage> {
       itemAsString: (searchcountry c) => "${c.country_name}",
       selectedItem: _selectedCountry,
       dropdownDecoratorProps: DropDownDecoratorProps(
-        dropdownSearchDecoration:
-            InputDecoration(labelText: localizations.translate('country')),
+        dropdownSearchDecoration: InputDecoration(
+          labelText: localizations.translate('country'),
+        ),
       ),
       onChanged: (searchcountry? value) async {
         if (value == null) return;
@@ -386,7 +437,8 @@ class _SearchPageState extends State<SearchPage> {
         await prefs.setString("selected_country_code", value.country_code);
 
         print(
-            "Selected Country: ${_selectedCountry?.country_name} - Code: $_selectedCountryCode");
+          "Selected Country: ${_selectedCountry?.country_name} - Code: $_selectedCountryCode",
+        );
 
         List<searchstate> allStates = await ApiService.fetchstate();
 
@@ -407,8 +459,9 @@ class _SearchPageState extends State<SearchPage> {
       itemAsString: (searchstate s) => s.state_name,
       selectedItem: _selectedState,
       dropdownDecoratorProps: DropDownDecoratorProps(
-        dropdownSearchDecoration:
-            InputDecoration(labelText: localizations.translate('state')),
+        dropdownSearchDecoration: InputDecoration(
+          labelText: localizations.translate('state'),
+        ),
       ),
       onChanged: (searchstate? value) async {
         if (value == null) return;
@@ -445,8 +498,9 @@ class _SearchPageState extends State<SearchPage> {
       itemAsString: (searchcity c) => c.city_name,
       selectedItem: _selectedCity,
       dropdownDecoratorProps: DropDownDecoratorProps(
-        dropdownSearchDecoration:
-            InputDecoration(labelText: localizations.translate('city')),
+        dropdownSearchDecoration: InputDecoration(
+          labelText: localizations.translate('city'),
+        ),
       ),
       onChanged: (searchcity? value) async {
         if (value == null) return;
@@ -487,107 +541,109 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     var localizations = AppLocalizations.of(context);
     return Scaffold(
-        body: Column(children: [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      body: Column(
         children: [
-          Padding(
-            padding: EdgeInsets.only(
-                left: 8.0,
-                right: 8.0,
-                top: 4.0,
-                bottom: 4.0), // Adjust as needed
-            child: Text(
-              localizations.translate('search'),
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(
+                  left: 8.0,
+                  right: 8.0,
+                  top: 20.0,
+                  bottom: 4.0,
+                ), // Adjust as needed
+                child: Text(
+                  localizations.translate('search'),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                ),
               ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () => setState(() {
-              isMatriSearch = true;
-              searchResults = [];
-              _isPaginationFetched = false;
-            }),
-            style: ElevatedButton.styleFrom(
-              backgroundColor:
-                  isMatriSearch == true ? Color(0xFFC3A38C) : Colors.white,
-              foregroundColor:
-                  isMatriSearch == true ? Colors.white : Color(0xFFC3A38C),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6)),
-            ),
-            child: Text(localizations.translate('matri_id')),
-          ),
-          SizedBox(width: 10),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                isMatriSearch = false;
-              });
-              _loadFilterData();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor:
-                  isMatriSearch == false ? Color(0xFFC3A38C) : Colors.white,
-              foregroundColor:
-                  isMatriSearch == false ? Colors.white : Color(0xFFC3A38C),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
+              ElevatedButton(
+                onPressed: () => setState(() {
+                  isMatriSearch = true;
+                  searchResults = [];
+                  _isPaginationFetched = false;
+                }),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      isMatriSearch == true ? Color(0xFFea4a57) : Colors.white,
+                  foregroundColor:
+                      isMatriSearch == true ? Colors.white : Color(0xFFea4a57),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                ),
+                child: Text(localizations.translate('matri_id')),
               ),
-            ),
-            child: Text(localizations.translate('category')),
+              SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    isMatriSearch = false;
+                  });
+                  _loadFilterData();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      isMatriSearch == false ? Color(0xFFea4a57) : Colors.white,
+                  foregroundColor:
+                      isMatriSearch == false ? Colors.white : Color(0xFFea4a57),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                ),
+                child: Text(localizations.translate('category')),
+              ),
+            ],
           ),
+
+          // Pagination Row (Always Visible)
+          if (!isMatriSearch && _isPaginationFetched) ...[
+            _searchbox(_controller),
+            if (_totalPages > 1)
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: List.generate(_totalPages, (index) {
+                      //
+                      int pageNumber = index + 1;
+                      return GestureDetector(
+                        onTap: () => _searchByCategory(pageNumber),
+                        child: Container(
+                          padding: EdgeInsets.all(10),
+                          margin: EdgeInsets.symmetric(horizontal: 4),
+                          decoration: BoxDecoration(
+                            color: _currentPage == pageNumber
+                                ? appcolor
+                                : Colors.grey[300],
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Text(
+                            pageNumber.toString(),
+                            style: TextStyle(
+                              color: _currentPage == pageNumber
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+              ),
+            Expanded(child: _buildResults()),
+          ],
+
+          if (isMatriSearch && !_isPaginationFetched) ...[
+            search(),
+            Expanded(child: _buildMatriSearchResults()),
+          ],
         ],
       ),
-
-      // Pagination Row (Always Visible)
-      if (!isMatriSearch && _isPaginationFetched) ...[
-        _searchbox(_controller),
-        if (_totalPages > 1)
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 8),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: List.generate(_totalPages, (index) {
-                  //
-                  int pageNumber = index + 1;
-                  return GestureDetector(
-                    onTap: () => _searchByCategory(pageNumber),
-                    child: Container(
-                      padding: EdgeInsets.all(10),
-                      margin: EdgeInsets.symmetric(horizontal: 4),
-                      decoration: BoxDecoration(
-                        color: _currentPage == pageNumber
-                            ? appcolor
-                            : Colors.grey[300],
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Text(
-                        pageNumber.toString(),
-                        style: TextStyle(
-                          color: _currentPage == pageNumber
-                              ? Colors.white
-                              : Colors.black,
-                        ),
-                      ),
-                    ),
-                  );
-                }),
-              ),
-            ),
-          ),
-        Expanded(child: _buildResults()),
-      ],
-
-      if (isMatriSearch && !_isPaginationFetched) ...[
-        search(),
-        Expanded(child: _buildMatriSearchResults()),
-      ]
-    ]));
+    );
   }
 
   bool isValidImageUrl(String url) {
@@ -672,12 +728,15 @@ class _SearchPageState extends State<SearchPage> {
           },
           child: Container(
             margin: const EdgeInsets.symmetric(
-                horizontal: 8, vertical: 10), // gap between cards
+              horizontal: 8,
+              vertical: 10,
+            ), // gap between cards
             child: Card(
               elevation: 4,
               shape: RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.circular(20), // smoother round corners
+                borderRadius: BorderRadius.circular(
+                  20,
+                ), // smoother round corners
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -729,8 +788,10 @@ class _SearchPageState extends State<SearchPage> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 4),
-                  Text("Age: ${profile.age}",
-                      style: const TextStyle(fontSize: 11)),
+                  Text(
+                    "Age: ${profile.age}",
+                    style: const TextStyle(fontSize: 11),
+                  ),
                   const SizedBox(height: 6),
                   Text(
                     " ${profile.matriId} ",
@@ -787,16 +848,21 @@ class _SearchPageState extends State<SearchPage> {
                 _searchFocusNode, //_isExpanded, // Auto-focus when expanded
             decoration: InputDecoration(
               hintText: "Search...",
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-              contentPadding:
-                  EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              contentPadding: EdgeInsets.symmetric(
+                vertical: 10,
+                horizontal: 10,
+              ),
             ),
           ),
         ),
         IconButton(
-          icon:
-              Icon(_isExpanded ? Icons.close : Icons.search, color: Colors.red),
+          icon: Icon(
+            _isExpanded ? Icons.close : Icons.search,
+            color: Colors.red,
+          ),
           onPressed: () {
             setState(() {
               _isExpanded = !_isExpanded; // Toggle state
@@ -805,8 +871,9 @@ class _SearchPageState extends State<SearchPage> {
                 filteredProfiles = searchResults; // Reset list when closed
                 _searchFocusNode.unfocus(); // Hide keyboard
               } else {
-                FocusScope.of(context)
-                    .requestFocus(_searchFocusNode); // Request focus
+                FocusScope.of(
+                  context,
+                ).requestFocus(_searchFocusNode); // Request focus
               }
             });
           },
@@ -930,8 +997,10 @@ class _SearchPageState extends State<SearchPage> {
                   children: [
                     Text(
                       "${profile.age} yrs, ",
-                      style:
-                          const TextStyle(fontSize: 12, color: Colors.black87),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.black87,
+                      ),
                     ),
                     Text(
                       "${profile.matriId}",

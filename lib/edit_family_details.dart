@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:practice/dashboard_model.dart';
-import 'package:practice/lang.dart';
-import 'package:practice/profile_page.dart';
+import 'package:buntsmatrimony/dashboard_model.dart';
+import 'package:buntsmatrimony/lang.dart';
+import 'package:buntsmatrimony/profile_page.dart';
 import 'api_services.dart';
 import 'custom_widget.dart';
 import 'api_models.dart';
@@ -32,17 +32,23 @@ class _FamilyDetailsPageState extends State<FamilyDetailsPage> {
   String? selectedSisters;
   String? selectedMotherTongue;
   String? selectedFamilyType;
-  String selectedFatherLivingStatus="0";
-  String selectedMotherLivingStatus="0";
-   Color appcolor = Color(0xFFC3A38C);
+  String selectedFatherLivingStatus = "0";
+  String selectedMotherLivingStatus = "0";
+  Color appcolor = Color(0xFFea4a57);
 
-  String marriedBrothersController="1";
-  String marriedSistersController="1";
+  String marriedBrothersController = "1";
+  String marriedSistersController = "1";
 
   final List<String> kidsOptions = ['0', '1', '2', '3', '4+'];
   final List<String> brothersOptions = ['0', '1', '2', '3', '4+'];
   final List<String> sistersOptions = ['0', '1', '2', '3', '4+'];
-  final List<String> familyTypes = ['Single','Joint','Extended','Nuclear', 'Blended'];
+  final List<String> familyTypes = [
+    'Single',
+    'Joint',
+    'Extended',
+    'Nuclear',
+    'Blended',
+  ];
 
   String? fatherNameError;
   String? motherNameError;
@@ -121,55 +127,52 @@ class _FamilyDetailsPageState extends State<FamilyDetailsPage> {
     }
   }
 
-  
-
   Future<void> validateAndProceed() async {
     setState(() {
       fatherNameError = _validateFathersName(fatherNameController.text);
       motherNameError = _validateMothersName(motherNameController.text);
       motherTongueError =
-          (selectedMotherTongue == null || selectedMotherTongue!.isEmpty) ? "Select Mother Tongue" : null;
-      kidsError = (selectedKids == null || selectedKids!.isEmpty) ? "Select no. of kids" : null;
+          (selectedMotherTongue == null || selectedMotherTongue!.isEmpty)
+          ? "Select Mother Tongue"
+          : null;
+      kidsError = (selectedKids == null || selectedKids!.isEmpty)
+          ? "Select no. of kids"
+          : null;
     });
 
     if (fatherNameError == null &&
         motherNameError == null &&
         kidsError == null &&
         motherTongueError == null) {
-
-          String? updatedMotherTongue = selectedMotherTongue != null
+      String? updatedMotherTongue = selectedMotherTongue != null
           ? motherTongueMap[selectedMotherTongue]
           : widget.profile.motherTongue;
-      bool success = await ApiService.updateFamilyDetails(context,
-  matriID: widget.profile.matriId,
-  fatherName: fatherNameController.text,
-  motherName: motherNameController.text,
-  id: widget.profile.id,
-  fatherOccupation: fatherOccupationController.text,
-  motherOccupation: motherOccupationController.text,
-  numberOfBrothers: selectedBrothers,
-  numberOfSisters: selectedSisters,
-  referenceNumber: referencePhoneController.text,
-  reference: referenceNameController.text,
-  place: permanentAddressController.text,
-  familyType: selectedFamilyType,
-  kidsCount: selectedKids,
-  motherTongue: updatedMotherTongue,
-);
+      bool success = await ApiService.updateFamilyDetails(
+        context,
+        matriID: widget.profile.matriId,
+        fatherName: fatherNameController.text,
+        motherName: motherNameController.text,
+        id: widget.profile.id,
+        fatherOccupation: fatherOccupationController.text,
+        motherOccupation: motherOccupationController.text,
+        numberOfBrothers: selectedBrothers,
+        numberOfSisters: selectedSisters,
+        referenceNumber: referencePhoneController.text,
+        reference: referenceNameController.text,
+        place: permanentAddressController.text,
+        familyType: selectedFamilyType,
+        kidsCount: selectedKids,
+        motherTongue: updatedMotherTongue,
+      );
 
-
-
-if (success) {
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(
-      builder: (context) => ProfilePage1(), 
-    ),
-  );
-} else {
-  print("Failed to update family details");
-}
-
+      if (success) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => ProfilePage1()),
+        );
+      } else {
+        print("Failed to update family details");
+      }
     }
   }
 
@@ -181,7 +184,7 @@ if (success) {
         backgroundColor: appcolor,
         title: Text(
           localizations.translate('family_details'),
-          style: TextStyle(color: Colors.white), 
+          style: TextStyle(color: Colors.white),
         ),
         leading: GestureDetector(
           onTap: () {
@@ -189,8 +192,11 @@ if (success) {
           },
           child: Container(
             margin: EdgeInsets.fromLTRB(10, 5, 0, 10),
-            child: Icon(Icons.arrow_back_rounded,
-                color: Colors.white, size: 25),
+            child: Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 25,
+            ),
           ),
         ),
       ),
@@ -199,8 +205,8 @@ if (success) {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              if(widget.profile.maritalStatus != "1")
-              buildDropdown(
+              if (widget.profile.maritalStatus != "1")
+                buildDropdown(
                   localizations.translate('no_of_kids'),
                   kidsOptions,
                   selectedKids,
@@ -215,18 +221,19 @@ if (success) {
                 fatherNameController,
                 errorText: fatherNameError,
               ),
-
-
-
               buildTextField(
-                  localizations.translate('father_occupation'), fatherOccupationController),
+                localizations.translate('father_occupation'),
+                fatherOccupationController,
+              ),
               buildTextField(
                 localizations.translate('mother_name'),
                 motherNameController,
                 errorText: motherNameError,
               ),
               buildTextField(
-                  localizations.translate('mother_occupation'), motherOccupationController),
+                localizations.translate('mother_occupation'),
+                motherOccupationController,
+              ),
               buildDropdown(
                 localizations.translate('no_of_brothers'),
                 brothersOptions,
@@ -239,7 +246,10 @@ if (success) {
                 selectedSisters,
                 (value) => setState(() => selectedSisters = value),
               ),
-              buildTextField(localizations.translate('permanent_address'), permanentAddressController),
+              buildTextField(
+                localizations.translate('permanent_address'),
+                permanentAddressController,
+              ),
               buildDropdown(
                 localizations.translate('mother_tongue'),
                 motherTongueOptions,
@@ -250,13 +260,26 @@ if (success) {
                 }),
                 errorText: motherTongueError,
               ),
-              buildDropdown(localizations.translate('family_type'), familyTypes, selectedFamilyType,
-                  (value) => setState(() => selectedFamilyType = value)),
-              buildTextField(localizations.translate('reference_name'), referenceNameController),
-              buildTextField(localizations.translate('reference_phone'), referencePhoneController,
-                  keyboardType: TextInputType.phone),
+              buildDropdown(
+                localizations.translate('family_type'),
+                familyTypes,
+                selectedFamilyType,
+                (value) => setState(() => selectedFamilyType = value),
+              ),
+              buildTextField(
+                localizations.translate('reference_name'),
+                referenceNameController,
+              ),
+              buildTextField(
+                localizations.translate('reference_phone'),
+                referencePhoneController,
+                keyboardType: TextInputType.phone,
+              ),
               const SizedBox(height: 20),
-              customElevatedButton(validateAndProceed, localizations.translate('submit')),
+              customElevatedButton(
+                validateAndProceed,
+                localizations.translate('submit'),
+              ),
             ],
           ),
         ),

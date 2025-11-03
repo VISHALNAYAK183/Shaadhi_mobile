@@ -3,13 +3,13 @@ import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
-import 'package:practice/api_services.dart';
-import 'package:practice/custom_widget.dart';
-import 'package:practice/lang.dart';
-import 'package:practice/language_provider.dart';
-import 'package:practice/login.dart';
-import 'package:practice/register_personal_details.dart';
-import 'package:practice/tearms.dart';
+import 'package:buntsmatrimony/api_services.dart';
+import 'package:buntsmatrimony/custom_widget.dart';
+import 'package:buntsmatrimony/lang.dart';
+import 'package:buntsmatrimony/language_provider.dart';
+import 'package:buntsmatrimony/login.dart';
+import 'package:buntsmatrimony/register_personal_details.dart';
+import 'package:buntsmatrimony/tearms.dart';
 import 'package:provider/provider.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -29,7 +29,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   int resendTimer = 30;
   Timer? _timer;
-  Color appcolor = Color(0xFFC3A38C);
+  Color appcolor = Color(0xFFea4a57);
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
@@ -55,7 +55,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final FocusNode otp3Focus = FocusNode();
   final FocusNode otp4Focus = FocusNode();
 
-  final Color _signColor = Color(0xFFC3A38C);
+  final Color _signColor = Color(0xFFea4a57);
 
   Map<String, String> profileCreatorMap = {
     "1": "1",
@@ -156,12 +156,14 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void checkOTP() {
-    String enteredOTP = otp1.text.trim() +
+    String enteredOTP =
+        otp1.text.trim() +
         otp2.text.trim() +
         otp3.text.trim() +
         otp4.text.trim();
-    String encryptedEnteredOTP =
-        md5.convert(utf8.encode(enteredOTP)).toString();
+    String encryptedEnteredOTP = md5
+        .convert(utf8.encode(enteredOTP))
+        .toString();
     if (receivedOtp == encryptedEnteredOTP) {
       setState(() {
         showPasswordFields = true;
@@ -174,8 +176,9 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void showSnackBar(String message) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   void startResendTimer() {
@@ -203,51 +206,58 @@ class _SignUpPageState extends State<SignUpPage> {
 
     return Scaffold(
       appBar: AppBar(
-  backgroundColor: appcolor,
-  title: Text(
-    localizations.translate('sign_up'),
-    style: TextStyle(color: Colors.white),
-  ),
-  leading: GestureDetector(
-    onTap: () {
-      Navigator.pop(context);
-    },
-    child: Container(
-      margin: EdgeInsets.fromLTRB(10, 5, 0, 10),
-      child: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 25),
-    ),
-  ),
-  actions: [
-    Align(
-                alignment: Alignment.centerRight,
-                // Align to the right
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                        color: _signColor, width: 2), // Border color & width
-                    borderRadius:
-                        BorderRadius.circular(8), // Optional: Rounded corners
-                  ),
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: DropdownButton<String>(
-                    value: languageProvider.locale.languageCode,
-                    icon: Icon(Icons.arrow_drop_down, color: _signColor),
-                    dropdownColor: const Color.fromARGB(255, 210, 114, 114), 
-                    style: TextStyle(color: Colors.white),
-                    onChanged: (String? newValue) {
-                      if (newValue != null) {
-                        languageProvider.changeLanguage(newValue);
-                      }
-                    },
-                    items: [
-                      DropdownMenuItem(value: 'en', child: Text('English')),
-                      DropdownMenuItem(value: 'kn', child: Text('ಕನ್ನಡ')),
-                    ],
-                  ),
-                ),
+        backgroundColor: appcolor,
+        title: Text(
+          localizations.translate('sign_up'),
+          style: TextStyle(color: Colors.white),
+        ),
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Container(
+            margin: EdgeInsets.fromLTRB(10, 5, 0, 10),
+            child: Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 25,
+            ),
+          ),
+        ),
+        actions: [
+          Align(
+            alignment: Alignment.centerRight,
+            // Align to the right
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: _signColor,
+                  width: 2,
+                ), // Border color & width
+                borderRadius: BorderRadius.circular(
+                  8,
+                ), // Optional: Rounded corners
               ),
-  ],
-),
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: DropdownButton<String>(
+                value: languageProvider.locale.languageCode,
+                icon: Icon(Icons.arrow_drop_down, color: _signColor),
+                dropdownColor: const Color.fromARGB(255, 210, 114, 114),
+                style: TextStyle(color: Colors.white),
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
+                    languageProvider.changeLanguage(newValue);
+                  }
+                },
+                items: [
+                  DropdownMenuItem(value: 'en', child: Text('English')),
+                  DropdownMenuItem(value: 'kn', child: Text('ಕನ್ನಡ')),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -258,25 +268,24 @@ class _SignUpPageState extends State<SignUpPage> {
               const SizedBox(height: 20),
               DropdownButtonFormField<String>(
                 value: selectedProfile,
-                items: {
-                  "1": "Self",
-                  "2": "Son",
-                  "3": "Daughter",
-                  "4": "Brother",
-                  "5": "Sister"
-                }
-                    .entries
-                    .map((entry) => DropdownMenuItem(
-                          value: entry.key,
-                          child: Text(
-                            entry.value,
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: _signColor,
+                items:
+                    {
+                          "1": "Self",
+                          "2": "Son",
+                          "3": "Daughter",
+                          "4": "Brother",
+                          "5": "Sister",
+                        }.entries
+                        .map(
+                          (entry) => DropdownMenuItem(
+                            value: entry.key,
+                            child: Text(
+                              entry.value,
+                              style: TextStyle(fontSize: 16, color: _signColor),
                             ),
                           ),
-                        ))
-                    .toList(),
+                        )
+                        .toList(),
                 onChanged: (value) {
                   setState(() {
                     selectedProfile = value;
@@ -318,7 +327,9 @@ class _SignUpPageState extends State<SignUpPage> {
               const SizedBox(height: 15),
               if (showOTPButton) ...[
                 customElevatedButton(
-                    getOtp, localizations.translate('get_otp')),
+                  getOtp,
+                  localizations.translate('get_otp'),
+                ),
                 const SizedBox(height: 10),
                 Center(
                   child: Row(
@@ -337,7 +348,8 @@ class _SignUpPageState extends State<SignUpPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => LoginScreen()),
+                              builder: (context) => LoginScreen(),
+                            ),
                           );
                         },
                         child: Text(
@@ -358,8 +370,11 @@ class _SignUpPageState extends State<SignUpPage> {
               if (showOTPField) ...[
                 const SizedBox(height: 20),
                 Center(
-                    child: Text(localizations.translate('enter_otp'),
-                        style: TextStyle(fontSize: 16))),
+                  child: Text(
+                    localizations.translate('enter_otp'),
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
                 const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -378,10 +393,14 @@ class _SignUpPageState extends State<SignUpPage> {
                       isResendEnabled
                           ? localizations.translate('resend_otp')
                           : localizations
-                              .translate('otp_resend')
-                              .replaceAll('{seconds}', resendTimer.toString()),
+                                .translate('otp_resend')
+                                .replaceAll(
+                                  '{seconds}',
+                                  resendTimer.toString(),
+                                ),
                       style: TextStyle(
-                          color: isResendEnabled ? Colors.blue : Colors.grey),
+                        color: isResendEnabled ? Colors.blue : Colors.grey,
+                      ),
                     ),
                   ),
                 ),
@@ -404,9 +423,11 @@ class _SignUpPageState extends State<SignUpPage> {
                     border: OutlineInputBorder(),
                     errorText: passwordError,
                     suffixIcon: IconButton(
-                      icon: Icon(_obscurePassword
-                          ? Icons.visibility_off
-                          : Icons.visibility),
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                      ),
                       onPressed: () {
                         setState(() {
                           _obscurePassword = !_obscurePassword;
@@ -429,14 +450,17 @@ class _SignUpPageState extends State<SignUpPage> {
                     labelText: localizations.translate('confirm_password'),
                     labelStyle: TextStyle(fontSize: 16, color: _signColor),
                     border: OutlineInputBorder(),
-                    errorText: confirmPasswordController.text !=
+                    errorText:
+                        confirmPasswordController.text !=
                             passwordController.text
                         ? "Passwords do not match"
                         : null,
                     suffixIcon: IconButton(
-                      icon: Icon(_obscureConfirmPassword
-                          ? Icons.visibility_off
-                          : Icons.visibility),
+                      icon: Icon(
+                        _obscureConfirmPassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                      ),
                       onPressed: () {
                         setState(() {
                           _obscureConfirmPassword = !_obscureConfirmPassword;
@@ -471,7 +495,8 @@ class _SignUpPageState extends State<SignUpPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => TermsAndConditionsPage()),
+                              builder: (context) => TermsAndConditionsPage(),
+                            ),
                           );
                         },
                         child: Text(
@@ -484,15 +509,16 @@ class _SignUpPageState extends State<SignUpPage> {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                      )
+                      ),
                     ],
                   ),
-                  customElevatedButton(ConfirmPersonalDetailsPage,
-                      localizations.translate('next')),
+                  customElevatedButton(
+                    ConfirmPersonalDetailsPage,
+                    localizations.translate('next'),
+                  ),
                   const SizedBox(height: 10),
                   Center(child: Text(localizations.translate('or'))),
                   const SizedBox(height: 10),
-
                   alreadyHaveAccount(context, localizations),
                 ],
               ],
@@ -503,8 +529,11 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget otpBox(TextEditingController controller, FocusNode focusNode,
-      FocusNode? nextFocus) {
+  Widget otpBox(
+    TextEditingController controller,
+    FocusNode focusNode,
+    FocusNode? nextFocus,
+  ) {
     return SizedBox(
       width: 50,
       child: TextField(
@@ -532,8 +561,10 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-   Widget alreadyHaveAccount(
-      BuildContext context, AppLocalizations localizations) {
+  Widget alreadyHaveAccount(
+    BuildContext context,
+    AppLocalizations localizations,
+  ) {
     return Center(
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -569,5 +600,3 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 }
-
-

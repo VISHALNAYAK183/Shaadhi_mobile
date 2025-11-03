@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:practice/lang.dart';
-import 'package:practice/register_additional_details.dart';
+import 'package:buntsmatrimony/lang.dart';
+import 'package:buntsmatrimony/register_additional_details.dart';
 import 'dashboard_model.dart';
-import 'package:practice/custom_widget.dart';
+import 'package:buntsmatrimony/custom_widget.dart';
 import 'api_services.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
@@ -13,13 +13,14 @@ class RegisterPersonalDetails extends StatefulWidget {
   final String creatorPhone;
   final String password;
 
-  const RegisterPersonalDetails(
-      {super.key,
-      required this.profileType,
-      required this.profileCreator,
-      required this.creatorName,
-      required this.creatorPhone,
-      required this.password,});
+  const RegisterPersonalDetails({
+    super.key,
+    required this.profileType,
+    required this.profileCreator,
+    required this.creatorName,
+    required this.creatorPhone,
+    required this.password,
+  });
 
   @override
   RegisterPersonalDetailsState createState() => RegisterPersonalDetailsState();
@@ -35,14 +36,13 @@ class RegisterPersonalDetailsState extends State<RegisterPersonalDetails> {
   String? selectedMaritalStatus;
   String? selectedSubCaste;
   String updatedGender = "";
- 
 
   final List<String> maritalStatusOptions = [
     "Unmarried",
     "Widow/Widower",
     "Divorcee",
     "Separated",
-    "Married"
+    "Married",
   ];
 
   String? _getMaritalStatusCode(String? status) {
@@ -75,7 +75,7 @@ class RegisterPersonalDetailsState extends State<RegisterPersonalDetails> {
   List<String> filteredSubCasteOptions = [];
   TextEditingController subCasteSearchController = TextEditingController();
   String? selectedValue;
-   Color appcolor = Color(0xFFC3A38C);
+  Color appcolor = Color(0xFFea4a57);
 
   @override
   void initState() {
@@ -83,11 +83,12 @@ class RegisterPersonalDetailsState extends State<RegisterPersonalDetails> {
 
     _checkInternet();
 
-    Connectivity()
-        .onConnectivityChanged
-        .listen((List<ConnectivityResult> result) {
+    Connectivity().onConnectivityChanged.listen((
+      List<ConnectivityResult> result,
+    ) {
       setState(() {
-        _isOffline = !result.contains(ConnectivityResult.mobile) &&
+        _isOffline =
+            !result.contains(ConnectivityResult.mobile) &&
             !result.contains(ConnectivityResult.wifi);
       });
     });
@@ -133,22 +134,26 @@ class RegisterPersonalDetailsState extends State<RegisterPersonalDetails> {
   }
 
   @override
-void didChangeDependencies() {
+  void didChangeDependencies() {
     super.didChangeDependencies();
-    _setProfileDetails(); 
-}
+    _setProfileDetails();
+  }
 
   Future<void> _checkInternet() async {
     var localizations = AppLocalizations.of(context);
-    List<ConnectivityResult> connectivityResult =
-        await Connectivity().checkConnectivity();
+    List<ConnectivityResult> connectivityResult = await Connectivity()
+        .checkConnectivity();
     setState(() {
-      _isOffline = !connectivityResult.contains(ConnectivityResult.mobile) &&
+      _isOffline =
+          !connectivityResult.contains(ConnectivityResult.mobile) &&
           !connectivityResult.contains(ConnectivityResult.wifi);
     });
 
     if (_isOffline) {
-      _showPopup(localizations.translate('no_internet'), localizations.translate('no_internet_msg'));
+      _showPopup(
+        localizations.translate('no_internet'),
+        localizations.translate('no_internet_msg'),
+      );
     }
   }
 
@@ -158,22 +163,27 @@ void didChangeDependencies() {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
           title: Row(
             children: [
               Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28),
               SizedBox(width: 8),
-              Text(title,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text(
+                title,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
             ],
           ),
           content: Text(message, style: TextStyle(fontSize: 16)),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child:
-                Text(localizations.translate('ok'), style: TextStyle(color: Colors.red, fontSize: 16)),      
+              child: Text(
+                localizations.translate('ok'),
+                style: TextStyle(color: Colors.red, fontSize: 16),
+              ),
             ),
           ],
         );
@@ -239,8 +249,9 @@ void didChangeDependencies() {
   void _filterSubCasteOptions(String query) {
     setState(() {
       filteredSubCasteOptions = subCasteOptions
-          .where((subCaste) =>
-              subCaste.toLowerCase().contains(query.toLowerCase()))
+          .where(
+            (subCaste) => subCaste.toLowerCase().contains(query.toLowerCase()),
+          )
           .toList();
     });
   }
@@ -251,18 +262,18 @@ void didChangeDependencies() {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: appcolor,
-        title: Text(
-          pageTitle,
-          style: TextStyle(color: Colors.white), 
-        ),
+        title: Text(pageTitle, style: TextStyle(color: Colors.white)),
         leading: GestureDetector(
           onTap: () {
             Navigator.pop(context);
           },
           child: Container(
             margin: EdgeInsets.fromLTRB(10, 5, 0, 10),
-            child: Icon(Icons.arrow_back_rounded,
-                color: Colors.white, size: 25),
+            child: Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 25,
+            ),
           ),
         ),
       ),
@@ -280,12 +291,14 @@ void didChangeDependencies() {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         _buildGenderSelection(
-                            localizations.translate('gender_male'),
-                            "assets/2.png"),
+                          localizations.translate('gender_male'),
+                          "assets/2.png",
+                        ),
                         SizedBox(width: 20),
                         _buildGenderSelection(
-                            localizations.translate('gender_female'),
-                            "assets/1.png"),
+                          localizations.translate('gender_female'),
+                          "assets/1.png",
+                        ),
                       ],
                     )
                   else
@@ -294,41 +307,55 @@ void didChangeDependencies() {
               ),
               SizedBox(height: 20),
               buildTextField(
-                  localizations.translate('first_name'), firstNameController,
-                  errorText: firstNameError),
+                localizations.translate('first_name'),
+                firstNameController,
+                errorText: firstNameError,
+              ),
               buildTextField(
-                  localizations.translate('last_name'), lastNameController,
-                  errorText: lastNameError),
+                localizations.translate('last_name'),
+                lastNameController,
+                errorText: lastNameError,
+              ),
               _buildDOBField(),
               buildTextField(
-                  localizations.translate('phone_number'), phoneController,
-                  keyboardType: TextInputType.phone, errorText: phoneError),
-              buildTextField(localizations.translate('email'), emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  errorText: emailError),
+                localizations.translate('phone_number'),
+                phoneController,
+                keyboardType: TextInputType.phone,
+                errorText: phoneError,
+              ),
+              buildTextField(
+                localizations.translate('email'),
+                emailController,
+                keyboardType: TextInputType.emailAddress,
+                errorText: emailError,
+              ),
               buildDropdown(
-                  localizations.translate('marital_status'),
-                  maritalStatusOptions,
-                  selectedMaritalStatus,
-                  (newValue) => setState(() {
-                        selectedMaritalStatus = newValue;
-                        maritalStatusError = null;
-                      }),
-                  errorText: maritalStatusError),
+                localizations.translate('marital_status'),
+                maritalStatusOptions,
+                selectedMaritalStatus,
+                (newValue) => setState(() {
+                  selectedMaritalStatus = newValue;
+                  maritalStatusError = null;
+                }),
+                errorText: maritalStatusError,
+              ),
               buildDropdown(
-                  localizations.translate('sub_caste'),
-                  subCasteOptions,
-                  selectedSubCaste,
-                  (newValue) => setState(() {
-                        selectedSubCaste = newValue;
-                        subCasteError = null;
-                      }),
-                  errorText: subCasteError),
+                localizations.translate('sub_caste'),
+                subCasteOptions,
+                selectedSubCaste,
+                (newValue) => setState(() {
+                  selectedSubCaste = newValue;
+                  subCasteError = null;
+                }),
+                errorText: subCasteError,
+              ),
               SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
                 child: customElevatedButton(
-                    validateAndProceed, localizations.translate('next')),
+                  validateAndProceed,
+                  localizations.translate('next'),
+                ),
               ),
               SizedBox(height: 20),
             ],
@@ -341,10 +368,7 @@ void didChangeDependencies() {
   Widget _buildFixedGenderImage() {
     return Column(
       children: [
-        CircleAvatar(
-          radius: 50,
-          backgroundImage: AssetImage(genderIcon),
-        ),
+        CircleAvatar(radius: 50, backgroundImage: AssetImage(genderIcon)),
         SizedBox(height: 8),
         Text(
           selectedGender,
@@ -374,13 +398,15 @@ void didChangeDependencies() {
       maritalStatusError = selectedMaritalStatus == null
           ? "Please select a marital status"
           : null;
-      subCasteError =
-          selectedSubCaste == null ? "Please select a sub caste" : null;
+      subCasteError = selectedSubCaste == null
+          ? "Please select a sub caste"
+          : null;
     });
 
     if (phoneError == null) {
-      bool isPhoneValid =
-          await ApiService.validatePhoneNumber(phoneController.text);
+      bool isPhoneValid = await ApiService.validatePhoneNumber(
+        phoneController.text,
+      );
 
       if (!isPhoneValid) {
         setState(() {
@@ -401,32 +427,33 @@ void didChangeDependencies() {
           ? _getMaritalStatusCode(selectedMaritalStatus)
           : null;
 
-      String? updatedSubCaste =
-          selectedSubCaste != null ? subCasteMap[selectedSubCaste] : null;
+      String? updatedSubCaste = selectedSubCaste != null
+          ? subCasteMap[selectedSubCaste]
+          : null;
 
       if (selectedGender == 'ಪುರುಷ' || selectedGender == 'Male') {
         updatedGender = "Male";
-      }else{
+      } else {
         updatedGender = "Female";
       }
 
       try {
         Map<String, String>? registrationData =
             await ApiService.registeredPersonalDetails(
-          firstName: firstNameController.text,
-          lastName: lastNameController.text,
-          dob: dobController.text,
-          phone: phoneController.text,
-          email: emailController.text,
-          subCaste: updatedSubCaste,
-          maritalStatus: updatedMaritalStatus,
-          gender: updatedGender == "Male" ? "1" : "2",
-          creatorName: widget.creatorName,
-          creatorPhone: widget.creatorPhone,
-          profileCreator: widget.profileCreator,
-          profileFor: widget.profileType,
-          password: widget.password,
-        );
+              firstName: firstNameController.text,
+              lastName: lastNameController.text,
+              dob: dobController.text,
+              phone: phoneController.text,
+              email: emailController.text,
+              subCaste: updatedSubCaste,
+              maritalStatus: updatedMaritalStatus,
+              gender: updatedGender == "Male" ? "1" : "2",
+              creatorName: widget.creatorName,
+              creatorPhone: widget.creatorPhone,
+              profileCreator: widget.profileCreator,
+              profileFor: widget.profileType,
+              password: widget.password,
+            );
 
         if (registrationData != null) {
           if (registrationData.containsKey("error")) {
@@ -495,8 +522,9 @@ void didChangeDependencies() {
       return "Enter a valid Date of Birth (DD/MM/YYYY)";
     }
 
-    DateTime minDate =
-        DateTime.now().subtract(Duration(days: 6570)); // 18 years
+    DateTime minDate = DateTime.now().subtract(
+      Duration(days: 6570),
+    ); // 18 years
     if (birthDate.isAfter(minDate)) return "You must be at least 18 years old";
 
     return null;
@@ -533,8 +561,13 @@ void didChangeDependencies() {
 
   Widget _buildDOBField() {
     var localizations = AppLocalizations.of(context);
-    return buildTextField(localizations.translate('dob'), dobController,
-        readOnly: true, onTap: _pickDOB, errorText: dobError);
+    return buildTextField(
+      localizations.translate('dob'),
+      dobController,
+      readOnly: true,
+      onTap: _pickDOB,
+      errorText: dobError,
+    );
   }
 
   Future<void> _pickDOB() async {
@@ -546,8 +579,9 @@ void didChangeDependencies() {
     );
 
     if (pickedDate != null) {
-      DateTime minDate =
-          DateTime.now().subtract(Duration(days: 6570)); // 18 years ago
+      DateTime minDate = DateTime.now().subtract(
+        Duration(days: 6570),
+      ); // 18 years ago
       setState(() {
         if (pickedDate.isAfter(minDate)) {
           dobError = "You must be at least 18 years old";
@@ -570,10 +604,7 @@ void didChangeDependencies() {
         children: [
           Stack(
             children: [
-              CircleAvatar(
-                radius: 50,
-                backgroundImage: AssetImage(imagePath),
-              ),
+              CircleAvatar(radius: 50, backgroundImage: AssetImage(imagePath)),
               if (!isSelected && selectedGender.isNotEmpty)
                 Positioned.fill(
                   child: ClipOval(
@@ -588,8 +619,9 @@ void didChangeDependencies() {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color:
-                  isSelected ? Color.fromARGB(255, 109, 78, 115) : Colors.grey,
+              color: isSelected
+                  ? Color.fromARGB(255, 109, 78, 115)
+                  : Colors.grey,
             ),
           ),
         ],

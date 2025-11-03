@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-// import 'package:practice/dashboard.dart';
-import 'package:practice/dashboard_model.dart';
-import 'package:practice/lang.dart';
-import 'package:practice/profile_page.dart';
+// import 'package:buntsmatrimony/dashboard.dart';
+import 'package:buntsmatrimony/dashboard_model.dart';
+import 'package:buntsmatrimony/lang.dart';
+import 'package:buntsmatrimony/profile_page.dart';
 import 'custom_widget.dart';
 import 'api_services.dart';
 
@@ -17,7 +17,7 @@ class PersonalDetails extends StatefulWidget {
 
 class PersonalDetailsState extends State<PersonalDetails> {
   String selectedGender = "";
-   Color appcolor = Color(0xFFC3A38C);
+  Color appcolor = Color(0xFFea4a57);
 
   String? selectedMaritalStatus;
   String? selectedSubCaste;
@@ -26,7 +26,7 @@ class PersonalDetailsState extends State<PersonalDetails> {
     "Widow/Widower",
     "Divorcee",
     "Separated",
-    "Married"
+    "Married",
   ];
 
   String? _getMaritalStatusCode(String? status) {
@@ -73,8 +73,9 @@ class PersonalDetailsState extends State<PersonalDetails> {
   void _filterSubCasteOptions(String query) {
     setState(() {
       filteredSubCasteOptions = subCasteOptions
-          .where((subCaste) =>
-              subCaste.toLowerCase().contains(query.toLowerCase()))
+          .where(
+            (subCaste) => subCaste.toLowerCase().contains(query.toLowerCase()),
+          )
           .toList();
     });
   }
@@ -126,7 +127,7 @@ class PersonalDetailsState extends State<PersonalDetails> {
         backgroundColor: appcolor,
         title: Text(
           localizations.translate('basic_details'),
-          style: TextStyle(color: Colors.white), 
+          style: TextStyle(color: Colors.white),
         ),
         leading: GestureDetector(
           onTap: () {
@@ -134,8 +135,11 @@ class PersonalDetailsState extends State<PersonalDetails> {
           },
           child: Container(
             margin: EdgeInsets.fromLTRB(10, 5, 0, 10),
-            child: Icon(Icons.arrow_back_rounded,
-                color: Colors.white, size: 25),
+            child: Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 25,
+            ),
           ),
         ),
       ),
@@ -145,17 +149,31 @@ class PersonalDetailsState extends State<PersonalDetails> {
           child: Column(
             children: [
               SizedBox(height: 20),
-              buildTextField(localizations.translate('first_name'), firstNameController, readOnly: true),
-              buildTextField(localizations.translate('last_name'), lastNameController, readOnly: true),
+              buildTextField(
+                localizations.translate('first_name'),
+                firstNameController,
+                readOnly: true,
+              ),
+              buildTextField(
+                localizations.translate('last_name'),
+                lastNameController,
+                readOnly: true,
+              ),
               _buildDOBField(),
-              buildTextField(localizations.translate('phone_number'), phoneController,
-                  readOnly: true,
-                  keyboardType: TextInputType.phone,
-                  errorText: phoneError),
-              buildTextField(localizations.translate('email'), emailController,
-                  readOnly: true,
-                  keyboardType: TextInputType.emailAddress,
-                  errorText: emailError),
+              buildTextField(
+                localizations.translate('phone_number'),
+                phoneController,
+                readOnly: true,
+                keyboardType: TextInputType.phone,
+                errorText: phoneError,
+              ),
+              buildTextField(
+                localizations.translate('email'),
+                emailController,
+                readOnly: true,
+                keyboardType: TextInputType.emailAddress,
+                errorText: emailError,
+              ),
               buildDropdown(
                 localizations.translate('marital_status'),
                 maritalStatusOptions,
@@ -167,18 +185,22 @@ class PersonalDetailsState extends State<PersonalDetails> {
                 errorText: maritalStatusError,
               ),
               buildDropdown(
-                  localizations.translate('sub_caste'),
-                  subCasteOptions,
-                  selectedSubCaste,
-                  (newValue) => setState(() {
-                        selectedSubCaste = newValue;
-                        subCasteError = null;
-                      }),
-                  errorText: subCasteError),
+                localizations.translate('sub_caste'),
+                subCasteOptions,
+                selectedSubCaste,
+                (newValue) => setState(() {
+                  selectedSubCaste = newValue;
+                  subCasteError = null;
+                }),
+                errorText: subCasteError,
+              ),
               SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
-                child: customElevatedButton(validateAndProceed, localizations.translate('submit')),
+                child: customElevatedButton(
+                  validateAndProceed,
+                  localizations.translate('submit'),
+                ),
               ),
               SizedBox(height: 20),
             ],
@@ -193,12 +215,12 @@ class PersonalDetailsState extends State<PersonalDetails> {
       maritalStatusError = selectedMaritalStatus == null
           ? "Please select a marital status"
           : null;
-      subCasteError =
-          selectedSubCaste == null ? "Please select a sub caste" : null;
+      subCasteError = selectedSubCaste == null
+          ? "Please select a sub caste"
+          : null;
     });
 
-    if (maritalStatusError == null &&
-        subCasteError == null) {
+    if (maritalStatusError == null && subCasteError == null) {
       String? updatedSubCaste = selectedSubCaste != null
           ? subCasteMap[selectedSubCaste]
           : widget.profile.subCasteId;
@@ -208,9 +230,11 @@ class PersonalDetailsState extends State<PersonalDetails> {
           : _getMaritalStatusCode(widget.profile.status);
 
       print(
-          "Sending API update: MaritalStatus ID: $updatedMaritalStatus, SubCaste ID: $updatedSubCaste");
+        "Sending API update: MaritalStatus ID: $updatedMaritalStatus, SubCaste ID: $updatedSubCaste",
+      );
 
-      bool success = await ApiService.updateProfile(context,
+      bool success = await ApiService.updateProfile(
+        context,
         matriID: widget.profile.matriId,
         maritalStatus: updatedMaritalStatus,
         subCaste: updatedSubCaste,
@@ -219,9 +243,7 @@ class PersonalDetailsState extends State<PersonalDetails> {
       if (success) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) => ProfilePage1(),
-          ),
+          MaterialPageRoute(builder: (context) => ProfilePage1()),
         );
       } else {
         print("Failed to update user profile");
@@ -231,7 +253,11 @@ class PersonalDetailsState extends State<PersonalDetails> {
 
   Widget _buildDOBField() {
     var localizations = AppLocalizations.of(context);
-    return buildTextField(localizations.translate('dob'), dobController,
-        readOnly: true, errorText: dobError);
+    return buildTextField(
+      localizations.translate('dob'),
+      dobController,
+      readOnly: true,
+      errorText: dobError,
+    );
   }
 }

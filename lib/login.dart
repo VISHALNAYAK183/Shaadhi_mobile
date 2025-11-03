@@ -3,12 +3,12 @@ import 'package:jwt_decode/jwt_decode.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:practice/dashboard_model.dart';
-import 'package:practice/lang.dart';
-import 'package:practice/language_provider.dart';
-import 'package:practice/register_main.dart';
-import 'package:practice/support.dart';
-import 'package:practice/tearms.dart';
+import 'package:buntsmatrimony/dashboard_model.dart';
+import 'package:buntsmatrimony/lang.dart';
+import 'package:buntsmatrimony/language_provider.dart';
+import 'package:buntsmatrimony/register_main.dart';
+import 'package:buntsmatrimony/support.dart';
+import 'package:buntsmatrimony/tearms.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'custom_button.dart'; // Import your custom button widget
@@ -41,22 +41,31 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _canResendOtp = false; // To track if resend is allowed
 
   String? _storedOtpHash;
-  List<TextEditingController> _otpControllers =
-      List.generate(4, (index) => TextEditingController());
+  List<TextEditingController> _otpControllers = List.generate(
+    4,
+    (index) => TextEditingController(),
+  );
   List<FocusNode> _otpFocusNodes = List.generate(4, (index) => FocusNode());
 
-  final Color _signColor = Color(0xFFC3A38C);
-  final Color _backgroundColor = Color(0xFFF1F1F1);
+  final Color _signColor = Color(0xFFea4a57);
+  final Color _backgroundColor = Color.fromARGB(255, 255, 255, 255);
 
-  Future<void> _saveLoginData(String mobile, String password, String matriId1,
-      int id, String phone) async {
+  Future<void> _saveLoginData(
+    String mobile,
+    String password,
+    String matriId1,
+    int id,
+    String phone,
+  ) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('mobile', mobile);
     await prefs.setString('password', password);
     await prefs.setString('matriId', matriId1);
     await prefs.setInt('id', id);
     await prefs.setString('phone', phone);
-    print( "Saved to SharedPreferences: Mobile=$mobile, Password=$password, MatriId=$matriId1, ID=$id, Phone=$phone");
+    print(
+      "Saved to SharedPreferences: Mobile=$mobile, Password=$password, MatriId=$matriId1, ID=$id, Phone=$phone",
+    );
   }
 
   @override
@@ -65,11 +74,12 @@ class _LoginScreenState extends State<LoginScreen> {
     _checkInternet(); // Check internet on startup
 
     // Listen for network changes
-    Connectivity()
-        .onConnectivityChanged
-        .listen((List<ConnectivityResult> result) {
+    Connectivity().onConnectivityChanged.listen((
+      List<ConnectivityResult> result,
+    ) {
       setState(() {
-        _isOffline = !result.contains(ConnectivityResult.mobile) &&
+        _isOffline =
+            !result.contains(ConnectivityResult.mobile) &&
             !result.contains(ConnectivityResult.wifi);
       });
     });
@@ -98,10 +108,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _checkInternet() async {
-    List<ConnectivityResult> connectivityResult =
-        await Connectivity().checkConnectivity();
+    List<ConnectivityResult> connectivityResult = await Connectivity()
+        .checkConnectivity();
     setState(() {
-      _isOffline = !connectivityResult.contains(ConnectivityResult.mobile) &&
+      _isOffline =
+          !connectivityResult.contains(ConnectivityResult.mobile) &&
           !connectivityResult.contains(ConnectivityResult.wifi);
     });
   }
@@ -112,22 +123,27 @@ class _LoginScreenState extends State<LoginScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
           title: Row(
             children: [
               Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28),
               SizedBox(width: 8),
-              Text(title,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text(
+                title,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
             ],
           ),
           content: Text(message, style: TextStyle(fontSize: 16)),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child:
-                  Text(localizations.translate('ok'), style: TextStyle(color: Colors.red, fontSize: 16)),
+              child: Text(
+                localizations.translate('ok'),
+                style: TextStyle(color: Colors.red, fontSize: 16),
+              ),
             ),
           ],
         );
@@ -138,7 +154,10 @@ class _LoginScreenState extends State<LoginScreen> {
   void _login() async {
     var localizations = AppLocalizations.of(context);
     if (_isOffline) {
-      _showPopup(localizations.translate('no_internet'), localizations.translate('no_internet_msg'));
+      _showPopup(
+        localizations.translate('no_internet'),
+        localizations.translate('no_internet_msg'),
+      );
       return;
     }
     if (!_termsAccepted) {
@@ -158,126 +177,126 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoginLoading = true;
     });
 
-   try {
-  Map<String, dynamic> response = await ApiService.loginUser(mobile, password);
-  print("Final API Response in Login: $response");
+    try {
+      Map<String, dynamic> response = await ApiService.loginUser(
+        mobile,
+        password,
+      );
+      print("Final API Response in Login: $response");
 
-  if (response.containsKey('token')) {
- 
-    _showMessage("Login successful");
+      if (response.containsKey('token')) {
+        _showMessage("Login successful");
 
-    int id = response['id'] ?? 0;
-    String matriId1 = response['matri_id'] ?? '';
-    String phone = response['phone']?.toString() ?? '';
+        int id = response['id'] ?? 0;
+        String matriId1 = response['matri_id'] ?? '';
+        String phone = response['phone']?.toString() ?? '';
 
-    await _saveLoginData(mobile, password, matriId1, id, phone);
-    loginEntry(matriId1);
+        await _saveLoginData(mobile, password, matriId1, id, phone);
+        loginEntry(matriId1);
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => MainScreen()),
-    );
-  } else {
-    _showMessage("Invalid credentials or response format");
-  }
-} catch (e) {
-  _showMessage("Error: ${e.toString()}");
-} finally {
-  setState(() {
-    _isLoginLoading = false;
-  });
-}
-
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MainScreen()),
+        );
+      } else {
+        _showMessage("Invalid credentials or response format");
+      }
+    } catch (e) {
+      _showMessage("Error: ${e.toString()}");
+    } finally {
+      setState(() {
+        _isLoginLoading = false;
+      });
+    }
   }
 
   void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   void loginEntry(String id) {
     ApiService.loginEntry(id);
   }
 
-void _loginWithOtp() async {
-  String enteredOtp = _otpControllers.map((c) => c.text).join();
-  if (enteredOtp.length != 4) {
-    _showMessage("Please enter a valid 4-digit OTP.");
-    return;
-  }
-
-  if (_storedOtpHash == null) {
-    _showMessage("OTP verification failed. Please request a new OTP.");
-    return;
-  }
-
-  setState(() => _isOtpLoading = true);
-
-  try { 
-    // Call API to verify OTP
-    final response = await ApiService.checkNumber(_phoneController.text.trim());
-    print("OTP Login API Response: $response");
-
-    if (response.containsKey('dataout') &&
-        response['dataout'].isNotEmpty &&
-        response['dataout'][0]['p_out_mssg_flg'] == "Y") {
-
-      // Extract token from API response
-      final token = response['dataout'][0]['token'] ?? '';
-      if (token.isEmpty) {
-        _showMessage("Token not received from server.");
-        return;
-      }
-
-      // Decode JWT manually (same as loginUser)
-      final parts = token.split('.');
-      if (parts.length != 3) throw Exception("Invalid JWT token format");
-
-      final payload = json.decode(
-        utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))),
-      );
-
-      final data = payload["data"];
-      final int id = data["id"] ?? 0;
-      final String matriId = data["matri_id"] ?? '';
-      final String phone = data["phone"].toString();
-
-      print("Decoded ID: $id");
-      print("Decoded Matri ID: $matriId");
-      print("Decoded Phone: $phone");
-
-      // Save token & user data in SharedPreferences
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString("token", token);
-      await prefs.setInt("id", id);
-      await prefs.setString("matriId", matriId);
-      await prefs.setString("phone", phone);
-
-      // Optional: Call login entry
-      loginEntry(matriId);
-
-      _showMessage("Login successful!");
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => MainScreen()),
-      );
-
-    } else {
-      String message = (response['dataout'] != null && response['dataout'].isNotEmpty)
-          ? response['dataout'][0]['p_out_mssg'] ?? "OTP verification failed."
-          : "OTP verification failed.";
-      _showMessage(message);
+  void _loginWithOtp() async {
+    String enteredOtp = _otpControllers.map((c) => c.text).join();
+    if (enteredOtp.length != 4) {
+      _showMessage("Please enter a valid 4-digit OTP.");
+      return;
     }
 
-  } catch (e) {
-    print("OTP Login Error: $e");
-    _showMessage("Error: $e");
-  } finally {
-    setState(() => _isOtpLoading = false);
-  }
-}
+    if (_storedOtpHash == null) {
+      _showMessage("OTP verification failed. Please request a new OTP.");
+      return;
+    }
 
+    setState(() => _isOtpLoading = true);
+
+    try {
+      // Call API to verify OTP
+      final response = await ApiService.checkNumber(
+        _phoneController.text.trim(),
+      );
+      print("OTP Login API Response: $response");
+
+      if (response.containsKey('dataout') &&
+          response['dataout'].isNotEmpty &&
+          response['dataout'][0]['p_out_mssg_flg'] == "Y") {
+        // Extract token from API response
+        final token = response['dataout'][0]['token'] ?? '';
+        if (token.isEmpty) {
+          _showMessage("Token not received from server.");
+          return;
+        }
+
+        // Decode JWT manually (same as loginUser)
+        final parts = token.split('.');
+        if (parts.length != 3) throw Exception("Invalid JWT token format");
+
+        final payload = json.decode(
+          utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))),
+        );
+
+        final data = payload["data"];
+        final int id = data["id"] ?? 0;
+        final String matriId = data["matri_id"] ?? '';
+        final String phone = data["phone"].toString();
+
+        print("Decoded ID: $id");
+        print("Decoded Matri ID: $matriId");
+        print("Decoded Phone: $phone");
+
+        // Save token & user data in SharedPreferences
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString("token", token);
+        await prefs.setInt("id", id);
+        await prefs.setString("matriId", matriId);
+        await prefs.setString("phone", phone);
+
+        // Optional: Call login entry
+        loginEntry(matriId);
+
+        _showMessage("Login successful!");
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MainScreen()),
+        );
+      } else {
+        String message =
+            (response['dataout'] != null && response['dataout'].isNotEmpty)
+            ? response['dataout'][0]['p_out_mssg'] ?? "OTP verification failed."
+            : "OTP verification failed.";
+        _showMessage(message);
+      }
+    } catch (e) {
+      print("OTP Login Error: $e");
+      _showMessage("Error: $e");
+    } finally {
+      setState(() => _isOtpLoading = false);
+    }
+  }
 
   void _generateOtp() async {
     String phone = _phoneController.text.trim();
@@ -290,7 +309,7 @@ void _loginWithOtp() async {
 
     try {
       Map<String, dynamic> response = await ApiService.checkNumber(phone);
-     
+
       if (response['dataout'][0]['p_out_mssg_flg'] == "Y") {
         await _sendOtp(phone);
 
@@ -342,9 +361,7 @@ void _loginWithOtp() async {
   }
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     var localizations = AppLocalizations.of(context);
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
@@ -362,9 +379,9 @@ void _loginWithOtp() async {
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.asset(
-                  'assets/icon-144x144.png',
+                  'assets/buntslogo.jpg',
                   height: screenHeight * 0.15,
-                  width: screenHeight * 0.15,
+                  width: screenHeight * 1,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -374,9 +391,12 @@ void _loginWithOtp() async {
                 child: Container(
                   decoration: BoxDecoration(
                     border: Border.all(
-                        color: _signColor, width: 2), // Border color & width
-                    borderRadius:
-                        BorderRadius.circular(8), // Optional: Rounded corners
+                      color: _signColor,
+                      width: 2,
+                    ), // Border color & width
+                    borderRadius: BorderRadius.circular(
+                      8,
+                    ), // Optional: Rounded corners
                   ),
                   padding: EdgeInsets.symmetric(horizontal: 10),
                   child: DropdownButton<String>(
@@ -403,8 +423,10 @@ void _loginWithOtp() async {
                 padding: EdgeInsets.all(10),
                 child: Column(
                   children: [
-                    Text(localizations.translate('login_otp'),
-                        style: TextStyle(color: _signColor, fontSize: 18)),
+                    Text(
+                      localizations.translate('login_otp'),
+                      style: TextStyle(color: _signColor, fontSize: 18),
+                    ),
                     SizedBox(height: 10),
                     TextField(
                       controller: _phoneController,
@@ -431,19 +453,24 @@ void _loginWithOtp() async {
                               decoration: InputDecoration(
                                 counterText: '',
                                 border: OutlineInputBorder(
-                                    borderSide: BorderSide(color: _signColor)),
+                                  borderSide: BorderSide(color: _signColor),
+                                ),
                                 enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(color: _signColor)),
+                                  borderSide: BorderSide(color: _signColor),
+                                ),
                                 focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(color: _signColor)),
+                                  borderSide: BorderSide(color: _signColor),
+                                ),
                               ),
                               onChanged: (value) {
                                 if (value.isNotEmpty && index < 3) {
-                                  FocusScope.of(context)
-                                      .requestFocus(_otpFocusNodes[index + 1]);
+                                  FocusScope.of(
+                                    context,
+                                  ).requestFocus(_otpFocusNodes[index + 1]);
                                 } else if (value.isEmpty && index > 0) {
-                                  FocusScope.of(context)
-                                      .requestFocus(_otpFocusNodes[index - 1]);
+                                  FocusScope.of(
+                                    context,
+                                  ).requestFocus(_otpFocusNodes[index - 1]);
                                 }
                               },
                             ),
@@ -466,7 +493,12 @@ void _loginWithOtp() async {
                               ),
                             )
                           : Text(
-                              localizations.translate('otp_resend').replaceAll('{seconds}', _countdown.toString()),
+                              localizations
+                                  .translate('otp_resend')
+                                  .replaceAll(
+                                    '{seconds}',
+                                    _countdown.toString(),
+                                  ),
                               style: TextStyle(color: _signColor, fontSize: 12),
                             ),
                     ],
@@ -477,8 +509,9 @@ void _loginWithOtp() async {
                             text: _otpGenerated
                                 ? localizations.translate('login_otp')
                                 : localizations.translate('get_otp'),
-                            onPressed:
-                                _otpGenerated ? _loginWithOtp : _generateOtp,
+                            onPressed: _otpGenerated
+                                ? _loginWithOtp
+                                : _generateOtp,
                             isLoading:
                                 _isOtpLoading, // ✅ Shows loader only for OTP button
                           ),
@@ -496,10 +529,12 @@ void _loginWithOtp() async {
                 padding: EdgeInsets.all(10),
                 child: Column(
                   children: [
-                    Text(localizations.translate('login_other'),
-                        maxLines: 1, // Limits text to one line
-                        // overflow: TextOverflow.ellipsis, // Adds "
-                        style: TextStyle(color: _signColor, fontSize: 18)),
+                    Text(
+                      localizations.translate('login_other'),
+                      maxLines: 1, // Limits text to one line
+                      // overflow: TextOverflow.ellipsis, // Adds "
+                      style: TextStyle(color: _signColor, fontSize: 18),
+                    ),
                     SizedBox(height: 10),
                     TextField(
                       controller: _mobileController,
@@ -547,12 +582,16 @@ void _loginWithOtp() async {
                     TextButton(
                       onPressed: () {
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ForgetPasswordPage()));
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ForgetPasswordPage(),
+                          ),
+                        );
                       },
-                      child: Text('${localizations.translate('forgot_password')}?',
-                          style: TextStyle(color: _signColor)),
+                      child: Text(
+                        '${localizations.translate('forgot_password')}?',
+                        style: TextStyle(color: _signColor),
+                      ),
                     ),
                   ],
                 ),
@@ -567,7 +606,7 @@ void _loginWithOtp() async {
                     style: TextStyle(color: _signColor),
                     children: [
                       TextSpan(
-                        text:localizations.translate('terms_and_conditions'),
+                        text: localizations.translate('terms_and_conditions'),
                         style: TextStyle(decoration: TextDecoration.underline),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
@@ -575,8 +614,8 @@ void _loginWithOtp() async {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      TermsAndConditionsPage()),
+                                builder: (context) => TermsAndConditionsPage(),
+                              ),
                             );
                           },
                       ),
@@ -604,22 +643,24 @@ void _loginWithOtp() async {
                   minimumSize: Size(0, 0),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                child: Text(localizations.translate('new_account'),
-                    style: TextStyle(
-                      color: _signColor,
-                    )),
+                child: Text(
+                  localizations.translate('new_account'),
+                  style: TextStyle(color: _signColor),
+                ),
               ),
               TextButton(
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) =>
-                            ContactFormPage()), // Wrap in MaterialPageRoute
+                      builder: (context) => ContactFormPage(),
+                    ), // Wrap in MaterialPageRoute
                   );
                 },
-                child: Text(localizations.translate('query_support'),
-                    style: TextStyle(color: _signColor)),
+                child: Text(
+                  localizations.translate('query_support'),
+                  style: TextStyle(color: _signColor),
+                ),
               ),
             ],
           ),

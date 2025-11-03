@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:practice/lang.dart';
-import 'package:practice/main_screen.dart';
+import 'package:buntsmatrimony/lang.dart';
+import 'package:buntsmatrimony/main_screen.dart';
 import 'api_service.dart';
 import 'dashboard_model.dart';
+
 class BlockReportCard extends StatefulWidget {
   final String matriIdTo;
 
@@ -29,21 +30,18 @@ class _BlockReportCardState extends State<BlockReportCard> {
       //print("Hlo ${matriIdTo}");
       // Handle the response, show success message, or further logic
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(blockResponse.message)),
-        
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(blockResponse.message)));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => MainScreen()),
       );
-          Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MainScreen(),
-                ),
-              );
     } catch (e) {
       // Handle failure scenario
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to submit: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Failed to submit: $e")));
     }
   }
 
@@ -52,7 +50,9 @@ class _BlockReportCardState extends State<BlockReportCard> {
     var localizations = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(
-          vertical: 4.0, horizontal: 8.0), // Reduced padding
+        vertical: 4.0,
+        horizontal: 8.0,
+      ), // Reduced padding
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,9 +74,10 @@ class _BlockReportCardState extends State<BlockReportCard> {
                 Text(
                   localizations.translate('info'),
                   style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue),
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                  ),
                 ),
               ],
             ),
@@ -95,23 +96,23 @@ class _BlockReportCardState extends State<BlockReportCard> {
                           TextSpan(
                             text: '${localizations.translate('block')}:',
                             style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold), // Bold "Block"
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ), // Bold "Block"
                           ),
                           TextSpan(
-                            text:
-                                localizations.translate('block_user'),
+                            text: localizations.translate('block_user'),
                             style: TextStyle(fontSize: 13), // Normal text
                           ),
                           TextSpan(
                             text: '${localizations.translate('report')}:',
                             style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold), // Bold "Report"
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ), // Bold "Report"
                           ),
                           TextSpan(
-                            text:
-                                localizations.translate('report_user'),
+                            text: localizations.translate('report_user'),
                             style: TextStyle(fontSize: 13), // Normal text
                           ),
                         ],
@@ -166,10 +167,12 @@ class _BlockReportCardState extends State<BlockReportCard> {
             decoration: InputDecoration(
               hintText: localizations.translate('reason'),
               contentPadding: const EdgeInsets.symmetric(
-                  vertical: 16.0, horizontal: 10.0), // Compact padding
+                vertical: 16.0,
+                horizontal: 10.0,
+              ), // Compact padding
               border: OutlineInputBorder(
-                  borderRadius:
-                      BorderRadius.circular(6.0)), // Smaller border radius
+                borderRadius: BorderRadius.circular(6.0),
+              ), // Smaller border radius
             ),
           ),
           const SizedBox(height: 1), // Reduced height
@@ -179,14 +182,18 @@ class _BlockReportCardState extends State<BlockReportCard> {
             child: ElevatedButton(
               onPressed: _handleSubmit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFFC3A38C),
+                backgroundColor: Color(0xFFea4a57),
                 padding: const EdgeInsets.symmetric(
-                    vertical: 2.0), // Reduced button padding
+                  vertical: 2.0,
+                ), // Reduced button padding
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6.0)),
+                  borderRadius: BorderRadius.circular(6.0),
+                ),
               ),
-              child: Text(localizations.translate('submit'),
-                  style: TextStyle(fontSize: 13,color: Colors.white)), // Slightly smaller text
+              child: Text(
+                localizations.translate('submit'),
+                style: TextStyle(fontSize: 13, color: Colors.white),
+              ), // Slightly smaller text
             ),
           ),
         ],

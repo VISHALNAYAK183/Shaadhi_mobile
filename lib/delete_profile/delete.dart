@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:practice/api_service.dart';
-import 'package:practice/dashboard_model.dart';
-import 'package:practice/lang.dart';
-import 'package:practice/login.dart';
+import 'package:buntsmatrimony/api_service.dart';
+import 'package:buntsmatrimony/dashboard_model.dart';
+import 'package:buntsmatrimony/lang.dart';
+import 'package:buntsmatrimony/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
@@ -19,7 +19,7 @@ class _ChangeStatusPageState extends State<ChangeStatusPage> {
   bool _showOtpField = false;
   bool _otpVerified = false;
   bool isLoading = false;
-  Color appcolor = Color(0xFFC3A38C);
+  Color appcolor = Color(0xFFea4a57);
   String otp = '';
   bool _isLoading = true;
 
@@ -57,7 +57,8 @@ class _ChangeStatusPageState extends State<ChangeStatusPage> {
           String lastFour = creatorPhone.substring(creatorPhone.length - 4);
           if (statusFlag == "Y") {
             _showMessage(
-                "OTP Sent To Registered Number Ending with : $lastFour");
+              "OTP Sent To Registered Number Ending with : $lastFour",
+            );
 
             if (response.containsKey('data')) {
               setState(() {
@@ -84,7 +85,10 @@ class _ChangeStatusPageState extends State<ChangeStatusPage> {
     setState(() {
       isLoading = true;
     });
-    Map<String, dynamic> response = await ApiService.changeStatus(context,data);
+    Map<String, dynamic> response = await ApiService.changeStatus(
+      context,
+      data,
+    );
     print("Final API Response in Login: $response");
 
     if (response.containsKey('message')) {
@@ -115,9 +119,9 @@ class _ChangeStatusPageState extends State<ChangeStatusPage> {
   }
 
   void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   String generateMd5(String input) {
@@ -137,7 +141,7 @@ class _ChangeStatusPageState extends State<ChangeStatusPage> {
     }
   }
 
-   Future<void> _fetchProfileStatus() async {
+  Future<void> _fetchProfileStatus() async {
     try {
       myProfileData profileData = await ApiService.fetchmyProfileData(context);
       if (profileData.dataout.isNotEmpty) {
@@ -151,8 +155,6 @@ class _ChangeStatusPageState extends State<ChangeStatusPage> {
     }
   }
 
-  
-
   Future<void> _handleSubmit() async {
     var localizations = AppLocalizations.of(context);
     if (_selectedStatus == '4') {
@@ -161,8 +163,7 @@ class _ChangeStatusPageState extends State<ChangeStatusPage> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text(localizations.translate('confirm_deletion')),
-            content: Text(
-                localizations.translate('delete_dialog')),
+            content: Text(localizations.translate('delete_dialog')),
             actions: [
               TextButton(
                 onPressed: () {
@@ -188,7 +189,10 @@ class _ChangeStatusPageState extends State<ChangeStatusPage> {
                     _showMessage("Error changing profile status.");
                   }
                 },
-                child: Text(localizations.translate('delete'), style: TextStyle(color: Colors.red)),
+                child: Text(
+                  localizations.translate('delete'),
+                  style: TextStyle(color: Colors.red),
+                ),
               ),
             ],
           );
@@ -210,8 +214,8 @@ class _ChangeStatusPageState extends State<ChangeStatusPage> {
 
   @override
   Widget build(BuildContext context) {
-      var localizations = AppLocalizations.of(context);
-      print("Vi${localizations.locale.languageCode}");
+    var localizations = AppLocalizations.of(context);
+    print("Vi${localizations.locale.languageCode}");
     return Scaffold(
       appBar: AppBar(
         backgroundColor: appcolor,
@@ -229,8 +233,11 @@ class _ChangeStatusPageState extends State<ChangeStatusPage> {
             //   color: Colors.white,
             //   borderRadius: BorderRadius.circular(20),
             // ),
-            child: Icon(Icons.arrow_back_rounded,
-                color: Colors.white, size: 25), // Back button icon
+            child: Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 25,
+            ), // Back button icon
           ),
         ),
       ),
@@ -241,22 +248,23 @@ class _ChangeStatusPageState extends State<ChangeStatusPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              (localizations.locale.languageCode=="en")?
-              Text(
-                "Change status as you require:\n\n"
-                "• Active: Your profile is visible to all users, and they can connect with you through the app.\n\n"
-                "• Married: Congratulations! Since you are married, your profile will no longer be visible to anyone.\n\n"
-                "• Not Interested: Your profile will be hidden from others, but you can log in anytime and change your status to make it visible again.\n\n"
-                "• Delete: Your account and all associated data will be permanently deleted. You will no longer be able to log in.",
-                style: TextStyle(fontSize: 14),
-              ): Text(
-                "ಸ್ಥಿತಿಯನ್ನು ನಿಮ್ಮ ಅಗತ್ಯಕ್ಕೆ ತಕ್ಕಂತೆ ಬದಲಾಯಿಸಿ:\n\n"
-                "• ಸಕ್ರಿಯ (Active): ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ಎಲ್ಲಾ ಬಳಕೆದಾರರಿಗೆ ಗೋಚರಿಸಲಿದೆ, ಮತ್ತು ಅವರು ಅಪ್ಲಿಕೇಶನ್ ಮೂಲಕ ನಿಮ್ಮೊಂದಿಗೆ ಸಂಪರ್ಕ ಸಾಧಿಸಬಹುದು.\n\n"
-                "•ವಿವಾಹಿತ (Married): ಅಭಿನಂದನೆಗಳು! ನೀವು ವಿವಾಹಿತರಾಗಿರುವುದರಿಂದ, ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ಯಾರಿಗೂ ಗೋಚರಿಸದು.\n\n"
-                "•ಆಸಕ್ತಿಯಿಲ್ಲ (Not Interested): ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ಇತರರಿಗೆ ಮರೆಮಾಡಲಾಗುತ್ತದೆ, ಆದರೆ ನೀವು ಯಾವಾಗ ಬೇಕಾದರೂ ಲಾಗಿನ್ ಮಾಡಿ, ನಿಮ್ಮ ಸ್ಥಿತಿಯನ್ನು ಬದಲಾಯಿಸಿ ಮತ್ತು ಮತ್ತೆ ಗೋಚರಿಸಬಹುದು.\n\n"
-                "• ಅಕೌಂಟ್ ಅಳಿಸಿ (Delete): ನಿಮ್ಮ ಖಾತೆ ಮತ್ತು ಅದರ ಸಂಬಂಧಿತ ಎಲ್ಲಾ ಡೇಟಾ ಶಾಶ್ವತವಾಗಿ ಅಳಿಸಲಿದೆ. ನೀವು ಮತ್ತೆ ಲಾಗಿನ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗುವುದಿಲ್ಲ.",
-                style: TextStyle(fontSize: 14),
-              ),
+              (localizations.locale.languageCode == "en")
+                  ? Text(
+                      "Change status as you require:\n\n"
+                      "• Active: Your profile is visible to all users, and they can connect with you through the app.\n\n"
+                      "• Married: Congratulations! Since you are married, your profile will no longer be visible to anyone.\n\n"
+                      "• Not Interested: Your profile will be hidden from others, but you can log in anytime and change your status to make it visible again.\n\n"
+                      "• Delete: Your account and all associated data will be permanently deleted. You will no longer be able to log in.",
+                      style: TextStyle(fontSize: 14),
+                    )
+                  : Text(
+                      "ಸ್ಥಿತಿಯನ್ನು ನಿಮ್ಮ ಅಗತ್ಯಕ್ಕೆ ತಕ್ಕಂತೆ ಬದಲಾಯಿಸಿ:\n\n"
+                      "• ಸಕ್ರಿಯ (Active): ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ಎಲ್ಲಾ ಬಳಕೆದಾರರಿಗೆ ಗೋಚರಿಸಲಿದೆ, ಮತ್ತು ಅವರು ಅಪ್ಲಿಕೇಶನ್ ಮೂಲಕ ನಿಮ್ಮೊಂದಿಗೆ ಸಂಪರ್ಕ ಸಾಧಿಸಬಹುದು.\n\n"
+                      "•ವಿವಾಹಿತ (Married): ಅಭಿನಂದನೆಗಳು! ನೀವು ವಿವಾಹಿತರಾಗಿರುವುದರಿಂದ, ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ಯಾರಿಗೂ ಗೋಚರಿಸದು.\n\n"
+                      "•ಆಸಕ್ತಿಯಿಲ್ಲ (Not Interested): ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ಇತರರಿಗೆ ಮರೆಮಾಡಲಾಗುತ್ತದೆ, ಆದರೆ ನೀವು ಯಾವಾಗ ಬೇಕಾದರೂ ಲಾಗಿನ್ ಮಾಡಿ, ನಿಮ್ಮ ಸ್ಥಿತಿಯನ್ನು ಬದಲಾಯಿಸಿ ಮತ್ತು ಮತ್ತೆ ಗೋಚರಿಸಬಹುದು.\n\n"
+                      "• ಅಕೌಂಟ್ ಅಳಿಸಿ (Delete): ನಿಮ್ಮ ಖಾತೆ ಮತ್ತು ಅದರ ಸಂಬಂಧಿತ ಎಲ್ಲಾ ಡೇಟಾ ಶಾಶ್ವತವಾಗಿ ಅಳಿಸಲಿದೆ. ನೀವು ಮತ್ತೆ ಲಾಗಿನ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗುವುದಿಲ್ಲ.",
+                      style: TextStyle(fontSize: 14),
+                    ),
               SizedBox(height: 10),
               Column(
                 children: [

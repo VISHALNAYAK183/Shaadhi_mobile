@@ -3,22 +3,18 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_cropper/image_cropper.dart';
-import 'package:practice/custom_widget.dart';
+import 'package:buntsmatrimony/custom_widget.dart';
 import 'package:http/http.dart' as http;
 import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart';
-import 'package:practice/lang.dart';
+import 'package:buntsmatrimony/lang.dart';
 import 'partner_preference.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 class UploadImagePage extends StatefulWidget {
   final String matriId;
   final String id;
-  const UploadImagePage({
-    super.key,
-    required this.matriId,
-    required this.id,
-  });
+  const UploadImagePage({super.key, required this.matriId, required this.id});
 
   @override
   _UploadImagePageState createState() => _UploadImagePageState();
@@ -36,11 +32,12 @@ class _UploadImagePageState extends State<UploadImagePage> {
     super.initState();
     _checkInternet();
 
-    Connectivity()
-        .onConnectivityChanged
-        .listen((List<ConnectivityResult> result) {
+    Connectivity().onConnectivityChanged.listen((
+      List<ConnectivityResult> result,
+    ) {
       setState(() {
-        _isOffline = !result.contains(ConnectivityResult.mobile) &&
+        _isOffline =
+            !result.contains(ConnectivityResult.mobile) &&
             !result.contains(ConnectivityResult.wifi);
       });
     });
@@ -48,15 +45,19 @@ class _UploadImagePageState extends State<UploadImagePage> {
 
   Future<void> _checkInternet() async {
     var localizations = AppLocalizations.of(context);
-    List<ConnectivityResult> connectivityResult =
-        await Connectivity().checkConnectivity();
+    List<ConnectivityResult> connectivityResult = await Connectivity()
+        .checkConnectivity();
     setState(() {
-      _isOffline = !connectivityResult.contains(ConnectivityResult.mobile) &&
+      _isOffline =
+          !connectivityResult.contains(ConnectivityResult.mobile) &&
           !connectivityResult.contains(ConnectivityResult.wifi);
     });
 
     if (_isOffline) {
-      _showPopup(localizations.translate('no_internet'), localizations.translate('no_internet_msg'));
+      _showPopup(
+        localizations.translate('no_internet'),
+        localizations.translate('no_internet_msg'),
+      );
     }
   }
 
@@ -66,22 +67,27 @@ class _UploadImagePageState extends State<UploadImagePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
           title: Row(
             children: [
               Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28),
               SizedBox(width: 8),
-              Text(title,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text(
+                title,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
             ],
           ),
           content: Text(message, style: TextStyle(fontSize: 16)),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child:
-                  Text(localizations.translate('ok'), style: TextStyle(color: Colors.red, fontSize: 16)),
+              child: Text(
+                localizations.translate('ok'),
+                style: TextStyle(color: Colors.red, fontSize: 16),
+              ),
             ),
           ],
         );
@@ -110,17 +116,18 @@ class _UploadImagePageState extends State<UploadImagePage> {
       sourcePath: imageFile.path,
       uiSettings: [
         AndroidUiSettings(
-            toolbarTitle: 'Crop Image',
-            toolbarColor: Colors.redAccent,
-            toolbarWidgetColor: Colors.white,
-            hideBottomControls: false,
-            aspectRatioPresets: [
-              CropAspectRatioPreset.square,
-              CropAspectRatioPreset.original,
-              CropAspectRatioPreset.ratio4x3,
-              CropAspectRatioPreset.ratio16x9,
-              CropAspectRatioPreset.ratio3x2,
-            ]),
+          toolbarTitle: 'Crop Image',
+          toolbarColor: Colors.redAccent,
+          toolbarWidgetColor: Colors.white,
+          hideBottomControls: false,
+          aspectRatioPresets: [
+            CropAspectRatioPreset.square,
+            CropAspectRatioPreset.original,
+            CropAspectRatioPreset.ratio4x3,
+            CropAspectRatioPreset.ratio16x9,
+            CropAspectRatioPreset.ratio3x2,
+          ],
+        ),
         IOSUiSettings(title: 'Crop Image'),
       ],
     );
@@ -130,8 +137,10 @@ class _UploadImagePageState extends State<UploadImagePage> {
   Future<void> uploadImages() async {
     var localizations = AppLocalizations.of(context);
     if (_isOffline) {
-      _showPopup(localizations.translate('no_internet'),
-          localizations.translate('no_internet_msg'));
+      _showPopup(
+        localizations.translate('no_internet'),
+        localizations.translate('no_internet_msg'),
+      );
       return;
     }
     if (mainImage == null) {
@@ -151,11 +160,13 @@ class _UploadImagePageState extends State<UploadImagePage> {
       request.fields.addAll({
         'matri_id': widget.matriId,
         'photo_type': '1',
-        'type': 'update_profilePhoto'
+        'type': 'update_profilePhoto',
       });
 
-      String newMainImagePath =
-          mainImage!.path.replaceAll(RegExp(r'\.jpg$'), '.jpeg');
+      String newMainImagePath = mainImage!.path.replaceAll(
+        RegExp(r'\.jpg$'),
+        '.jpeg',
+      );
       File renamedMainImage = await mainImage!.rename(newMainImagePath);
 
       String? mimeType = lookupMimeType(renamedMainImage.path);
@@ -163,30 +174,38 @@ class _UploadImagePageState extends State<UploadImagePage> {
           ? MediaType('image', 'png')
           : MediaType('image', 'jpeg');
 
-      request.files.add(await http.MultipartFile.fromPath(
-        'images[]',
-        renamedMainImage.path,
-        contentType: mediaType,
-      ));
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'images[]',
+          renamedMainImage.path,
+          contentType: mediaType,
+        ),
+      );
 
       for (int i = 0; i < additionalImages.length; i++) {
         if (additionalImages[i] != null) {
-          String newAdditionalImagePath =
-              additionalImages[i]!.path.replaceAll(RegExp(r'\.jpg$'), '.jpeg');
-          File renamedAdditionalImage =
-              await additionalImages[i]!.rename(newAdditionalImagePath);
+          String newAdditionalImagePath = additionalImages[i]!.path.replaceAll(
+            RegExp(r'\.jpg$'),
+            '.jpeg',
+          );
+          File renamedAdditionalImage = await additionalImages[i]!.rename(
+            newAdditionalImagePath,
+          );
 
-          String? additionalMimeType =
-              lookupMimeType(renamedAdditionalImage.path);
+          String? additionalMimeType = lookupMimeType(
+            renamedAdditionalImage.path,
+          );
           MediaType additionalMediaType = additionalMimeType == 'image/png'
               ? MediaType('image', 'png')
               : MediaType('image', 'jpeg');
 
-          request.files.add(await http.MultipartFile.fromPath(
-            'images[]',
-            renamedAdditionalImage.path,
-            contentType: additionalMediaType,
-          ));
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              'images[]',
+              renamedAdditionalImage.path,
+              contentType: additionalMediaType,
+            ),
+          );
         }
       }
 
@@ -205,10 +224,9 @@ class _UploadImagePageState extends State<UploadImagePage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => FilterDialog(
-                        matriId: widget.matriId,
-                        id: widget.id,
-                      )),
+                builder: (context) =>
+                    FilterDialog(matriId: widget.matriId, id: widget.id),
+              ),
             );
           }
         });
@@ -239,9 +257,7 @@ class _UploadImagePageState extends State<UploadImagePage> {
         ),
         child: image == null
             ? const Center(child: Icon(Icons.add, color: Colors.blue, size: 40))
-            : ClipRRect(
-                child: Image.file(image, fit: BoxFit.cover),
-              ),
+            : ClipRRect(child: Image.file(image, fit: BoxFit.cover)),
       ),
     );
   }
@@ -268,7 +284,9 @@ class _UploadImagePageState extends State<UploadImagePage> {
               ),
               const SizedBox(height: 20),
               buildImageBox(
-                  image: mainImage, onTap: () => pickImage(true, null)),
+                image: mainImage,
+                onTap: () => pickImage(true, null),
+              ),
               const SizedBox(height: 40),
               Text(
                 localizations.translate('additional_images'),
@@ -287,8 +305,9 @@ class _UploadImagePageState extends State<UploadImagePage> {
                 children: List.generate(
                   3,
                   (index) => buildImageBox(
-                      image: additionalImages[index],
-                      onTap: () => pickImage(false, index)),
+                    image: additionalImages[index],
+                    onTap: () => pickImage(false, index),
+                  ),
                 ),
               ),
               const SizedBox(height: 40),
@@ -315,17 +334,18 @@ uploadImage(String matri_id) async {
       sourcePath: pickedFile.path,
       uiSettings: [
         AndroidUiSettings(
-            toolbarTitle: 'Crop Image',
-            toolbarColor: Colors.redAccent,
-            toolbarWidgetColor: Colors.white,
-            hideBottomControls: false,
-            aspectRatioPresets: [
-              CropAspectRatioPreset.square,
-              CropAspectRatioPreset.original,
-              CropAspectRatioPreset.ratio4x3,
-              CropAspectRatioPreset.ratio16x9,
-              CropAspectRatioPreset.ratio3x2,
-            ]),
+          toolbarTitle: 'Crop Image',
+          toolbarColor: Colors.redAccent,
+          toolbarWidgetColor: Colors.white,
+          hideBottomControls: false,
+          aspectRatioPresets: [
+            CropAspectRatioPreset.square,
+            CropAspectRatioPreset.original,
+            CropAspectRatioPreset.ratio4x3,
+            CropAspectRatioPreset.ratio16x9,
+            CropAspectRatioPreset.ratio3x2,
+          ],
+        ),
         IOSUiSettings(title: 'Crop Image'),
       ],
     );
@@ -333,8 +353,10 @@ uploadImage(String matri_id) async {
     if (cropped != null) {
       File imageFile = File(cropped.path);
 
-      String newMainImagePath =
-          imageFile.path.replaceAll(RegExp(r'\.jpg$'), '.jpeg');
+      String newMainImagePath = imageFile.path.replaceAll(
+        RegExp(r'\.jpg$'),
+        '.jpeg',
+      );
       File renamedMainImage = await imageFile.rename(newMainImagePath);
 
       String apiEndpoint =
@@ -345,7 +367,7 @@ uploadImage(String matri_id) async {
         request.fields.addAll({
           'matri_id': matri_id,
           'photo_type': '1',
-          'type': 'update_profiePhoto'
+          'type': 'update_profiePhoto',
         });
 
         String? mimeType = lookupMimeType(renamedMainImage.path);
@@ -353,11 +375,13 @@ uploadImage(String matri_id) async {
             ? MediaType('image', 'png')
             : MediaType('image', 'jpeg');
 
-        request.files.add(await http.MultipartFile.fromPath(
-          'images[]',
-          renamedMainImage.path,
-          contentType: mediaType,
-        ));
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'images[]',
+            renamedMainImage.path,
+            contentType: mediaType,
+          ),
+        );
 
         http.StreamedResponse response = await request.send();
 

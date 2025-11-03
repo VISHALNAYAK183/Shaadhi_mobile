@@ -11,8 +11,8 @@ import 'package:flutter_cashfree_pg_sdk/api/cftheme/cftheme.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfenums.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfexceptions.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cferrorresponse/cferrorresponse.dart';
-import 'package:practice/api_service.dart';
-import 'package:practice/dashboard_model.dart';
+import 'package:buntsmatrimony/api_service.dart';
+import 'package:buntsmatrimony/dashboard_model.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -34,7 +34,7 @@ class _SubscriptionPaymentPageState extends State<SubscriptionPaymentPage> {
   bool isPlanSelected = false;
   String orderId = "";
   String paymentSessionId = "";
-  Color appcolor = Color(0xFFC3A38C);
+  Color appcolor = Color(0xFFea4a57);
 
   @override
   void initState() {
@@ -174,15 +174,17 @@ class _SubscriptionPaymentPageState extends State<SubscriptionPaymentPage> {
 
   Future<void> getcfToken() async {
     try {
-      Map<String, dynamic> response =
-          await ApiService.fetchPaymentData(selectedPlanId!, selectedAmount!);
+      Map<String, dynamic> response = await ApiService.fetchPaymentData(
+        selectedPlanId!,
+        selectedAmount!,
+      );
       PaymentData paymentData = PaymentData.fromJson(response);
-        String backendEnvironment = response['environment'] ?? "SANDBOX";
-        print("RESponse${ response['environment']}");
-     
-     environment = backendEnvironment.toUpperCase() == "PRODUCTION"
-        ? CFEnvironment.PRODUCTION
-        : CFEnvironment.SANDBOX;
+      String backendEnvironment = response['environment'] ?? "SANDBOX";
+      print("RESponse${response['environment']}");
+
+      environment = backendEnvironment.toUpperCase() == "PRODUCTION"
+          ? CFEnvironment.PRODUCTION
+          : CFEnvironment.SANDBOX;
 
       makePayment(paymentData.paymentSessionId, paymentData.orderId);
       print("SANDBOX${environment}");
@@ -215,8 +217,11 @@ class _SubscriptionPaymentPageState extends State<SubscriptionPaymentPage> {
           },
           child: Container(
             margin: EdgeInsets.fromLTRB(10, 5, 0, 10),
-            child: Icon(Icons.arrow_back_rounded,
-                color: Colors.white, size: 25), // Back button icon
+            child: Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 25,
+            ), // Back button icon
           ),
         ),
       ),
@@ -239,11 +244,17 @@ class _SubscriptionPaymentPageState extends State<SubscriptionPaymentPage> {
                   itemBuilder: (context, index) {
                     final plan = subscriptions[index];
                     return ListTile(
-                      title: Text(plan.planName,
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold)),
-                      subtitle: Text("₹${plan.amount}",
-                          style: TextStyle(fontSize: 16, color: Colors.green)),
+                      title: Text(
+                        plan.planName,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Text(
+                        "₹${plan.amount}",
+                        style: TextStyle(fontSize: 16, color: Colors.green),
+                      ),
                       trailing: ElevatedButton(
                         onPressed: () {
                           setState(() {

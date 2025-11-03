@@ -1,8 +1,8 @@
-import 'package:practice/api_service.dart';
-import 'package:practice/dashboard_model.dart';
+import 'package:buntsmatrimony/api_service.dart';
+import 'package:buntsmatrimony/dashboard_model.dart';
 import 'package:flutter/material.dart';
-import 'package:practice/lang.dart';
-import 'package:practice/profile_page.dart';
+import 'package:buntsmatrimony/lang.dart';
+import 'package:buntsmatrimony/profile_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'custom_widget.dart';
 
@@ -34,7 +34,7 @@ class AdditionalDetailsPageState extends State<AdditionalDetailsPage> {
   String? countryError;
   String? stateError;
   String? cityError;
-  Color appcolor = Color(0xFFC3A38C);
+  Color appcolor = Color(0xFFea4a57);
 
   final List<String> bloodGroups = [
     'A+',
@@ -44,7 +44,7 @@ class AdditionalDetailsPageState extends State<AdditionalDetailsPage> {
     'O+',
     'O-',
     'AB+',
-    'AB-'
+    'AB-',
   ];
   final List<String> complexions = ['Fair', 'Wheatish', 'Dusky', 'Dark'];
   final List<String> disabilityOptions = ['No', 'Yes'];
@@ -80,7 +80,7 @@ class AdditionalDetailsPageState extends State<AdditionalDetailsPage> {
       if (countryList.isNotEmpty) {
         setState(() {
           countryMap = {
-            for (var e in countryList) e.country_name: e.country_id
+            for (var e in countryList) e.country_name: e.country_id,
           };
           countries = countryMap.keys.toList();
         });
@@ -94,7 +94,9 @@ class AdditionalDetailsPageState extends State<AdditionalDetailsPage> {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString(
-          "selected_country_id", countryMap[selectedCountry] ?? "");
+        "selected_country_id",
+        countryMap[selectedCountry] ?? "",
+      );
 
       List<searchstate> statesList = await ApiService.fetchstate();
 
@@ -177,7 +179,7 @@ class AdditionalDetailsPageState extends State<AdditionalDetailsPage> {
     if (heightValue != null && heightValue < 100) {
       return "Minimum height required is 100 cm";
     }
-    return null; 
+    return null;
   }
 
   void validateAndProceed() async {
@@ -185,12 +187,12 @@ class AdditionalDetailsPageState extends State<AdditionalDetailsPage> {
       heightError = _validateHeight(heightController.text);
       bloodGroupError =
           (selectedBloodGroup == null || selectedBloodGroup!.isEmpty)
-              ? "Select Blood Group"
-              : null;
+          ? "Select Blood Group"
+          : null;
       complexionError =
           (selectedComplexion == null || selectedComplexion!.isEmpty)
-              ? "Select Complexion"
-              : null;
+          ? "Select Complexion"
+          : null;
       countryError = (selectedCountry == null || selectedCountry!.isEmpty)
           ? "Select Country"
           : null;
@@ -212,7 +214,8 @@ class AdditionalDetailsPageState extends State<AdditionalDetailsPage> {
       String? updatedState = stateMap[selectedState];
       String? updatedCity = cityMap[selectedCity];
 
-      bool success = await ApiService.updateAdditionalDetails(context,
+      bool success = await ApiService.updateAdditionalDetails(
+        context,
         matriID: widget.profile.matriId,
         id: widget.profile.id,
         height: heightController.text,
@@ -230,9 +233,7 @@ class AdditionalDetailsPageState extends State<AdditionalDetailsPage> {
       if (success) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) => ProfilePage1(),
-          ),
+          MaterialPageRoute(builder: (context) => ProfilePage1()),
         );
       } else {
         print("Failed to update additional details");
@@ -248,7 +249,7 @@ class AdditionalDetailsPageState extends State<AdditionalDetailsPage> {
         backgroundColor: appcolor,
         title: Text(
           localizations.translate('additional_details'),
-          style: TextStyle(color: Colors.white), 
+          style: TextStyle(color: Colors.white),
         ),
         leading: GestureDetector(
           onTap: () {
@@ -256,8 +257,11 @@ class AdditionalDetailsPageState extends State<AdditionalDetailsPage> {
           },
           child: Container(
             margin: EdgeInsets.fromLTRB(10, 5, 0, 10),
-            child: Icon(Icons.arrow_back_rounded,
-                color: Colors.white, size: 25),
+            child: Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 25,
+            ),
           ),
         ),
       ),
@@ -267,18 +271,27 @@ class AdditionalDetailsPageState extends State<AdditionalDetailsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              buildTextField(localizations.translate('height'), heightController,
-                  errorText: heightError,keyboardType: TextInputType.number,),
-              buildTextField(localizations.translate('weight'), weightController, keyboardType: TextInputType.number,),
+              buildTextField(
+                localizations.translate('height'),
+                heightController,
+                errorText: heightError,
+                keyboardType: TextInputType.number,
+              ),
+              buildTextField(
+                localizations.translate('weight'),
+                weightController,
+                keyboardType: TextInputType.number,
+              ),
               buildDropdown(
-                  localizations.translate('blood_group'),
-                  bloodGroups,
-                  selectedBloodGroup,
-                  (value) => setState(() {
-                        selectedBloodGroup = value;
-                        bloodGroupError = null;
-                      }),
-                  errorText: bloodGroupError),
+                localizations.translate('blood_group'),
+                bloodGroups,
+                selectedBloodGroup,
+                (value) => setState(() {
+                  selectedBloodGroup = value;
+                  bloodGroupError = null;
+                }),
+                errorText: bloodGroupError,
+              ),
               buildDropdown(
                 localizations.translate('complexion'),
                 complexions,
@@ -294,7 +307,7 @@ class AdditionalDetailsPageState extends State<AdditionalDetailsPage> {
               buildDropdown(
                 localizations.translate('disabilities'),
                 disabilityOptions,
-                selectedDisability, 
+                selectedDisability,
                 (value) {
                   setState(() {
                     selectedDisability = value;
@@ -345,10 +358,20 @@ class AdditionalDetailsPageState extends State<AdditionalDetailsPage> {
                 },
                 errorText: cityError,
               ),
-              buildTextField(localizations.translate('address'), addressController),
-              buildTextField(localizations.translate('remarks'), remarksController, maxLines: 3),
+              buildTextField(
+                localizations.translate('address'),
+                addressController,
+              ),
+              buildTextField(
+                localizations.translate('remarks'),
+                remarksController,
+                maxLines: 3,
+              ),
               const SizedBox(height: 20),
-              customElevatedButton(validateAndProceed, localizations.translate('submit')),
+              customElevatedButton(
+                validateAndProceed,
+                localizations.translate('submit'),
+              ),
             ],
           ),
         ),

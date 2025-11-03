@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:http/http.dart' as http;
-import 'package:practice/api_service.dart';
-import 'package:practice/lang.dart';
+import 'package:buntsmatrimony/api_service.dart';
+import 'package:buntsmatrimony/lang.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SubscriptionScreen extends StatefulWidget {
@@ -18,17 +18,20 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   List<ProductDetails> _products = [];
   bool _isFeatureUnlocked = false;
   bool _isLoading = false;
-  Color appcolor = Color(0xFFC3A38C);
+  Color appcolor = Color(0xFFea4a57);
 
   @override
   void initState() {
     super.initState();
     _initializeIAP();
-    _subscription = _iap.purchaseStream.listen((purchases) {
-      _handlePurchaseUpdates(purchases);
-    }, onError: (error) {
-      print("⚠️ Error in purchase stream: $error");
-    });
+    _subscription = _iap.purchaseStream.listen(
+      (purchases) {
+        _handlePurchaseUpdates(purchases);
+      },
+      onError: (error) {
+        print("⚠️ Error in purchase stream: $error");
+      },
+    );
   }
 
   // Fetch products on screen load
@@ -52,7 +55,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     }
     final matchedData = await ApiService.getInappProduct('app_store');
 
-// Print the entire response
+    // Print the entire response
     print(matchedData);
 
     List<dynamic> dataout = matchedData['dataout'];
@@ -105,8 +108,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         print("❌ Purchase Error: ${purchase.error?.message}");
         if (purchase.error?.code == 'user_canceled') {
           print("❌ The user canceled the purchase.");
-          _showCancelDialog((purchase.status)
-              .toString()); // Show a cancel dialog or retry prompt.
+          _showCancelDialog(
+            (purchase.status).toString(),
+          ); // Show a cancel dialog or retry prompt.
         }
         _handlePurchaseError(purchase);
       } else if (purchase.status == PurchaseStatus.canceled) {
@@ -126,8 +130,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(status),
-          content: Text(
-              localizations.translate('retry_purchase')),
+          content: Text(localizations.translate('retry_purchase')),
           actions: <Widget>[
             TextButton(
               child: Text(localizations.translate('cancel')),
@@ -161,7 +164,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       "platform": purchase.verificationData.source,
       "status": purchase.status.toString(),
       "title": purchase.productID,
-      "transactionDate": purchase.transactionDate?.toString() ?? ""
+      "transactionDate": purchase.transactionDate?.toString() ?? "",
     });
 
     print(body);
@@ -238,8 +241,11 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
             //   color: Colors.white,
             //   borderRadius: BorderRadius.circular(20),
             // ),
-            child: Icon(Icons.arrow_back_rounded,
-                color: Colors.white, size: 25), // Back button icon
+            child: Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 25,
+            ), // Back button icon
           ),
         ),
       ),
@@ -249,7 +255,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
             ? Center(child: CircularProgressIndicator())
             : ListView(
                 children: [
-                  if (_products.isEmpty) Text(localizations.translate('no_products')),
+                  if (_products.isEmpty)
+                    Text(localizations.translate('no_products')),
                   ..._products.map((product) {
                     return ListTile(
                       title: Text(product.title),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:practice/login.dart';
-import 'package:practice/main_screen.dart';
+import 'package:buntsmatrimony/login.dart';
+import 'package:buntsmatrimony/main_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'language_provider.dart';
@@ -25,10 +25,7 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             locale: languageProvider.locale,
-            supportedLocales: [
-              Locale('en', ''),
-              Locale('kn', ''),
-            ],
+            supportedLocales: [Locale('en', ''), Locale('kn', '')],
             localizationsDelegates: [
               const AppLocalizationsDelegate(),
               GlobalMaterialLocalizations.delegate,

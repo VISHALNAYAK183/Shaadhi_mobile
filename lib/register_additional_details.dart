@@ -1,20 +1,21 @@
-import 'package:practice/api_service.dart';
-import 'package:practice/dashboard_model.dart';
-import 'package:practice/lang.dart';
-import 'package:practice/register_education_profession_details.dart';
+import 'package:buntsmatrimony/api_service.dart';
+import 'package:buntsmatrimony/dashboard_model.dart';
+import 'package:buntsmatrimony/lang.dart';
+import 'package:buntsmatrimony/register_education_profession_details.dart';
 import 'package:flutter/material.dart';
-import 'package:practice/custom_widget.dart';
+import 'package:buntsmatrimony/custom_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterAdditionalDetailsPage extends StatefulWidget {
   final String matriId;
   final String id;
   final maritalStatus;
-  const RegisterAdditionalDetailsPage(
-      {super.key,
-      required this.matriId,
-      required this.id,
-      required this.maritalStatus});
+  const RegisterAdditionalDetailsPage({
+    super.key,
+    required this.matriId,
+    required this.id,
+    required this.maritalStatus,
+  });
 
   @override
   RegisterAdditionalDetailsPageState createState() =>
@@ -30,7 +31,7 @@ class RegisterAdditionalDetailsPageState
   final TextEditingController remarksController = TextEditingController();
 
   String? selectedBloodGroup;
-   Color appcolor = Color(0xFFC3A38C);
+  Color appcolor = Color(0xFFea4a57);
   String? selectedComplexion;
   String? selectedDisability;
   String? selectedCountry;
@@ -53,7 +54,7 @@ class RegisterAdditionalDetailsPageState
     'O+',
     'O-',
     'AB+',
-    'AB-'
+    'AB-',
   ];
   final List<String> complexions = ['Fair', 'Wheatish', 'Dusky', 'Dark'];
   final List<String> disabilityOptions = ['No', 'Yes'];
@@ -87,7 +88,7 @@ class RegisterAdditionalDetailsPageState
       if (countryList.isNotEmpty) {
         setState(() {
           countryMap = {
-            for (var e in countryList) e.country_name: e.country_id
+            for (var e in countryList) e.country_name: e.country_id,
           };
           countries = countryMap.keys.toList();
         });
@@ -101,7 +102,9 @@ class RegisterAdditionalDetailsPageState
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString(
-          "selected_country_id", countryMap[selectedCountry] ?? "");
+        "selected_country_id",
+        countryMap[selectedCountry] ?? "",
+      );
 
       List<searchstate> statesList = await ApiService.fetchstate();
 
@@ -171,8 +174,9 @@ class RegisterAdditionalDetailsPageState
   Future<void> validateAndProceed() async {
     setState(() {
       heightError = _validateHeight(heightController.text);
-      bloodGroupError =
-          selectedBloodGroup == null ? "Select Blood Group" : null;
+      bloodGroupError = selectedBloodGroup == null
+          ? "Select Blood Group"
+          : null;
       complexionError = selectedComplexion == null ? "Select Complexion" : null;
       countryError = selectedCountry == null ? "Select Country" : null;
       stateError = selectedState == null ? "Select State" : null;
@@ -208,11 +212,12 @@ class RegisterAdditionalDetailsPageState
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => RegisterEducationProfessionPage(
-                    matriId: widget.matriId,
-                    id: widget.id,
-                    maritalStatus: widget.maritalStatus,
-                  )),
+            builder: (context) => RegisterEducationProfessionPage(
+              matriId: widget.matriId,
+              id: widget.id,
+              maritalStatus: widget.maritalStatus,
+            ),
+          ),
         );
       } else {
         print("Failed to save additional details");
@@ -228,7 +233,7 @@ class RegisterAdditionalDetailsPageState
         backgroundColor: appcolor,
         title: Text(
           localizations.translate('additional_details'),
-          style: TextStyle(color: Colors.white), 
+          style: TextStyle(color: Colors.white),
         ),
         leading: GestureDetector(
           onTap: () {
@@ -236,8 +241,11 @@ class RegisterAdditionalDetailsPageState
           },
           child: Container(
             margin: EdgeInsets.fromLTRB(10, 5, 0, 10),
-            child: Icon(Icons.arrow_back_rounded,
-                color: Colors.white, size: 25),
+            child: Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 25,
+            ),
           ),
         ),
       ),
@@ -248,8 +256,12 @@ class RegisterAdditionalDetailsPageState
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(height: 20),
-              buildTextField(localizations.translate('height'), heightController,
-                  keyboardType: TextInputType.number, errorText: heightError),
+              buildTextField(
+                localizations.translate('height'),
+                heightController,
+                keyboardType: TextInputType.number,
+                errorText: heightError,
+              ),
               buildTextField(
                 localizations.translate('weight'),
                 weightController,
@@ -257,14 +269,15 @@ class RegisterAdditionalDetailsPageState
               ),
               // const SizedBox(height: 5),
               buildDropdown(
-                  localizations.translate('blood_group'),
-                  bloodGroups,
-                  selectedBloodGroup,
-                  (value) => setState(() {
-                        selectedBloodGroup = value;
-                        bloodGroupError = null;
-                      }),
-                  errorText: bloodGroupError),
+                localizations.translate('blood_group'),
+                bloodGroups,
+                selectedBloodGroup,
+                (value) => setState(() {
+                  selectedBloodGroup = value;
+                  bloodGroupError = null;
+                }),
+                errorText: bloodGroupError,
+              ),
               buildDropdown(
                 localizations.translate('complexion'),
                 complexions,
@@ -337,22 +350,29 @@ class RegisterAdditionalDetailsPageState
 
               const SizedBox(height: 5),
               buildTextField(
-                  localizations.translate('address'), addressController),
+                localizations.translate('address'),
+                addressController,
+              ),
               buildTextField(
-                  localizations.translate('remarks'), remarksController,
-                  maxLines: 3),
+                localizations.translate('remarks'),
+                remarksController,
+                maxLines: 3,
+              ),
               const SizedBox(height: 20),
               customElevatedButton(
-                  validateAndProceed, localizations.translate('next')),
+                validateAndProceed,
+                localizations.translate('next'),
+              ),
               customTextButton(() {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => RegisterEducationProfessionPage(
-                            matriId: widget.matriId,
-                            id: widget.id,
-                            maritalStatus: widget.maritalStatus,
-                          )),
+                    builder: (context) => RegisterEducationProfessionPage(
+                      matriId: widget.matriId,
+                      id: widget.id,
+                      maritalStatus: widget.maritalStatus,
+                    ),
+                  ),
                 );
               }, localizations.translate('skip')),
             ],

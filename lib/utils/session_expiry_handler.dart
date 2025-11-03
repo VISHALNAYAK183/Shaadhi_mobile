@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:practice/login.dart';
+import 'package:buntsmatrimony/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
- // adjust import path if needed
+// adjust import path if needed
 
 Future<void> handleSessionExpiry(BuildContext context) async {
   // 1️⃣ Clear all stored preferences
@@ -29,10 +29,7 @@ Future<void> handleSessionExpiry(BuildContext context) async {
                   (Route<dynamic> route) => false,
                 );
               },
-              child: const Text(
-                "OK",
-                style: TextStyle(color: Colors.red),
-              ),
+              child: const Text("OK", style: TextStyle(color: Colors.red)),
             ),
           ],
         );

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:practice/profile_page.dart';
+import 'package:buntsmatrimony/profile_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
@@ -61,7 +61,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: const Color(0xFFC3A38C),
+      backgroundColor: const Color(0xFFea4a57),
       iconTheme: const IconThemeData(color: Colors.white),
       title: GestureDetector(
         onTap: () {
@@ -89,10 +89,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                   const SizedBox(height: 2),
                   Text(
                     myMatriId,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.white,
-                    ),
+                    style: const TextStyle(fontSize: 12, color: Colors.white),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],

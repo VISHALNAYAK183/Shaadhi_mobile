@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:practice/chat/chats.dart';
-import 'package:practice/checkProfiles.dart';
-import 'package:practice/inapp/subscription_list_screen.dart';
-import 'package:practice/lang.dart';
-import 'package:practice/payment_gateway.dart';
+import 'package:buntsmatrimony/chat/chats.dart';
+import 'package:buntsmatrimony/checkProfiles.dart';
+import 'package:buntsmatrimony/inapp/subscription_list_screen.dart';
+import 'package:buntsmatrimony/lang.dart';
+import 'package:buntsmatrimony/payment_gateway.dart';
 import 'api_service.dart';
 import 'dashboard_model.dart';
 import 'Block.dart';
@@ -26,12 +26,15 @@ class _ProfilePageState extends State<ProfilePage> {
   final MaxLimit _maxLimit = MaxLimit();
   late Future<ProfileViewData> _profileDataFuture;
 
-  final Color _signColor = Color(0xFFC3A38C);
+  final Color _signColor = Color(0xFFea4a57);
   @override
   void initState() {
     super.initState();
     print("profilepage");
-    _profileDataFuture = ApiService.fetchProfileViewData(context,widget.matriId);
+    _profileDataFuture = ApiService.fetchProfileViewData(
+      context,
+      widget.matriId,
+    );
     _checkIfShortlisted(widget.matriId);
     _checkIfLiked(widget.matriId);
   }
@@ -47,12 +50,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _checkIfShortlisted(String matriId) async {
     try {
-      ShortlistData shortlistData =
-          await ApiService.fetchShortlistedProfiles(context); // ✅ Corrected type
+      ShortlistData shortlistData = await ApiService.fetchShortlistedProfiles(
+        context,
+      ); // ✅ Corrected type
 
       setState(() {
-        _isShortlisted =
-            shortlistData.profiles.any((profile) => profile.matriId == matriId);
+        _isShortlisted = shortlistData.profiles.any(
+          (profile) => profile.matriId == matriId,
+        );
       });
 
       debugPrint("Shortlist status for $matriId: $_isShortlisted");
@@ -64,8 +69,9 @@ class _ProfilePageState extends State<ProfilePage> {
   //Added Extra
   Future<void> _checkIfLiked(String matriId) async {
     try {
-      Map<String, dynamic> response =
-          await ApiService.fetchLikedProfiles(context);
+      Map<String, dynamic> response = await ApiService.fetchLikedProfiles(
+        context,
+      );
       LikeData likedata = LikeData.fromJson(response, ApiService.baseUrl);
 
       setState(() {
@@ -126,8 +132,11 @@ class _ProfilePageState extends State<ProfilePage> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Icon(Icons.arrow_back_rounded,
-                        color: Colors.black, size: 25), // Back button icon
+                    child: Icon(
+                      Icons.arrow_back_rounded,
+                      color: Colors.black,
+                      size: 25,
+                    ), // Back button icon
                   ),
                 ),
                 bottom: PreferredSize(
@@ -141,12 +150,19 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Container(
                         margin: EdgeInsets.fromLTRB(10, 5, 0, 10),
                         padding: EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4), // Adds padding
+                          horizontal: 8,
+                          vertical: 4,
+                        ), // Adds padding
                         decoration: BoxDecoration(
                           color: Color.fromARGB(
-                              181, 255, 255, 255), // Background color
-                          borderRadius:
-                              BorderRadius.circular(12), // Circular border
+                            181,
+                            255,
+                            255,
+                            255,
+                          ), // Background color
+                          borderRadius: BorderRadius.circular(
+                            12,
+                          ), // Circular border
                         ),
                         child: Text(
                           widget.matriId,
@@ -166,16 +182,18 @@ class _ProfilePageState extends State<ProfilePage> {
                     decoration: BoxDecoration(
                       border: Border(
                         top: BorderSide(
-                            color: Colors.black,
-                            width: 1), // Border only at the top
+                          color: Colors.black,
+                          width: 1,
+                        ), // Border only at the top
                       ),
                       borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(
-                              10)), // Rounded corners only at the top
+                        top: Radius.circular(10),
+                      ), // Rounded corners only at the top
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(10)), // Match border radius
+                        top: Radius.circular(10),
+                      ), // Match border radius
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
@@ -210,14 +228,17 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Container(
                   decoration: const BoxDecoration(
                     color: Colors.white,
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(20)),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
                   ),
                   child: Column(
                     children: [
                       _buildActionButtons(profile),
                       const Divider(
-                          thickness: 3, color: Colors.grey), // Line added here
+                        thickness: 3,
+                        color: Colors.grey,
+                      ), // Line added here
                       _buildPersonalInfoSection(profile),
                       _buildMoreSection(),
 
@@ -233,7 +254,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-//ADD
+  //ADD
   Widget _buildPersonalInfoSection(profileview profile) {
     var localizations = AppLocalizations.of(context);
     return Padding(
@@ -255,10 +276,14 @@ class _ProfilePageState extends State<ProfilePage> {
           _buildInfoRow(localizations.translate('name'), profile.firstName),
           _buildInfoRow(localizations.translate('age'), profile.age.toString()),
           _buildInfoRow(
-              localizations.translate('height'), "${profile.height} cm"),
+            localizations.translate('height'),
+            "${profile.height} cm",
+          ),
           _buildInfoRow(localizations.translate('place'), profile.city),
           _buildInfoRow(
-              localizations.translate('qualification'), profile.qualification),
+            localizations.translate('qualification'),
+            profile.qualification,
+          ),
         ],
       ),
     );
@@ -266,7 +291,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   bool _isShortlisted = false;
   bool _isLiked = false;
-//End
+  //End
   Widget _buildActionButtons(profileview profile) {
     var localizations = AppLocalizations.of(context);
     return Padding(
@@ -274,7 +299,6 @@ class _ProfilePageState extends State<ProfilePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-
           _buildIconButton(
             _isLiked ? Icons.favorite : Icons.favorite_border,
             localizations.translate('like'),
@@ -283,17 +307,21 @@ class _ProfilePageState extends State<ProfilePage> {
               try {
                 if (_isLiked) {
                   // Call remove shortlist API
-                  Removelike response =
-                      await ApiService.fetchRemovelikeData(context,widget.matriId);
+                  Removelike response = await ApiService.fetchRemovelikeData(
+                    context,
+                    widget.matriId,
+                  );
                   debugPrint("Removed from Liked: ${response.message}");
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Removed from Liked")),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text("Removed from Liked")));
                 } else {
                   // Call add shortlist API
-                  Addlike response =
-                      await ApiService.fetchAddlikeData(context,widget.matriId);
+                  Addlike response = await ApiService.fetchAddlikeData(
+                    context,
+                    widget.matriId,
+                  );
                   debugPrint("Liked Successfully: ${response.message}");
 
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -313,7 +341,6 @@ class _ProfilePageState extends State<ProfilePage> {
               }
             },
           ),
-
           _buildIconButton(
             _isShortlisted ? Icons.bookmark : Icons.bookmark_border,
             localizations.translate('shortlist'),
@@ -323,7 +350,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 if (_isShortlisted) {
                   // Call remove shortlist API
                   RemoveShortlist response =
-                      await ApiService.fetchRemoveShortlistData(context,widget.matriId);
+                      await ApiService.fetchRemoveShortlistData(
+                        context,
+                        widget.matriId,
+                      );
                   debugPrint("Removed from Shortlist: ${response.message}");
 
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -332,7 +362,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 } else {
                   // Call add shortlist API
                   AddShortlist response =
-                      await ApiService.fetchAddShortlistData(context,widget.matriId);
+                      await ApiService.fetchAddShortlistData(
+                        context,
+                        widget.matriId,
+                      );
                   debugPrint("Shortlisted Successfully: ${response.message}");
 
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -348,47 +381,57 @@ class _ProfilePageState extends State<ProfilePage> {
                 debugPrint("Error updating Shortlist: $error");
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                      content: Text("Failed to update shortlist. Try again!")),
+                    content: Text("Failed to update shortlist. Try again!"),
+                  ),
                 );
               }
             },
           ),
-
-          _buildIconButton(Icons.chat_bubble_outline,
-              (localizations.translate('chat')).toString(),
-              onPressed: () async {
-            {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ChatScreen(
+          _buildIconButton(
+            Icons.chat_bubble_outline,
+            (localizations.translate('chat')).toString(),
+            onPressed: () async {
+              {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatScreen(
                       matriId: widget.matriId,
                       profile: profile.url,
-                      name: profile.firstName),
-                ),
-              );
-            }
-          }),
-
-          _buildIconButton(Icons.phone, localizations.translate('contact_info'),
-              onPressed: () async {
-            String status =
-                await _maxLimit.checkContactedProfiles(widget.matriId,context);
-            if (status == "Y") {
-              _showContactInfoDialog(context, profile);
-            } else {
-              Navigator.push(
+                      name: profile.firstName,
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
+          _buildIconButton(
+            Icons.phone,
+            localizations.translate('contact_info'),
+            onPressed: () async {
+              String status = await _maxLimit.checkContactedProfiles(
+                widget.matriId,
                 context,
-                MaterialPageRoute(
-                  builder: (context) => SubscriptionPaymentPage(),
-                ),
               );
-            }
-          }),
-          _buildIconButton(Icons.report, localizations.translate('block'),
-              onPressed: () {
-            _showBlockReportDialog(context);
-          }),
+              if (status == "Y") {
+                _showContactInfoDialog(context, profile);
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SubscriptionPaymentPage(),
+                  ),
+                );
+              }
+            },
+          ),
+          _buildIconButton(
+            Icons.report,
+            localizations.translate('block'),
+            onPressed: () {
+              _showBlockReportDialog(context);
+            },
+          ),
         ],
       ),
     );
@@ -402,8 +445,9 @@ class _ProfilePageState extends State<ProfilePage> {
         return AlertDialog(
           contentPadding: const EdgeInsets.all(16),
           title: Text(localizations.translate('block_report')),
-          content:
-              BlockReportCard(matriIdTo: widget.matriId), // Pass matriId here
+          content: BlockReportCard(
+            matriIdTo: widget.matriId,
+          ), // Pass matriId here
           actions: [
             TextButton(
               onPressed: () {
@@ -417,8 +461,12 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildIconButton(IconData icon, String label,
-      {VoidCallback? onPressed, Color? color}) {
+  Widget _buildIconButton(
+    IconData icon,
+    String label, {
+    VoidCallback? onPressed,
+    Color? color,
+  }) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -427,8 +475,11 @@ class _ProfilePageState extends State<ProfilePage> {
           height: 40,
           decoration: BoxDecoration(shape: BoxShape.circle),
           child: IconButton(
-            icon: Icon(icon,
-                size: 30, color: color ?? Colors.blue), // Use dynamic color
+            icon: Icon(
+              icon,
+              size: 30,
+              color: color ?? Colors.blue,
+            ), // Use dynamic color
             onPressed: onPressed ?? () {},
             padding: EdgeInsets.zero,
             constraints: BoxConstraints(),
@@ -443,7 +494,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-// Method to show the contact info dialog
+  // Method to show the contact info dialog
   void _showContactInfoDialog(BuildContext context, profileview profile) {
     var localizations = AppLocalizations.of(context);
     showDialog(
@@ -455,9 +506,13 @@ class _ProfilePageState extends State<ProfilePage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               _buildContactInfoRow(
-                  '${localizations.translate('email')}:', profile.email),
+                '${localizations.translate('email')}:',
+                profile.email,
+              ),
               _buildContactInfoRow(
-                  '${localizations.translate('phone_number')}:', profile.phone),
+                '${localizations.translate('phone_number')}:',
+                profile.phone,
+              ),
             ],
           ),
           actions: <Widget>[
@@ -480,10 +535,7 @@ class _ProfilePageState extends State<ProfilePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
+          Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -509,28 +561,46 @@ class _ProfilePageState extends State<ProfilePage> {
 
     if (selectedSection == selectedBasic) {
       return _buildSection(localizations.translate('basic_details'), [
-        _buildInfoRow(localizations.translate('dob'),
-            DateFormat("dd-MM-yyyy").format(DateTime.parse(profile.dob))),
         _buildInfoRow(
-            localizations.translate('profile_handler'), profile.profileCreator),
-        _buildInfoRow(localizations.translate('creating_profile_for'),
-            profile.profileFor),
+          localizations.translate('dob'),
+          DateFormat("dd-MM-yyyy").format(DateTime.parse(profile.dob)),
+        ),
         _buildInfoRow(
-            localizations.translate('marital_status'), profile.status),
+          localizations.translate('profile_handler'),
+          profile.profileCreator,
+        ),
+        _buildInfoRow(
+          localizations.translate('creating_profile_for'),
+          profile.profileFor,
+        ),
+        _buildInfoRow(
+          localizations.translate('marital_status'),
+          profile.status,
+        ),
         _buildInfoRow(localizations.translate('sub_caste'), profile.subCaste),
       ]);
     } else if (selectedSection == selectedAttributes) {
       return _buildSection(localizations.translate('additional_details'), [
         _buildInfoRow(
-            localizations.translate('height'), "${profile.height} cm"),
+          localizations.translate('height'),
+          "${profile.height} cm",
+        ),
         _buildInfoRow(
-            localizations.translate('weight'), "${profile.weight} kg"),
+          localizations.translate('weight'),
+          "${profile.weight} kg",
+        ),
         _buildInfoRow(
-            localizations.translate('blood_group'), profile.bloodGroup),
+          localizations.translate('blood_group'),
+          profile.bloodGroup,
+        ),
         _buildInfoRow(
-            localizations.translate('complexion'), profile.complexion),
+          localizations.translate('complexion'),
+          profile.complexion,
+        ),
         _buildInfoRow(
-            localizations.translate('disabilities'), profile.disability),
+          localizations.translate('disabilities'),
+          profile.disability,
+        ),
         _buildInfoRow(localizations.translate('country'), profile.country),
         _buildInfoRow(localizations.translate('state'), profile.state),
         _buildInfoRow(localizations.translate('city'), profile.city),
@@ -540,14 +610,22 @@ class _ProfilePageState extends State<ProfilePage> {
     } else if (selectedSection == selectedEducation) {
       return _buildSection(localizations.translate('education_profession'), [
         _buildInfoRow(
-            localizations.translate('qualification'), profile.qualification),
+          localizations.translate('qualification'),
+          profile.qualification,
+        ),
         _buildInfoRow(
-            localizations.translate('specialisation'), profile.specialization),
+          localizations.translate('specialisation'),
+          profile.specialization,
+        ),
         _buildInfoRow(
-            localizations.translate('profession'), profile.occupation),
+          localizations.translate('profession'),
+          profile.occupation,
+        ),
         _buildInfoRow(localizations.translate('company_name'), profile.company),
         _buildInfoRow(
-            localizations.translate('company_city'), profile.companyCity),
+          localizations.translate('company_city'),
+          profile.companyCity,
+        ),
         _buildInfoRow(localizations.translate('salary_range'), profile.salary),
       ]);
     } else if (selectedSection == selectedHoroscope) {
@@ -556,35 +634,61 @@ class _ProfilePageState extends State<ProfilePage> {
         _buildInfoRow(localizations.translate('nakshatra'), profile.nakshatra),
         _buildInfoRow(localizations.translate('gothra'), profile.gothra),
         _buildInfoRow(
-            localizations.translate('birth_place'), profile.birthPlace),
+          localizations.translate('birth_place'),
+          profile.birthPlace,
+        ),
         _buildInfoRow(localizations.translate('birth_time'), profile.birthTime),
         _buildInfoRow(
-            localizations.translate('family_deity'), profile.familyDiety),
+          localizations.translate('family_deity'),
+          profile.familyDiety,
+        ),
       ]);
     } else if (selectedSection == selectedFamily) {
       return _buildSection(localizations.translate('family_details'), [
         _buildInfoRow(
-            localizations.translate('father_name'), profile.fatherName),
-        _buildInfoRow(localizations.translate('father_occupation'),
-            profile.fatherOccupation),
+          localizations.translate('father_name'),
+          profile.fatherName,
+        ),
         _buildInfoRow(
-            localizations.translate('mother_name'), profile.motherName),
-        _buildInfoRow(localizations.translate('mother_occupation'),
-            profile.motherOccupation),
-        _buildInfoRow(localizations.translate('no_of_brothers'),
-            profile.numberOfBrothers),
+          localizations.translate('father_occupation'),
+          profile.fatherOccupation,
+        ),
         _buildInfoRow(
-            localizations.translate('no_of_sisters'), profile.numberOfSisters),
+          localizations.translate('mother_name'),
+          profile.motherName,
+        ),
         _buildInfoRow(
-            localizations.translate('permanent_address'), profile.address),
+          localizations.translate('mother_occupation'),
+          profile.motherOccupation,
+        ),
         _buildInfoRow(
-            localizations.translate('mother_tongue'), profile.motherTongue),
+          localizations.translate('no_of_brothers'),
+          profile.numberOfBrothers,
+        ),
         _buildInfoRow(
-            localizations.translate('family_type'), profile.familyType),
+          localizations.translate('no_of_sisters'),
+          profile.numberOfSisters,
+        ),
         _buildInfoRow(
-            localizations.translate('reference_name'), profile.reference),
-        _buildInfoRow(localizations.translate('reference_phone'),
-            profile.referenceNumber),
+          localizations.translate('permanent_address'),
+          profile.address,
+        ),
+        _buildInfoRow(
+          localizations.translate('mother_tongue'),
+          profile.motherTongue,
+        ),
+        _buildInfoRow(
+          localizations.translate('family_type'),
+          profile.familyType,
+        ),
+        _buildInfoRow(
+          localizations.translate('reference_name'),
+          profile.reference,
+        ),
+        _buildInfoRow(
+          localizations.translate('reference_phone'),
+          profile.referenceNumber,
+        ),
       ]);
     } else if (selectedSection == selectedImages) {
       // Added case for Photos
@@ -667,7 +771,10 @@ class _ProfilePageState extends State<ProfilePage> {
             itemBuilder: (context, index) {
               return GestureDetector(
                 onTap: () => _showFullImage(
-                    context, images, index), // Pass images & index
+                  context,
+                  images,
+                  index,
+                ), // Pass images & index
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: Image.network(
@@ -687,7 +794,10 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _showFullImage(
-      BuildContext context, List<searchimages> images, int initialIndex) {
+    BuildContext context,
+    List<searchimages> images,
+    int initialIndex,
+  ) {
     PageController _pageController = PageController(initialPage: initialIndex);
     int currentIndex = initialIndex;
 
@@ -703,9 +813,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   // Blurred Background
                   BackdropFilter(
                     filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                    child: Container(
-                      color: Colors.black,
-                    ),
+                    child: Container(color: Colors.black),
                   ),
                   // Full Image Dialog with PageView
                   Center(
@@ -735,8 +843,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                       fit: BoxFit.contain,
                                       errorBuilder:
                                           (context, error, stackTrace) {
-                                        return Image.asset('assets/1.png');
-                                      },
+                                            return Image.asset('assets/1.png');
+                                          },
                                     ),
                                   ),
                                 );
@@ -747,8 +855,11 @@ class _ProfilePageState extends State<ProfilePage> {
                               Positioned(
                                 left: 10,
                                 child: IconButton(
-                                  icon: Icon(Icons.arrow_back_ios,
-                                      color: Colors.white, size: 30),
+                                  icon: Icon(
+                                    Icons.arrow_back_ios,
+                                    color: Colors.white,
+                                    size: 30,
+                                  ),
                                   onPressed: () {
                                     if (currentIndex > 0) {
                                       _pageController.previousPage(
@@ -764,8 +875,11 @@ class _ProfilePageState extends State<ProfilePage> {
                               Positioned(
                                 right: 10,
                                 child: IconButton(
-                                  icon: Icon(Icons.arrow_forward_ios,
-                                      color: Colors.white, size: 30),
+                                  icon: Icon(
+                                    Icons.arrow_forward_ios,
+                                    color: Colors.white,
+                                    size: 30,
+                                  ),
                                   onPressed: () {
                                     if (currentIndex < images.length - 1) {
                                       _pageController.nextPage(
@@ -838,10 +952,7 @@ class _ProfilePageState extends State<ProfilePage> {
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.black87,
-              ),
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
             ),
           ),
         ],

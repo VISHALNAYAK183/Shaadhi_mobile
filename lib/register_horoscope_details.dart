@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:practice/api_services.dart';
-import 'package:practice/custom_widget.dart';
-import 'package:practice/lang.dart';
-import 'package:practice/register_family_details.dart';
+import 'package:buntsmatrimony/api_services.dart';
+import 'package:buntsmatrimony/custom_widget.dart';
+import 'package:buntsmatrimony/lang.dart';
+import 'package:buntsmatrimony/register_family_details.dart';
 // import 'package:intl/intl.dart';
 
 class RegisterHoroscopeDetailsPage extends StatefulWidget {
   final String matriId;
   final String id;
   final maritalStatus;
-  const RegisterHoroscopeDetailsPage(
-      {super.key,
-      required this.matriId,
-      required this.id,
-      required this.maritalStatus,});
+  const RegisterHoroscopeDetailsPage({
+    super.key,
+    required this.matriId,
+    required this.id,
+    required this.maritalStatus,
+  });
 
   @override
   _RegisterHoroscopeDetailsPageState createState() =>
@@ -28,7 +29,7 @@ class _RegisterHoroscopeDetailsPageState
   final TextEditingController familyDeityController = TextEditingController();
 
   String? selectedNakshatra;
-   Color appcolor = Color(0xFFC3A38C);
+  Color appcolor = Color(0xFFea4a57);
   String? selectedRashi;
   String? birthTimeError;
   String? birthPlaceError;
@@ -62,7 +63,7 @@ class _RegisterHoroscopeDetailsPageState
     "Uttara Ashadha",
     "Uttara Bhadrapada",
     "Uttara Phalguni",
-    "Vishakha"
+    "Vishakha",
   ];
 
   final List<String> rashiOptions = [
@@ -77,7 +78,7 @@ class _RegisterHoroscopeDetailsPageState
     "Simha (Leo)",
     "Tula (Libra)",
     "Vrischika (Scorpio)",
-    "Vrishabha (Taurus)"
+    "Vrishabha (Taurus)",
   ];
 
   String? _getNakshatraCode(String? nakshatra) {
@@ -151,8 +152,9 @@ class _RegisterHoroscopeDetailsPageState
   Future<void> validateAndProceed() async {
     setState(() {
       birthPlaceError = _validateBirthPlace(birthPlaceController.text);
-      birthTimeError =
-          birthTimeController.text.isEmpty ? "Select Birth Time" : null;
+      birthTimeError = birthTimeController.text.isEmpty
+          ? "Select Birth Time"
+          : null;
       nakshatraError = selectedNakshatra == null ? "Select Nakshatra" : null;
       rashiError = selectedRashi == null ? "Select Rashi" : null;
     });
@@ -165,8 +167,9 @@ class _RegisterHoroscopeDetailsPageState
           ? _getNakshatraCode(selectedNakshatra)
           : null;
 
-      String? updatedRashi =
-          selectedRashi != null ? _getRashiCode(selectedRashi) : null;
+      String? updatedRashi = selectedRashi != null
+          ? _getRashiCode(selectedRashi)
+          : null;
 
       bool success = await ApiService.registeredHoroscopeDetails(
         id: widget.id,
@@ -184,11 +187,12 @@ class _RegisterHoroscopeDetailsPageState
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => RegisterFamilyDetailsPage(
-                    matriId: widget.matriId,
-                    id: widget.id,
-                    maritalStatus: widget.maritalStatus,
-                  )),
+            builder: (context) => RegisterFamilyDetailsPage(
+              matriId: widget.matriId,
+              id: widget.id,
+              maritalStatus: widget.maritalStatus,
+            ),
+          ),
         );
       } else {
         print("Failed to save details");
@@ -229,7 +233,7 @@ class _RegisterHoroscopeDetailsPageState
         backgroundColor: appcolor,
         title: Text(
           localizations.translate('horoscope'),
-          style: TextStyle(color: Colors.white), 
+          style: TextStyle(color: Colors.white),
         ),
         leading: GestureDetector(
           onTap: () {
@@ -237,8 +241,11 @@ class _RegisterHoroscopeDetailsPageState
           },
           child: Container(
             margin: EdgeInsets.fromLTRB(10, 5, 0, 10),
-            child: Icon(Icons.arrow_back_rounded,
-                color: Colors.white, size: 25),
+            child: Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 25,
+            ),
           ),
         ),
       ),
@@ -249,43 +256,54 @@ class _RegisterHoroscopeDetailsPageState
             children: [
               SizedBox(height: 20),
               buildDropdown(
-                  localizations.translate('nakshatra'),
-                  nakshatraOptions,
-                  selectedNakshatra,
-                  (value) => setState(() {
-                        selectedNakshatra = value;
-                        nakshatraError = null;
-                      }),
-                  errorText: nakshatraError),
+                localizations.translate('nakshatra'),
+                nakshatraOptions,
+                selectedNakshatra,
+                (value) => setState(() {
+                  selectedNakshatra = value;
+                  nakshatraError = null;
+                }),
+                errorText: nakshatraError,
+              ),
               buildDropdown(
-                  localizations.translate('rashi'),
-                  rashiOptions,
-                  selectedRashi,
-                  (value) => setState(() {
-                        selectedRashi = value;
-                        rashiError = null;
-                      }),
-                  errorText: rashiError),
+                localizations.translate('rashi'),
+                rashiOptions,
+                selectedRashi,
+                (value) => setState(() {
+                  selectedRashi = value;
+                  rashiError = null;
+                }),
+                errorText: rashiError,
+              ),
               buildTextField(
-                  localizations.translate('gothra'), gothraController),
+                localizations.translate('gothra'),
+                gothraController,
+              ),
               _buildBirthTime(),
               buildTextField(
-                  localizations.translate('birth_place'), birthPlaceController,
-                  errorText: birthPlaceError),
-              buildTextField(localizations.translate('family_deity'),
-                  familyDeityController),
+                localizations.translate('birth_place'),
+                birthPlaceController,
+                errorText: birthPlaceError,
+              ),
+              buildTextField(
+                localizations.translate('family_deity'),
+                familyDeityController,
+              ),
               const SizedBox(height: 20),
               customElevatedButton(
-                  validateAndProceed, localizations.translate('next')),
+                validateAndProceed,
+                localizations.translate('next'),
+              ),
               customTextButton(() {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => RegisterFamilyDetailsPage(
-                            matriId: widget.matriId,
-                            id: widget.id,
-                            maritalStatus: widget.maritalStatus,
-                          )),
+                    builder: (context) => RegisterFamilyDetailsPage(
+                      matriId: widget.matriId,
+                      id: widget.id,
+                      maritalStatus: widget.maritalStatus,
+                    ),
+                  ),
                 );
               }, localizations.translate('skip')),
             ],

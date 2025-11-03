@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:practice/api_service.dart';
-import 'package:practice/inapp/subscription_list_screen.dart';
-import 'package:practice/lang.dart';
-import 'package:practice/main.dart';
-import 'package:practice/payment_gateway.dart';
-import 'package:practice/profile_view.dart';
+import 'package:buntsmatrimony/api_service.dart';
+import 'package:buntsmatrimony/inapp/subscription_list_screen.dart';
+import 'package:buntsmatrimony/lang.dart';
+import 'package:buntsmatrimony/main.dart';
+import 'package:buntsmatrimony/payment_gateway.dart';
+import 'package:buntsmatrimony/profile_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MaxLimit {
@@ -28,7 +28,7 @@ class MaxLimit {
 
     if (planStatus == "paid" || planStatus == "not paid") {
       if (maxProfile > usedProfile) {
-        getResponse = await profileViewed(candidateId,context);
+        getResponse = await profileViewed(candidateId, context);
       } else {
         getResponse = await masterCount(candidateId, "profile");
       }
@@ -42,7 +42,10 @@ class MaxLimit {
     } else {}
   }
 
-  Future<String> checkContactedProfiles(String candidateId,BuildContext context) async {
+  Future<String> checkContactedProfiles(
+    String candidateId,
+    BuildContext context,
+  ) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String max = prefs.getString('maxContact').toString();
     String used = prefs.getString('usedContact').toString();
@@ -61,8 +64,7 @@ class MaxLimit {
     if (planStatus == "paid" || planStatus == "not paid") {
       if (maxProfile > usedProfile) {
         print("$planStatus maxProfile > usedProfile");
-     return await contactViewed(candidateId,context);
-
+        return await contactViewed(candidateId, context);
       } else {
         print("$planStatus maxProfile < usedProfile");
         return await masterCount(candidateId, "contact");
@@ -76,24 +78,38 @@ class MaxLimit {
     print("getProfileData $getProfileData");
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString(
-        'usedProfile', (getProfileData["profile_viewed"]).toString());
+      'usedProfile',
+      (getProfileData["profile_viewed"]).toString(),
+    );
     await prefs.setString(
-        'usedMessage', getProfileData["message_viewed"].toString());
+      'usedMessage',
+      getProfileData["message_viewed"].toString(),
+    );
     await prefs.setString(
-        'usedContact', getProfileData["contact_viewed"].toString());
+      'usedContact',
+      getProfileData["contact_viewed"].toString(),
+    );
 
     await prefs.setString(
-        'maxProfile', (getProfileData["max_profile"]).toString());
+      'maxProfile',
+      (getProfileData["max_profile"]).toString(),
+    );
     await prefs.setString(
-        'maxMessage', getProfileData["max_contact"].toString());
+      'maxMessage',
+      getProfileData["max_contact"].toString(),
+    );
     await prefs.setString(
-        'maxContact', getProfileData["max_message"].toString());
+      'maxContact',
+      getProfileData["max_message"].toString(),
+    );
   }
 
   Future<String> masterCount(String candidateId, String type) async {
     print("max reached checkig for viewed before");
-    Map<String, dynamic> response =
-        await ApiService.masterCount(candidateId, type);
+    Map<String, dynamic> response = await ApiService.masterCount(
+      candidateId,
+      type,
+    );
     if (response.containsKey('message')) {
       var messageData = response['message'];
       String? statusFlag = '';
@@ -127,9 +143,10 @@ class MaxLimit {
   }
 
   Future<String> profileViewed(String candidateId, BuildContext context) async {
-  Map<String, dynamic> response =
-    await ApiService.profileViewed( candidateId,context);
-
+    Map<String, dynamic> response = await ApiService.profileViewed(
+      candidateId,
+      context,
+    );
 
     if (response.containsKey('message')) {
       var messageData = response['message'];
@@ -149,7 +166,7 @@ class MaxLimit {
               "message_viewed": getProfileData['message_count'],
               "max_profile": getProfileData['max_profile'],
               "max_contact": getProfileData['max_contact'],
-              "max_message": getProfileData['max_message']
+              "max_message": getProfileData['max_message'],
             };
 
             await setCounts(getProfileData);
@@ -166,60 +183,59 @@ class MaxLimit {
     }
   }
 
- Future<String> contactViewed(String candidateId, BuildContext context) async {
-  print("contact viewed");
-  Map<String, dynamic> response =
-      await ApiService.contactViewed(context, candidateId);
+  Future<String> contactViewed(String candidateId, BuildContext context) async {
+    print("contact viewed");
+    Map<String, dynamic> response = await ApiService.contactViewed(
+      context,
+      candidateId,
+    );
 
-  if (response.containsKey('message')) {
-    var messageData = response['message'];
-    String? statusFlag = '';
-    if (messageData is Map<String, dynamic>) {
-      statusFlag = messageData['p_out_mssg_flg']?.toString();
-      String? messageText = messageData['p_out_mssg']?.toString();
+    if (response.containsKey('message')) {
+      var messageData = response['message'];
+      String? statusFlag = '';
+      if (messageData is Map<String, dynamic>) {
+        statusFlag = messageData['p_out_mssg_flg']?.toString();
+        String? messageText = messageData['p_out_mssg']?.toString();
 
-      print("Status Flag: $statusFlag");
-      print("Message Text: $messageText");
+        print("Status Flag: $statusFlag");
+        print("Message Text: $messageText");
 
-      if (statusFlag == "Y") {
-        if (response["dataout"] is List && response["dataout"].isNotEmpty) {
-          print("getProfileData--++ ${response['dataout'][0]}");
-          dynamic getProfileData = response['dataout'][0];
-          getProfileData = {
-            "profile_viewed": getProfileData['viewed_count'],
-            "contact_viewed": getProfileData['contact_count'],
-            "message_viewed": getProfileData['message_count'],
-            "max_profile": getProfileData['max_profile'],
-            "max_contact": getProfileData['max_contact'],
-            "max_message": getProfileData['max_message'],
-          };
-          print("getProfileData--++$getProfileData");
-          await setCounts(getProfileData);
+        if (statusFlag == "Y") {
+          if (response["dataout"] is List && response["dataout"].isNotEmpty) {
+            print("getProfileData--++ ${response['dataout'][0]}");
+            dynamic getProfileData = response['dataout'][0];
+            getProfileData = {
+              "profile_viewed": getProfileData['viewed_count'],
+              "contact_viewed": getProfileData['contact_count'],
+              "message_viewed": getProfileData['message_count'],
+              "max_profile": getProfileData['max_profile'],
+              "max_contact": getProfileData['max_contact'],
+              "max_message": getProfileData['max_message'],
+            };
+            print("getProfileData--++$getProfileData");
+            await setCounts(getProfileData);
+          }
+          return "Y";
+        } else {
+          return "N - flag N";
         }
-        return "Y";
       } else {
-        return "N - flag N";
+        return 'N - invalid format';
       }
     } else {
-      return 'N - invalid format';
+      return 'N - no message';
     }
-  } else {
-    return 'N - no message';
   }
-}
-
 
   showProfiles(String profileId, BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => ProfilePage(matriId: profileId),
-      ),
+      MaterialPageRoute(builder: (context) => ProfilePage(matriId: profileId)),
     );
   }
 
   showSubscriptionDialog(BuildContext context) {
-     var localizations = AppLocalizations.of(context);
+    var localizations = AppLocalizations.of(context);
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -237,7 +253,9 @@ class MaxLimit {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SubscriptionPaymentPage()),
+                  MaterialPageRoute(
+                    builder: (context) => SubscriptionPaymentPage(),
+                  ),
                 );
               },
               child: Text(localizations.translate('subscribe_now')),

@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:practice/api_models.dart';
-import 'package:practice/api_services.dart';
-import 'package:practice/custom_widget.dart';
-import 'package:practice/lang.dart';
-import 'package:practice/register_horoscope_details.dart';
-
+import 'package:buntsmatrimony/api_models.dart';
+import 'package:buntsmatrimony/api_services.dart';
+import 'package:buntsmatrimony/custom_widget.dart';
+import 'package:buntsmatrimony/lang.dart';
+import 'package:buntsmatrimony/register_horoscope_details.dart';
 
 class RegisterEducationProfessionPage extends StatefulWidget {
   final String matriId;
   final String id;
   final maritalStatus;
-  const RegisterEducationProfessionPage(
-      {super.key,
-      required this.matriId,
-      required this.id,
-      required this.maritalStatus,});
+  const RegisterEducationProfessionPage({
+    super.key,
+    required this.matriId,
+    required this.id,
+    required this.maritalStatus,
+  });
 
   @override
   RegisterEducationProfessionPageState createState() =>
@@ -35,7 +35,7 @@ class RegisterEducationProfessionPageState
   String? specialisationError;
   String? professionError;
   String? salaryError;
-   Color appcolor = Color(0xFFC3A38C);
+  Color appcolor = Color(0xFFea4a57);
 
   List<String> filteredQualification = [];
   TextEditingController qualificationSearchController = TextEditingController();
@@ -71,7 +71,7 @@ class RegisterEducationProfessionPageState
     "35-40 Lakh",
     "40-45 Lakh",
     "45-50 Lakh",
-    "50 Lakh and Above"
+    "50 Lakh and Above",
   ];
 
   @override
@@ -153,8 +153,9 @@ class RegisterEducationProfessionPageState
       specialisationError = (selectedSpecialisations.isEmpty)
           ? "Select at least one Specialisation"
           : null;
-      professionError =
-          (selectedProfession == null) ? "Select Profession" : null;
+      professionError = (selectedProfession == null)
+          ? "Select Profession"
+          : null;
       salaryError = selectedSalaryRange == null ? "Select salary range" : null;
     });
 
@@ -164,8 +165,9 @@ class RegisterEducationProfessionPageState
         salaryError == null) {
       String? updatedSalaryRange = selectedSalaryRange;
 
-      String? updatedProfession =
-          selectedProfession != null ? professionMap[selectedProfession] : null;
+      String? updatedProfession = selectedProfession != null
+          ? professionMap[selectedProfession]
+          : null;
 
       List<String> qualificationIDs = selectedQualifications
           .map((q) => qualificationMap[q] ?? "")
@@ -191,11 +193,12 @@ class RegisterEducationProfessionPageState
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => RegisterHoroscopeDetailsPage(
-                    matriId: widget.matriId,
-                    id: widget.id,
-                    maritalStatus: widget.maritalStatus,
-                  )),
+            builder: (context) => RegisterHoroscopeDetailsPage(
+              matriId: widget.matriId,
+              id: widget.id,
+              maritalStatus: widget.maritalStatus,
+            ),
+          ),
         );
       } else {
         print("Failed to save details");
@@ -211,7 +214,7 @@ class RegisterEducationProfessionPageState
         backgroundColor: appcolor,
         title: Text(
           localizations.translate('education_profession'),
-          style: TextStyle(color: Colors.white), 
+          style: TextStyle(color: Colors.white),
         ),
         leading: GestureDetector(
           onTap: () {
@@ -219,8 +222,11 @@ class RegisterEducationProfessionPageState
           },
           child: Container(
             margin: EdgeInsets.fromLTRB(10, 5, 0, 10),
-            child: Icon(Icons.arrow_back_rounded,
-                color: Colors.white, size: 25),
+            child: Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 25,
+            ),
           ),
         ),
       ),
@@ -253,13 +259,13 @@ class RegisterEducationProfessionPageState
                     maxLines: null,
                     decoration: InputDecoration(
                       labelText: localizations.translate('qualification'),
-                      labelStyle: const TextStyle(color: Color(0xFFC3A38C)),
+                      labelStyle: const TextStyle(color: Color(0xFFea4a57)),
                       border: OutlineInputBorder(),
                       errorText: qualificationError,
                     ),
                     style: const TextStyle(
                       fontSize: 16,
-                      color: Color(0xFFC3A38C),
+                      color: Color(0xFFea4a57),
                     ),
                     readOnly: true,
                   ),
@@ -289,13 +295,13 @@ class RegisterEducationProfessionPageState
                     maxLines: null,
                     decoration: InputDecoration(
                       labelText: localizations.translate('specialisation'),
-                      labelStyle: const TextStyle(color: Color(0xFFC3A38C)),
+                      labelStyle: const TextStyle(color: Color(0xFFea4a57)),
                       border: OutlineInputBorder(),
                       errorText: specialisationError,
                     ),
                     style: const TextStyle(
                       fontSize: 16,
-                      color: Color(0xFFC3A38C),
+                      color: Color(0xFFea4a57),
                     ),
                     readOnly: true,
                   ),
@@ -303,39 +309,48 @@ class RegisterEducationProfessionPageState
               ),
               const SizedBox(height: 15),
               buildDropdown(
-                  localizations.translate('profession'),
-                  professionOptions,
-                  selectedProfession,
-                  (value) => setState(() {
-                        selectedProfession = value;
-                        professionError = null;
-                      }),
-                  errorText: professionError),
-              buildTextField(localizations.translate('company_name'),
-                  companyNameController),
-              buildTextField(localizations.translate('company_city'),
-                  companyCityController),
+                localizations.translate('profession'),
+                professionOptions,
+                selectedProfession,
+                (value) => setState(() {
+                  selectedProfession = value;
+                  professionError = null;
+                }),
+                errorText: professionError,
+              ),
+              buildTextField(
+                localizations.translate('company_name'),
+                companyNameController,
+              ),
+              buildTextField(
+                localizations.translate('company_city'),
+                companyCityController,
+              ),
               buildDropdown(
-                  localizations.translate('salary_range'),
-                  salaryRangeOptions,
-                  selectedSalaryRange,
-                  (value) => setState(() {
-                        selectedSalaryRange = value;
-                        salaryError = null;
-                      }),
-                  errorText: salaryError),
+                localizations.translate('salary_range'),
+                salaryRangeOptions,
+                selectedSalaryRange,
+                (value) => setState(() {
+                  selectedSalaryRange = value;
+                  salaryError = null;
+                }),
+                errorText: salaryError,
+              ),
               const SizedBox(height: 20),
               customElevatedButton(
-                  validateAndProceed, localizations.translate('next')),
+                validateAndProceed,
+                localizations.translate('next'),
+              ),
               customTextButton(() {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => RegisterHoroscopeDetailsPage(
-                            matriId: widget.matriId,
-                            id: widget.id,
-                            maritalStatus: widget.maritalStatus,
-                          )),
+                    builder: (context) => RegisterHoroscopeDetailsPage(
+                      matriId: widget.matriId,
+                      id: widget.id,
+                      maritalStatus: widget.maritalStatus,
+                    ),
+                  ),
                 );
               }, localizations.translate('skip')),
             ],

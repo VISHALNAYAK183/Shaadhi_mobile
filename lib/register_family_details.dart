@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:practice/api_services.dart';
-import 'package:practice/custom_widget.dart';
-import 'package:practice/lang.dart';
-import 'package:practice/upload_image.dart';
-import 'package:practice/api_models.dart';
+import 'package:buntsmatrimony/api_services.dart';
+import 'package:buntsmatrimony/custom_widget.dart';
+import 'package:buntsmatrimony/lang.dart';
+import 'package:buntsmatrimony/upload_image.dart';
+import 'package:buntsmatrimony/api_models.dart';
 
 class RegisterFamilyDetailsPage extends StatefulWidget {
   final String matriId;
@@ -50,11 +50,11 @@ class _RegisterFamilyDetailsPageState extends State<RegisterFamilyDetailsPage> {
     'Joint',
     'Extended',
     'Nuclear',
-    'Blended'
+    'Blended',
   ];
 
   String? fatherNameError;
-   Color appcolor = Color(0xFFC3A38C);
+  Color appcolor = Color(0xFFea4a57);
   String? motherNameError;
   String? kidsError;
   String? brothersError;
@@ -116,8 +116,9 @@ class _RegisterFamilyDetailsPageState extends State<RegisterFamilyDetailsPage> {
     setState(() {
       fatherNameError = _validateFathersName(fatherNameController.text);
       motherNameError = _validateMothersName(motherNameController.text);
-      motherTongueError =
-          selectedMotherTongue == null ? "Select Mother Tongue" : null;
+      motherTongueError = selectedMotherTongue == null
+          ? "Select Mother Tongue"
+          : null;
       if (widget.maritalStatus != "1") {
         kidsError = selectedKids == null ? "Select no. of kids" : null;
       } else {
@@ -156,10 +157,9 @@ class _RegisterFamilyDetailsPageState extends State<RegisterFamilyDetailsPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => UploadImagePage(
-                    matriId: widget.matriId,
-                    id: widget.id,
-                  )),
+            builder: (context) =>
+                UploadImagePage(matriId: widget.matriId, id: widget.id),
+          ),
         );
       } else {
         print("Failed to save details");
@@ -169,13 +169,13 @@ class _RegisterFamilyDetailsPageState extends State<RegisterFamilyDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-   var localizations = AppLocalizations.of(context);
+    var localizations = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: appcolor,
         title: Text(
           localizations.translate('family_details'),
-          style: TextStyle(color: Colors.white), 
+          style: TextStyle(color: Colors.white),
         ),
         leading: GestureDetector(
           onTap: () {
@@ -183,8 +183,11 @@ class _RegisterFamilyDetailsPageState extends State<RegisterFamilyDetailsPage> {
           },
           child: Container(
             margin: EdgeInsets.fromLTRB(10, 5, 0, 10),
-            child: Icon(Icons.arrow_back_rounded,
-                color: Colors.white, size: 25),
+            child: Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 25,
+            ),
           ),
         ),
       ),
@@ -210,15 +213,19 @@ class _RegisterFamilyDetailsPageState extends State<RegisterFamilyDetailsPage> {
                 fatherNameController,
                 errorText: fatherNameError,
               ),
-              buildTextField(localizations.translate('father_occupation'),
-                  fatherOccupationController),
+              buildTextField(
+                localizations.translate('father_occupation'),
+                fatherOccupationController,
+              ),
               buildTextField(
                 localizations.translate('mother_name'),
                 motherNameController,
                 errorText: motherNameError,
               ),
-              buildTextField(localizations.translate('mother_occupation'),
-                  motherOccupationController),
+              buildTextField(
+                localizations.translate('mother_occupation'),
+                motherOccupationController,
+              ),
               buildDropdown(
                 localizations.translate('no_of_brothers'),
                 brothersOptions,
@@ -231,8 +238,10 @@ class _RegisterFamilyDetailsPageState extends State<RegisterFamilyDetailsPage> {
                 selectedSisters,
                 (value) => setState(() => selectedSisters = value),
               ),
-              buildTextField(localizations.translate('permanent_address'),
-                  permanentAddressController),
+              buildTextField(
+                localizations.translate('permanent_address'),
+                permanentAddressController,
+              ),
               buildDropdown(
                 localizations.translate('mother_tongue'),
                 motherTongueOptions,
@@ -244,26 +253,32 @@ class _RegisterFamilyDetailsPageState extends State<RegisterFamilyDetailsPage> {
                 errorText: motherTongueError,
               ),
               buildDropdown(
-                  localizations.translate('family_type'),
-                  familyTypes,
-                  selectedFamilyType,
-                  (value) => setState(() => selectedFamilyType = value)),
-              buildTextField(localizations.translate('reference_name'),
-                  referenceNameController),
-              buildTextField(localizations.translate('reference_phone'),
-                  referencePhoneController,
-                  keyboardType: TextInputType.phone),
+                localizations.translate('family_type'),
+                familyTypes,
+                selectedFamilyType,
+                (value) => setState(() => selectedFamilyType = value),
+              ),
+              buildTextField(
+                localizations.translate('reference_name'),
+                referenceNameController,
+              ),
+              buildTextField(
+                localizations.translate('reference_phone'),
+                referencePhoneController,
+                keyboardType: TextInputType.phone,
+              ),
               const SizedBox(height: 20),
               customElevatedButton(
-                  validateAndProceed, localizations.translate('next')),
+                validateAndProceed,
+                localizations.translate('next'),
+              ),
               customTextButton(() {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => UploadImagePage(
-                            matriId: widget.matriId,
-                            id: widget.id,
-                          )),
+                    builder: (context) =>
+                        UploadImagePage(matriId: widget.matriId, id: widget.id),
+                  ),
                 );
               }, localizations.translate('skip')),
             ],

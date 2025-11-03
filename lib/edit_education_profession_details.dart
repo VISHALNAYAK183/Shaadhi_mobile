@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:practice/dashboard_model.dart';
-import 'package:practice/lang.dart';
-import 'package:practice/profile_page.dart';
+import 'package:buntsmatrimony/dashboard_model.dart';
+import 'package:buntsmatrimony/lang.dart';
+import 'package:buntsmatrimony/profile_page.dart';
 import 'api_models.dart';
 import 'api_services.dart';
 import 'custom_widget.dart';
@@ -23,7 +23,7 @@ class EducationProfessionPageState extends State<EducationProfessionPage> {
   String? selectedProfession;
   String? selectedSalaryRange;
   String? selectedSpecialisation;
-   Color appcolor = Color(0xFFC3A38C);
+  Color appcolor = Color(0xFFea4a57);
 
   Map<String, String> qualificationMap = {}; // Map to store name -> ID
   List<String> qualifications = [];
@@ -50,9 +50,8 @@ class EducationProfessionPageState extends State<EducationProfessionPage> {
     "35-40 Lakh",
     "40-45 Lakh",
     "45-50 Lakh",
-    "50 Lakh and Above"
+    "50 Lakh and Above",
   ];
-
 
   String? qualificationError;
   String? specialisationError;
@@ -130,8 +129,9 @@ class EducationProfessionPageState extends State<EducationProfessionPage> {
               .toList();
         }
 
-        specialisationSearchController.text =
-            selectedSpecialisations.join(", ");
+        specialisationSearchController.text = selectedSpecialisations.join(
+          ", ",
+        );
 
         if (qualificationMap.isNotEmpty) {
           selectedQualifications = widget.profile.qualification
@@ -209,23 +209,24 @@ class EducationProfessionPageState extends State<EducationProfessionPage> {
           ? "Select at least one qualification"
           : null;
       specialisationError = (selectedSpecialisations.isEmpty)
-    ? "Select at least one Specialisation"
-    : null;
+          ? "Select at least one Specialisation"
+          : null;
 
-      professionError = (selectedProfession == null || selectedProfession!.trim().isEmpty)
-    ? "Select Profession"
-    : null;
+      professionError =
+          (selectedProfession == null || selectedProfession!.trim().isEmpty)
+          ? "Select Profession"
+          : null;
 
-salaryError = (selectedSalaryRange == null || selectedSalaryRange!.trim().isEmpty)
-    ? "Select Salary Range"
-    : null;
-
+      salaryError =
+          (selectedSalaryRange == null || selectedSalaryRange!.trim().isEmpty)
+          ? "Select Salary Range"
+          : null;
     });
 
     if (qualificationError == null &&
         specialisationError == null &&
-        professionError == null && salaryError == null) {
-
+        professionError == null &&
+        salaryError == null) {
       String? updatedSalaryRange = selectedSalaryRange ?? widget.profile.salary;
 
       String? updatedProfession = selectedProfession != null
@@ -244,7 +245,8 @@ salaryError = (selectedSalaryRange == null || selectedSalaryRange!.trim().isEmpt
 
       print('Sending qualifications: $qualificationIDs');
 
-      bool success = await ApiService.updateEducationDetails(context,
+      bool success = await ApiService.updateEducationDetails(
+        context,
         matriID: widget.profile.matriId,
         id: widget.profile.id,
         qualification: qualificationIDs.join(", "),
@@ -258,9 +260,7 @@ salaryError = (selectedSalaryRange == null || selectedSalaryRange!.trim().isEmpt
       if (success) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) => ProfilePage1(),
-          ),
+          MaterialPageRoute(builder: (context) => ProfilePage1()),
         );
       } else {
         print("Failed to update details");
@@ -276,7 +276,7 @@ salaryError = (selectedSalaryRange == null || selectedSalaryRange!.trim().isEmpt
         backgroundColor: appcolor,
         title: Text(
           localizations.translate('education_profession'),
-          style: TextStyle(color: Colors.white), 
+          style: TextStyle(color: Colors.white),
         ),
         leading: GestureDetector(
           onTap: () {
@@ -284,8 +284,11 @@ salaryError = (selectedSalaryRange == null || selectedSalaryRange!.trim().isEmpt
           },
           child: Container(
             margin: EdgeInsets.fromLTRB(10, 5, 0, 10),
-            child: Icon(Icons.arrow_back_rounded,
-                color: Colors.white, size: 25),
+            child: Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 25,
+            ),
           ),
         ),
       ),
@@ -317,14 +320,11 @@ salaryError = (selectedSalaryRange == null || selectedSalaryRange!.trim().isEmpt
                     maxLines: null,
                     decoration: InputDecoration(
                       labelText: localizations.translate('qualification'),
-                      labelStyle: TextStyle(color: Color(0xFFC3A38C)),
+                      labelStyle: TextStyle(color: Color(0xFFea4a57)),
                       border: OutlineInputBorder(),
                       errorText: qualificationError,
                     ),
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Color(0xFFC3A38C),
-                    ),
+                    style: TextStyle(fontSize: 16, color: Color(0xFFea4a57)),
                     readOnly: true,
                   ),
                 ),
@@ -353,41 +353,49 @@ salaryError = (selectedSalaryRange == null || selectedSalaryRange!.trim().isEmpt
                     maxLines: null,
                     decoration: InputDecoration(
                       labelText: localizations.translate('specialisation'),
-                      labelStyle: TextStyle(color: Color(0xFFC3A38C)),
+                      labelStyle: TextStyle(color: Color(0xFFea4a57)),
                       border: OutlineInputBorder(),
                       errorText: specialisationError,
                     ),
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Color(0xFFC3A38C),
-                    ),
+                    style: TextStyle(fontSize: 16, color: Color(0xFFea4a57)),
                     readOnly: true,
                   ),
                 ),
               ),
               const SizedBox(height: 15),
               buildDropdown(
-                  localizations.translate('profession'),
-                  professionOptions,
-                  selectedProfession,
-                  (value) => setState(() {
-                        selectedProfession = value;
-                        professionError = null;
-                      }),
-                  errorText: professionError),
-              buildTextField(localizations.translate('company_name'), companyNameController),
-              buildTextField(localizations.translate('company_city'), companyCityController),
+                localizations.translate('profession'),
+                professionOptions,
+                selectedProfession,
+                (value) => setState(() {
+                  selectedProfession = value;
+                  professionError = null;
+                }),
+                errorText: professionError,
+              ),
+              buildTextField(
+                localizations.translate('company_name'),
+                companyNameController,
+              ),
+              buildTextField(
+                localizations.translate('company_city'),
+                companyCityController,
+              ),
               buildDropdown(
-                  localizations.translate('salary_range'),
-                  salaryRangeOptions,
-                  selectedSalaryRange,
-                  (value) => setState(() {
-                        selectedSalaryRange = value;
-                        salaryError = null;
-                      }),
-                  errorText: salaryError),
+                localizations.translate('salary_range'),
+                salaryRangeOptions,
+                selectedSalaryRange,
+                (value) => setState(() {
+                  selectedSalaryRange = value;
+                  salaryError = null;
+                }),
+                errorText: salaryError,
+              ),
               const SizedBox(height: 20),
-              customElevatedButton(validateAndProceed, localizations.translate('submit')),
+              customElevatedButton(
+                validateAndProceed,
+                localizations.translate('submit'),
+              ),
             ],
           ),
         ),

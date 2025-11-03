@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:practice/api_service.dart';
-import 'package:practice/chat/chatuser_model.dart';
-import 'package:practice/checkProfiles.dart';
-import 'package:practice/lang.dart';
+import 'package:buntsmatrimony/api_service.dart';
+import 'package:buntsmatrimony/chat/chatuser_model.dart';
+import 'package:buntsmatrimony/checkProfiles.dart';
+import 'package:buntsmatrimony/lang.dart';
 
 class ChatScreen extends StatefulWidget {
   final String matriId;
   final String profile;
   final String name;
 
-  const ChatScreen(
-      {Key? key,
-      required this.matriId,
-      required this.profile,
-      required this.name})
-      : super(key: key);
+  const ChatScreen({
+    Key? key,
+    required this.matriId,
+    required this.profile,
+    required this.name,
+  }) : super(key: key);
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -27,7 +27,7 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _sendLoading = false;
   bool chatLoad = true;
   final ScrollController _scrollController = ScrollController();
-  Color appcolor = Color(0xFFC3A38C);
+  Color appcolor = Color(0xFFea4a57);
   final MaxLimit _maxLimit = MaxLimit();
 
   @override
@@ -70,14 +70,19 @@ class _ChatScreenState extends State<ChatScreen> {
       _sendLoading = true;
     });
     String messageResponce = await ApiService.initateChats(
-        widget.matriId, _messageController.text.trim());
+      widget.matriId,
+      _messageController.text.trim(),
+    );
     if (messageResponce == "Y") {
       setState(() {
-        messages.add(Messages(
+        messages.add(
+          Messages(
             matri_id_by: _reciverUserId,
             message: _messageController.text.trim(),
             matri_id_to: _reciverUserId,
-            id: "0"));
+            id: "0",
+          ),
+        );
 
         _sendLoading = false;
       });
@@ -86,9 +91,9 @@ class _ChatScreenState extends State<ChatScreen> {
     } else if (messageResponce == "Max") {
       MaxLimit maxLimit = MaxLimit();
       maxLimit.showSubscriptionDialog(context);
-       setState(() {
-      _sendLoading = false;  
-    });
+      setState(() {
+        _sendLoading = false;
+      });
     }
   }
 
@@ -122,9 +127,10 @@ class _ChatScreenState extends State<ChatScreen> {
                   Text(
                     widget.name,
                     style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: Colors.white),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
                   ),
                   Text(
                     '${localizations.translate('matri_id')}: ${widget.matriId}',
@@ -143,7 +149,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 ? Center(
                     child: chatLoad
                         ? CircularProgressIndicator()
-                        : Text(localizations.translate('no_message')))
+                        : Text(localizations.translate('no_message')),
+                  )
                 // Show loading until messages are loaded
                 : ListView.builder(
                     controller: _scrollController,
@@ -203,7 +210,7 @@ class _ChatScreenState extends State<ChatScreen> {
               : IconButton(
                   icon: Icon(Icons.send, color: Colors.blue),
                   onPressed: _sendMessage,
-                )
+                ),
         ],
       ),
     );

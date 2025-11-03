@@ -1,4 +1,4 @@
-import 'package:practice/dashboard_model.dart';
+import 'package:buntsmatrimony/dashboard_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardStore {

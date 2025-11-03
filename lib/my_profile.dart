@@ -152,14 +152,14 @@ class MyProfileUI extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: Colors.grey[700],
+                color:  Color(0xFF2d2d2d),
               ),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: TextStyle(fontSize: 16, color: Colors.grey[800]),
+              style: TextStyle(fontSize: 16, color:  Color(0xFF2d2d2d)),
             ),
           ),
         ],

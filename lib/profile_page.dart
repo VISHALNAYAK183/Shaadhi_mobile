@@ -2,14 +2,14 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:practice/custom_widget.dart';
-import 'package:practice/edit_additional_details.dart';
-import 'package:practice/edit_education_profession_details.dart';
-import 'package:practice/edit_family_details.dart';
-import 'package:practice/edit_horoscope_details.dart';
-import 'package:practice/edit_personal_details.dart';
-import 'package:practice/lang.dart';
-import 'package:practice/main_screen.dart';
+import 'package:buntsmatrimony/custom_widget.dart';
+import 'package:buntsmatrimony/edit_additional_details.dart';
+import 'package:buntsmatrimony/edit_education_profession_details.dart';
+import 'package:buntsmatrimony/edit_family_details.dart';
+import 'package:buntsmatrimony/edit_horoscope_details.dart';
+import 'package:buntsmatrimony/edit_personal_details.dart';
+import 'package:buntsmatrimony/lang.dart';
+import 'package:buntsmatrimony/main_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dashboard_model.dart';
 import 'api_service.dart';
@@ -36,7 +36,7 @@ class ProfilePageState extends State<ProfilePage1> {
   late Future<DashboardData> _dashboardDataFuture;
   String profileImageUrl = "";
   String storedProfileUrl = "";
-   Color appcolor = Color(0xFFC3A38C);
+  Color appcolor = Color(0xFFea4a57);
 
   @override
   void initState() {
@@ -81,10 +81,7 @@ class ProfilePageState extends State<ProfilePage1> {
           padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
           child: Text(
             value,
-            style: const TextStyle(
-              fontSize: 17,
-              color: Colors.black87,
-            ),
+            style: const TextStyle(fontSize: 17, color: Colors.black87),
           ),
         ),
       ],
@@ -106,44 +103,51 @@ class ProfilePageState extends State<ProfilePage1> {
     var localizations = AppLocalizations.of(context);
     return Scaffold(
       // backgroundColor: Colors.black87
-      appBar:AppBar(
-    backgroundColor: appcolor,
-    title: Text(
-      localizations.translate('profile'),
-      style: TextStyle(color: Colors.white), 
-    ),
-    leading: GestureDetector(
-      onTap: () async {
-              final SharedPreferences prefs =
-                  await SharedPreferences.getInstance();
-              String? savedProfileUrl = prefs.getString('profile_image');
-              String? currentProfileUrl =
-                  prefs.getString('current_profile_image');
-              await prefs.setString(
-                  'current_profile_image', savedProfileUrl ?? "");
-              print("Current URL: $currentProfileUrl");
-              print("Saved URL: $savedProfileUrl");
+      appBar: AppBar(
+        backgroundColor: appcolor,
+        title: Text(
+          localizations.translate('profile'),
+          style: TextStyle(color: Colors.white),
+        ),
+        leading: GestureDetector(
+          onTap: () async {
+            final SharedPreferences prefs =
+                await SharedPreferences.getInstance();
+            String? savedProfileUrl = prefs.getString('profile_image');
+            String? currentProfileUrl = prefs.getString(
+              'current_profile_image',
+            );
+            await prefs.setString(
+              'current_profile_image',
+              savedProfileUrl ?? "",
+            );
+            print("Current URL: $currentProfileUrl");
+            print("Saved URL: $savedProfileUrl");
 
-              if (currentProfileUrl == savedProfileUrl) {
-                print("Storing initial profile image as current.");
-                Navigator.pop(context);
-              } else if (currentProfileUrl != savedProfileUrl) {
-                print("Profile image updated, navigating to MainScreen.");
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => MainScreen()),
-                );
-              } else {
-                print("No changes detected, just popping.");
-                Navigator.pop(context);
-              }
-            },
-      child: Container(
-        margin: EdgeInsets.fromLTRB(10, 5, 0, 10),
-        child: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 25),
+            if (currentProfileUrl == savedProfileUrl) {
+              print("Storing initial profile image as current.");
+              Navigator.pop(context);
+            } else if (currentProfileUrl != savedProfileUrl) {
+              print("Profile image updated, navigating to MainScreen.");
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => MainScreen()),
+              );
+            } else {
+              print("No changes detected, just popping.");
+              Navigator.pop(context);
+            }
+          },
+          child: Container(
+            margin: EdgeInsets.fromLTRB(10, 5, 0, 10),
+            child: Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 25,
+            ),
+          ),
+        ),
       ),
-    ),
-  ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -178,10 +182,10 @@ class ProfilePageState extends State<ProfilePage1> {
 
               if (profileImageUrl.isEmpty ||
                   profileImageUrl.contains("/null") ||
-                  profileImageUrl ==
-                      "https://www.sharutech.com/matrimony") {
-                profileImageUrl =
-                    profile.gender == "1" ? 'assets/2.png' : 'assets/1.png';
+                  profileImageUrl == "https://www.sharutech.com/matrimony") {
+                profileImageUrl = profile.gender == "1"
+                    ? 'assets/2.png'
+                    : 'assets/1.png';
               }
 
               print("Updated Profile URL: $profileImageUrl");
@@ -196,15 +200,15 @@ class ProfilePageState extends State<ProfilePage1> {
                   Stack(
                     alignment: Alignment.bottomRight,
                     children: [
-                      
                       CircleAvatar(
                         radius: 75,
                         backgroundColor: Colors.white,
                         backgroundImage: (profileImage != null)
                             ? FileImage(profileImage!)
                             : (profileImageUrl.startsWith("http")
-                                ? NetworkImage(profileImageUrl) as ImageProvider
-                                : AssetImage(profileImageUrl)),
+                                  ? NetworkImage(profileImageUrl)
+                                        as ImageProvider
+                                  : AssetImage(profileImageUrl)),
                         onBackgroundImageError: (_, __) {
                           setState(() {
                             profileImageUrl = (widget.user.gender == "1")
@@ -227,85 +231,96 @@ class ProfilePageState extends State<ProfilePage1> {
                           onPressed: () async {
                             final ImagePicker picker = ImagePicker();
                             final pickedFile = await picker.pickImage(
-                                source: ImageSource.gallery);
+                              source: ImageSource.gallery,
+                            );
 
                             if (pickedFile != null) {
-                              CroppedFile? cropped =
-                                  await ImageCropper().cropImage(
-                                sourcePath: pickedFile.path,
-                                uiSettings: [
-                                  AndroidUiSettings(
-                                      toolbarTitle: 'Crop Image',
-                                      toolbarColor: Colors.redAccent,
-                                      toolbarWidgetColor: Colors.white,
-                                      hideBottomControls: false,
-                                      aspectRatioPresets: [
-                                        CropAspectRatioPreset.square,
-                                        CropAspectRatioPreset.original,
-                                        CropAspectRatioPreset.ratio4x3,
-                                        CropAspectRatioPreset.ratio16x9,
-                                        CropAspectRatioPreset.ratio3x2,
-                                      ]),
-                                  IOSUiSettings(title: 'Crop Image'),
-                                ],
-                              );
+                              CroppedFile? cropped = await ImageCropper()
+                                  .cropImage(
+                                    sourcePath: pickedFile.path,
+                                    uiSettings: [
+                                      AndroidUiSettings(
+                                        toolbarTitle: 'Crop Image',
+                                        toolbarColor: Colors.redAccent,
+                                        toolbarWidgetColor: Colors.white,
+                                        hideBottomControls: false,
+                                        aspectRatioPresets: [
+                                          CropAspectRatioPreset.square,
+                                          CropAspectRatioPreset.original,
+                                          CropAspectRatioPreset.ratio4x3,
+                                          CropAspectRatioPreset.ratio16x9,
+                                          CropAspectRatioPreset.ratio3x2,
+                                        ],
+                                      ),
+                                      IOSUiSettings(title: 'Crop Image'),
+                                    ],
+                                  );
 
                               if (cropped != null) {
                                 File imageFile = File(cropped.path);
 
                                 String newMainImagePath = imageFile.path
                                     .replaceAll(RegExp(r'\.jpg$'), '.jpeg');
-                                File renamedMainImage =
-                                    await imageFile.rename(newMainImagePath);
+                                File renamedMainImage = await imageFile.rename(
+                                  newMainImagePath,
+                                );
 
                                 String apiEndpoint =
                                     "https://www.sharutech.com/matrimony/upload_image.php";
 
                                 try {
                                   var request = http.MultipartRequest(
-                                      'POST', Uri.parse(apiEndpoint));
+                                    'POST',
+                                    Uri.parse(apiEndpoint),
+                                  );
                                   request.fields.addAll({
                                     'matri_id': profile.matriId,
                                     'id': profile.id,
                                     'photo_type': '1',
-                                    'type': 'update_profiePhoto'
+                                    'type': 'update_profiePhoto',
                                   });
 
-                                  String? mimeType =
-                                      lookupMimeType(renamedMainImage.path);
+                                  String? mimeType = lookupMimeType(
+                                    renamedMainImage.path,
+                                  );
                                   MediaType mediaType = mimeType == 'image/png'
                                       ? MediaType('image', 'png')
                                       : MediaType('image', 'jpeg');
 
-                                  request.files
-                                      .add(await http.MultipartFile.fromPath(
-                                    'images[]',
-                                    renamedMainImage.path,
-                                    contentType: mediaType,
-                                  ));
+                                  request.files.add(
+                                    await http.MultipartFile.fromPath(
+                                      'images[]',
+                                      renamedMainImage.path,
+                                      contentType: mediaType,
+                                    ),
+                                  );
 
-                                  http.StreamedResponse response =
-                                      await request.send();
+                                  http.StreamedResponse response = await request
+                                      .send();
 
                                   if (response.statusCode == 200) {
-                                    String responseBody =
-                                        await response.stream.bytesToString();
+                                    String responseBody = await response.stream
+                                        .bytesToString();
                                     print("API Response Data: $responseBody");
                                     Fluttertoast.showToast(
-                                        msg:
-                                            "Profile photo updated successfully.");
+                                      msg:
+                                          "Profile photo updated successfully.",
+                                    );
 
                                     setState(() {
                                       profileImage = renamedMainImage;
                                       _myProfileDataFuture =
-                                          ApiService.fetchmyProfileData(context);
+                                          ApiService.fetchmyProfileData(
+                                            context,
+                                          );
                                       _myAdditionalImages =
                                           ApiService.fetchAdditionalImages();
                                     });
                                   } else {
                                     print("Error: ${response.reasonPhrase}");
                                     Fluttertoast.showToast(
-                                        msg: "Failed to update profile photo.");
+                                      msg: "Failed to update profile photo.",
+                                    );
                                   }
                                 } catch (e) {
                                   print("Error occurred: $e");
@@ -337,54 +352,70 @@ class ProfilePageState extends State<ProfilePage1> {
                         ),
                       ),
                       IconButton(
-                          icon: const Icon(
-                            Icons.edit,
-                            color: Color.fromARGB(255, 237, 106, 66),
-                            size: 30,
-                          ),
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    PersonalDetails(profile: profile),
-                              ),
-                            );
-                          }),
+                        icon: const Icon(
+                          Icons.edit,
+                          color: Color.fromARGB(255, 237, 106, 66),
+                          size: 30,
+                        ),
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  PersonalDetails(profile: profile),
+                            ),
+                          );
+                        },
+                      ),
                     ],
                   ),
                   const SizedBox(height: 15),
                   Table(
                     columnWidths: const {
                       0: FlexColumnWidth(1.5),
-                      1: FlexColumnWidth(2)
+                      1: FlexColumnWidth(2),
                     },
                     children: [
-                      _buildProfileRow('${localizations.translate('name')}:',
-                          '${profile.firstName} ${profile.lastName}'),
-                      _buildProfileRow('${localizations.translate('dob')}:',
-                          _formatDate(profile.dob)),
                       _buildProfileRow(
-                          '${localizations.translate('age')}:', profile.age),
-                      _buildProfileRow('${localizations.translate('gender')}:',
-                          profile.genderType),
+                        '${localizations.translate('name')}:',
+                        '${profile.firstName} ${profile.lastName}',
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('marital_status')}:',
-                          profile.status),
+                        '${localizations.translate('dob')}:',
+                        _formatDate(profile.dob),
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('phone_number')}:',
-                          profile.phone),
-                      _buildProfileRow('${localizations.translate('email')}:',
-                          profile.email),
+                        '${localizations.translate('age')}:',
+                        profile.age,
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('creator_name')}:',
-                          profile.creatorName),
+                        '${localizations.translate('gender')}:',
+                        profile.genderType,
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('creator_phone')}:',
-                          profile.creatorPhone.toString()),
+                        '${localizations.translate('marital_status')}:',
+                        profile.status,
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('sub_caste')}:',
-                          profile.subCaste),
+                        '${localizations.translate('phone_number')}:',
+                        profile.phone,
+                      ),
+                      _buildProfileRow(
+                        '${localizations.translate('email')}:',
+                        profile.email,
+                      ),
+                      _buildProfileRow(
+                        '${localizations.translate('creator_name')}:',
+                        profile.creatorName,
+                      ),
+                      _buildProfileRow(
+                        '${localizations.translate('creator_phone')}:',
+                        profile.creatorPhone.toString(),
+                      ),
+                      _buildProfileRow(
+                        '${localizations.translate('sub_caste')}:',
+                        profile.subCaste,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 40),
@@ -421,30 +452,45 @@ class ProfilePageState extends State<ProfilePage1> {
                   Table(
                     columnWidths: const {
                       0: FlexColumnWidth(1.5),
-                      1: FlexColumnWidth(2)
+                      1: FlexColumnWidth(2),
                     },
                     children: [
-                      _buildProfileRow('${localizations.translate('height')}:',
-                          "${profile.height}cm"),
-                      _buildProfileRow('${localizations.translate('weight')}:',
-                          "${profile.weight}kg"),
                       _buildProfileRow(
-                          '${localizations.translate('blood_group')}:',
-                          profile.bloodGroup),
+                        '${localizations.translate('height')}:',
+                        "${profile.height}cm",
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('complexion')}:',
-                          profile.complexion),
+                        '${localizations.translate('weight')}:',
+                        "${profile.weight}kg",
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('disabilities')}:',
-                          profile.disability),
-                      _buildProfileRow('${localizations.translate('country')}:',
-                          profile.country),
-                      _buildProfileRow('${localizations.translate('state')}:',
-                          profile.state),
+                        '${localizations.translate('blood_group')}:',
+                        profile.bloodGroup,
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('city')}:', profile.city),
-                      _buildProfileRow('${localizations.translate('address')}:',
-                          profile.address),
+                        '${localizations.translate('complexion')}:',
+                        profile.complexion,
+                      ),
+                      _buildProfileRow(
+                        '${localizations.translate('disabilities')}:',
+                        profile.disability,
+                      ),
+                      _buildProfileRow(
+                        '${localizations.translate('country')}:',
+                        profile.country,
+                      ),
+                      _buildProfileRow(
+                        '${localizations.translate('state')}:',
+                        profile.state,
+                      ),
+                      _buildProfileRow(
+                        '${localizations.translate('city')}:',
+                        profile.city,
+                      ),
+                      _buildProfileRow(
+                        '${localizations.translate('address')}:',
+                        profile.address,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 40),
@@ -481,27 +527,33 @@ class ProfilePageState extends State<ProfilePage1> {
                   Table(
                     columnWidths: const {
                       0: FlexColumnWidth(1.5),
-                      1: FlexColumnWidth(2)
+                      1: FlexColumnWidth(2),
                     },
                     children: [
                       _buildProfileRow(
-                          '${localizations.translate('qualification')}:',
-                          profile.qualification),
+                        '${localizations.translate('qualification')}:',
+                        profile.qualification,
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('specialisation')}:',
-                          profile.specialization),
+                        '${localizations.translate('specialisation')}:',
+                        profile.specialization,
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('profession')}:',
-                          profile.occupation),
+                        '${localizations.translate('profession')}:',
+                        profile.occupation,
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('company_name')}:',
-                          profile.company),
+                        '${localizations.translate('company_name')}:',
+                        profile.company,
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('company_city')}:',
-                          profile.companyCity),
+                        '${localizations.translate('company_city')}:',
+                        profile.companyCity,
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('salary_range')}:',
-                          profile.salary),
+                        '${localizations.translate('salary_range')}:',
+                        profile.salary,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 40),
@@ -543,21 +595,29 @@ class ProfilePageState extends State<ProfilePage1> {
                     },
                     children: [
                       _buildProfileRow(
-                          '${localizations.translate('nakshatra')}:',
-                          profile.nakshatra),
-                      _buildProfileRow('${localizations.translate('rashi')}:',
-                          profile.rashi),
-                      _buildProfileRow('${localizations.translate('gothra')}:',
-                          profile.gothra),
+                        '${localizations.translate('nakshatra')}:',
+                        profile.nakshatra,
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('birth_place')}:',
-                          profile.birthPlace),
+                        '${localizations.translate('rashi')}:',
+                        profile.rashi,
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('birth_time')}:',
-                          profile.birthTime),
+                        '${localizations.translate('gothra')}:',
+                        profile.gothra,
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('family_deity')}:',
-                          profile.familyDiety),
+                        '${localizations.translate('birth_place')}:',
+                        profile.birthPlace,
+                      ),
+                      _buildProfileRow(
+                        '${localizations.translate('birth_time')}:',
+                        profile.birthTime,
+                      ),
+                      _buildProfileRow(
+                        '${localizations.translate('family_deity')}:',
+                        profile.familyDiety,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 60),
@@ -602,41 +662,53 @@ class ProfilePageState extends State<ProfilePage1> {
                     children: [
                       if (profile.maritalStatus != "1")
                         _buildProfileRow(
-                            '${localizations.translate('no_of_kids')}:',
-                            profile.kids),
+                          '${localizations.translate('no_of_kids')}:',
+                          profile.kids,
+                        ),
                       _buildProfileRow(
-                          '${localizations.translate('father_name')}:',
-                          profile.fatherName),
+                        '${localizations.translate('father_name')}:',
+                        profile.fatherName,
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('father_occupation')}:',
-                          profile.fatherOccupation),
+                        '${localizations.translate('father_occupation')}:',
+                        profile.fatherOccupation,
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('mother_name')}:',
-                          profile.motherName),
+                        '${localizations.translate('mother_name')}:',
+                        profile.motherName,
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('mother_occupation')}:',
-                          profile.motherOccupation),
+                        '${localizations.translate('mother_occupation')}:',
+                        profile.motherOccupation,
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('no_of_brothers')}:',
-                          profile.numberOfBrothers.toString()),
+                        '${localizations.translate('no_of_brothers')}:',
+                        profile.numberOfBrothers.toString(),
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('no_of_sisters')}:',
-                          profile.numberOfSisters.toString()),
+                        '${localizations.translate('no_of_sisters')}:',
+                        profile.numberOfSisters.toString(),
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('permanent_address')}:',
-                          profile.homeTown),
+                        '${localizations.translate('permanent_address')}:',
+                        profile.homeTown,
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('mother_tongue')}:',
-                          profile.motherTongue),
+                        '${localizations.translate('mother_tongue')}:',
+                        profile.motherTongue,
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('family_type')}:',
-                          profile.familyType),
+                        '${localizations.translate('family_type')}:',
+                        profile.familyType,
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('reference_name')}:',
-                          profile.reference),
+                        '${localizations.translate('reference_name')}:',
+                        profile.reference,
+                      ),
                       _buildProfileRow(
-                          '${localizations.translate('reference_phone')}:',
-                          profile.reference_no),
+                        '${localizations.translate('reference_phone')}:',
+                        profile.reference_no,
+                      ),
                     ],
                   ),
                   SizedBox(height: 60),
@@ -647,11 +719,13 @@ class ProfilePageState extends State<ProfilePage1> {
                       1: FlexColumnWidth(2),
                     },
                     children: [
-                      _buildProfileRow('${localizations.translate('remarks')}:',
-                          profile.remark),
+                      _buildProfileRow(
+                        '${localizations.translate('remarks')}:',
+                        profile.remark,
+                      ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 40),
                   Text(
                     localizations.translate('images'),
@@ -692,11 +766,11 @@ class ProfilePageState extends State<ProfilePage1> {
                         physics: const NeverScrollableScrollPhysics(),
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: 0.8,
-                        ),
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 12,
+                              mainAxisSpacing: 12,
+                              childAspectRatio: 0.8,
+                            ),
                         itemCount: images.length,
                         itemBuilder: (context, index) {
                           String imageUrl =
@@ -715,22 +789,27 @@ class ProfilePageState extends State<ProfilePage1> {
                                       Positioned.fill(
                                         child: BackdropFilter(
                                           filter: ImageFilter.blur(
-                                              sigmaX: 10, sigmaY: 10),
+                                            sigmaX: 10,
+                                            sigmaY: 10,
+                                          ),
                                           child: Container(
-                                            color:
-                                                Colors.black.withOpacity(0.3),
+                                            color: Colors.black.withOpacity(
+                                              0.3,
+                                            ),
                                           ),
                                         ),
                                       ),
                                       Center(
                                         child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
                                           child: Image.network(
                                             imageUrl,
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
+                                            width:
+                                                MediaQuery.of(
+                                                  context,
+                                                ).size.width *
                                                 0.8,
                                             fit: BoxFit.contain,
                                           ),
@@ -740,7 +819,8 @@ class ProfilePageState extends State<ProfilePage1> {
                                         child: GestureDetector(
                                           onTap: () => Navigator.pop(context),
                                           child: Container(
-                                              color: Colors.transparent),
+                                            color: Colors.transparent,
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -759,32 +839,35 @@ class ProfilePageState extends State<ProfilePage1> {
                                       imageUrl,
                                       width: double.infinity,
                                       fit: BoxFit.cover,
-                                      loadingBuilder:
-                                          (context, child, loadingProgress) {
+                                      loadingBuilder: (context, child, loadingProgress) {
                                         if (loadingProgress == null) {
                                           return child;
                                         }
                                         return Center(
                                           child: CircularProgressIndicator(
-                                            value: loadingProgress
+                                            value:
+                                                loadingProgress
                                                         .expectedTotalBytes !=
                                                     null
                                                 ? loadingProgress
-                                                        .cumulativeBytesLoaded /
-                                                    (loadingProgress
-                                                            .expectedTotalBytes ??
-                                                        1)
+                                                          .cumulativeBytesLoaded /
+                                                      (loadingProgress
+                                                              .expectedTotalBytes ??
+                                                          1)
                                                 : null,
                                           ),
                                         );
                                       },
                                       errorBuilder:
                                           (context, error, stackTrace) {
-                                        print(
-                                            "Image failed to load: $imageUrl");
-                                        return const Icon(Icons.error,
-                                            color: Colors.red);
-                                      },
+                                            print(
+                                              "Image failed to load: $imageUrl",
+                                            );
+                                            return const Icon(
+                                              Icons.error,
+                                              color: Colors.red,
+                                            );
+                                          },
                                     ),
                                   ),
                                 ),
@@ -804,12 +887,14 @@ class ProfilePageState extends State<ProfilePage1> {
                                                       .spaceBetween,
                                               children: [
                                                 Text(
-                                                  localizations.translate('choose'),
+                                                  localizations.translate(
+                                                    'choose',
+                                                  ),
                                                   style: TextStyle(
-                                                      fontSize: 16,
-                                                      color: Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.bold),
+                                                    fontSize: 16,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
                                                 ),
                                                 IconButton(
                                                   onPressed: () {
@@ -825,22 +910,25 @@ class ProfilePageState extends State<ProfilePage1> {
                                                 TextButton(
                                                   onPressed: () {
                                                     setAsProfilePhoto(
-                                                        profile.matriId,
-                                                        images[index]
-                                                            .slId
-                                                            .toString());
+                                                      profile.matriId,
+                                                      images[index].slId
+                                                          .toString(),
+                                                    );
                                                     Navigator.pop(context);
                                                     setState(() {
                                                       _myProfileDataFuture =
-                                                          ApiService
-                                                              .fetchmyProfileData(context);
+                                                          ApiService.fetchmyProfileData(
+                                                            context,
+                                                          );
                                                       _myAdditionalImages =
-                                                          ApiService
-                                                              .fetchAdditionalImages();
+                                                          ApiService.fetchAdditionalImages();
                                                     });
                                                   },
-                                                  child:Text(
-                                                      localizations.translate('set_profile')),
+                                                  child: Text(
+                                                    localizations.translate(
+                                                      'set_profile',
+                                                    ),
+                                                  ),
                                                 ),
                                                 const SizedBox(height: 8),
                                                 TextButton(
@@ -849,7 +937,7 @@ class ProfilePageState extends State<ProfilePage1> {
                                                         "https://www.sharutech.com/matrimony/edit_image.php";
 
                                                     final Map<String, String>
-                                                        body = {
+                                                    body = {
                                                       "type": "delet",
                                                       "matri_id":
                                                           profile.matriId,
@@ -861,82 +949,93 @@ class ProfilePageState extends State<ProfilePage1> {
                                                     try {
                                                       final response =
                                                           await http.post(
-                                                        Uri.parse(apiUrl),
-                                                        headers: {
-                                                          "Content-Type":
-                                                              "application/json"
-                                                        },
-                                                        body: jsonEncode(body),
-                                                      );
+                                                            Uri.parse(apiUrl),
+                                                            headers: {
+                                                              "Content-Type":
+                                                                  "application/json",
+                                                            },
+                                                            body: jsonEncode(
+                                                              body,
+                                                            ),
+                                                          );
 
                                                       final Map<String, dynamic>
-                                                          responseData =
-                                                          jsonDecode(
-                                                              response.body);
+                                                      responseData = jsonDecode(
+                                                        response.body,
+                                                      );
 
                                                       if (response.statusCode ==
                                                               200 &&
-                                                          responseData[
-                                                                      "message"]
-                                                                  [
-                                                                  "p_out_mssg_flg"] ==
+                                                          responseData["message"]["p_out_mssg_flg"] ==
                                                               "Y") {
                                                         ScaffoldMessenger.of(
-                                                                context)
-                                                            .showSnackBar(
+                                                          context,
+                                                        ).showSnackBar(
                                                           const SnackBar(
-                                                              content: Text(
-                                                                  "Photo deleted successfully!")),
+                                                            content: Text(
+                                                              "Photo deleted successfully!",
+                                                            ),
+                                                          ),
                                                         );
 
                                                         final SharedPreferences
-                                                            prefs =
-                                                            await SharedPreferences
-                                                                .getInstance();
+                                                        prefs =
+                                                            await SharedPreferences.getInstance();
                                                         prefs.setString(
-                                                            'myImageUrl', '');
+                                                          'myImageUrl',
+                                                          '',
+                                                        );
                                                         await prefs.setBool(
-                                                            'hasUploadedImage',
-                                                            false);
+                                                          'hasUploadedImage',
+                                                          false,
+                                                        );
 
                                                         Navigator.pop(context);
 
                                                         setState(() {
                                                           profileImage = null;
 
-                                                          profileImageUrl = (profile
-                                                                      .gender ==
+                                                          profileImageUrl =
+                                                              (profile.gender ==
                                                                   "1")
                                                               ? 'assets/2.png'
                                                               : 'assets/1.png';
 
                                                           _myProfileDataFuture =
-                                                              ApiService
-                                                                  .fetchmyProfileData(context);
+                                                              ApiService.fetchmyProfileData(
+                                                                context,
+                                                              );
                                                           _myAdditionalImages =
-                                                              ApiService
-                                                                  .fetchAdditionalImages();
+                                                              ApiService.fetchAdditionalImages();
                                                         });
                                                       } else {
                                                         ScaffoldMessenger.of(
-                                                                context)
-                                                            .showSnackBar(
+                                                          context,
+                                                        ).showSnackBar(
                                                           SnackBar(
-                                                              content: Text(
-                                                                  "Failed: ${responseData["message"]["p_out_mssg"]}")),
+                                                            content: Text(
+                                                              "Failed: ${responseData["message"]["p_out_mssg"]}",
+                                                            ),
+                                                          ),
                                                         );
                                                       }
                                                     } catch (e) {
                                                       ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(
+                                                        context,
+                                                      ).showSnackBar(
                                                         SnackBar(
-                                                            content: Text(
-                                                                "Error: $e")),
+                                                          content: Text(
+                                                            "Error: $e",
+                                                          ),
+                                                        ),
                                                       );
                                                     }
                                                   },
-                                                  child: Text(localizations.translate('delete_photo')),
+                                                  child: Text(
+                                                    localizations.translate(
+                                                      'delete_photo',
+                                                    ),
+                                                  ),
                                                 ),
                                               ],
                                             ),
@@ -952,8 +1051,12 @@ class ProfilePageState extends State<ProfilePage1> {
                                       ),
                                       child: const Icon(
                                         Icons.edit,
-                                        color:
-                                            Color.fromARGB(255, 237, 106, 66),
+                                        color: Color.fromARGB(
+                                          255,
+                                          237,
+                                          106,
+                                          66,
+                                        ),
                                         size: 18,
                                       ),
                                     ),
@@ -1008,7 +1111,8 @@ class ProfilePageState extends State<ProfilePage1> {
         });
       } else {
         Fluttertoast.showToast(
-            msg: "Failed: ${jsonResponse["message"]["p_out_mssg"]}");
+          msg: "Failed: ${jsonResponse["message"]["p_out_mssg"]}",
+        );
       }
     } catch (e) {
       Fluttertoast.showToast(msg: "Error: $e");

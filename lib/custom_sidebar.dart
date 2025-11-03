@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:practice/dashboard.dart';
-import 'package:practice/delete_profile/delete.dart';
-import 'package:practice/inapp/subscription_list_screen.dart';
-import 'package:practice/login.dart';
-import 'package:practice/main_screen.dart';
-import 'package:practice/pending_counts.dart';
-import 'package:practice/payment_gateway.dart';
-import 'package:practice/shortlist.dart';
-import 'package:practice/profile_page.dart';
-import 'package:practice/tearms.dart';
+import 'package:buntsmatrimony/dashboard.dart';
+import 'package:buntsmatrimony/delete_profile/delete.dart';
+import 'package:buntsmatrimony/inapp/subscription_list_screen.dart';
+import 'package:buntsmatrimony/login.dart';
+import 'package:buntsmatrimony/main_screen.dart';
+import 'package:buntsmatrimony/pending_counts.dart';
+import 'package:buntsmatrimony/payment_gateway.dart';
+import 'package:buntsmatrimony/shortlist.dart';
+import 'package:buntsmatrimony/profile_page.dart';
+import 'package:buntsmatrimony/tearms.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dashboard_model.dart';
@@ -16,6 +16,7 @@ import 'api_service.dart';
 import 'lang.dart';
 import 'language_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 class CustomSidebar extends StatefulWidget {
   @override
   _CustomSidebarState createState() => _CustomSidebarState();
@@ -44,7 +45,8 @@ class _CustomSidebarState extends State<CustomSidebar> {
       matriId = prefs.getString('myMatriId') ?? "N/A";
       gender = prefs.getString('myGender') ?? "N/A";
 
-      profileImageUrl = prefs.getString('myImageUrl') ??
+      profileImageUrl =
+          prefs.getString('myImageUrl') ??
           (int.tryParse(gender.toString()) == 1
               ? "assets/2.png"
               : "assets/1.png");
@@ -88,7 +90,7 @@ class _CustomSidebarState extends State<CustomSidebar> {
         children: [
           Container(
             width: double.infinity, // Full width
-            color: Color(0xFFC3A38C), // Background color
+            color: Color(0xFFea4a57), // Background color
             child: Padding(
               padding: EdgeInsets.all(20),
               child: Column(
@@ -99,10 +101,12 @@ class _CustomSidebarState extends State<CustomSidebar> {
                     backgroundColor: Colors.white,
                     backgroundImage:
                         (profileImageUrl != null && profileImageUrl.isNotEmpty)
-                            ? NetworkImage(profileImageUrl) as ImageProvider
-                            : AssetImage(int.tryParse(gender.toString()) == 1
+                        ? NetworkImage(profileImageUrl) as ImageProvider
+                        : AssetImage(
+                            int.tryParse(gender.toString()) == 1
                                 ? "assets/2.png"
-                                : "assets/1.png"),
+                                : "assets/1.png",
+                          ),
                   ),
                   SizedBox(height: 8),
                   Text(
@@ -127,16 +131,16 @@ class _CustomSidebarState extends State<CustomSidebar> {
               ),
             ),
           ),
-         Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                _buildSidebarItems(context, localizations),
-                _buildCopyrightInfo(), // Copyright info at the bottom
-              ],
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  _buildSidebarItems(context, localizations),
+                  _buildCopyrightInfo(), // Copyright info at the bottom
+                ],
+              ),
             ),
           ),
-        ),
         ],
       ),
     );
@@ -148,10 +152,8 @@ Widget _buildLoadingSidebar() {
     padding: EdgeInsets.zero,
     children: [
       DrawerHeader(
-        decoration: BoxDecoration(color: Color(0xFFC3A38C)),
-        child: Center(
-          child: CircularProgressIndicator(color: Colors.white),
-        ),
+        decoration: BoxDecoration(color: Color(0xFFea4a57)),
+        child: Center(child: CircularProgressIndicator(color: Colors.white)),
       ),
     ],
   );
@@ -162,14 +164,16 @@ Widget _buildErrorSidebar() {
     padding: EdgeInsets.zero,
     children: [
       DrawerHeader(
-        decoration: BoxDecoration(color: Color(0xFFC3A38C)),
+        decoration: BoxDecoration(color: Color(0xFFea4a57)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.account_circle, size: 50, color: Colors.white),
             SizedBox(height: 10),
-            Text("User Name",
-                style: TextStyle(color: Colors.white, fontSize: 18)),
+            Text(
+              "User Name",
+              style: TextStyle(color: Colors.white, fontSize: 18),
+            ),
           ],
         ),
       ),
@@ -178,7 +182,9 @@ Widget _buildErrorSidebar() {
 }
 
 Widget _buildSidebarItems(
-    BuildContext context, AppLocalizations localizations) {
+  BuildContext context,
+  AppLocalizations localizations,
+) {
   var languageProvider = Provider.of<LanguageProvider>(context);
   return Column(
     children: [
@@ -186,25 +192,33 @@ Widget _buildSidebarItems(
         leading: Icon(Icons.dashboard),
         title: Text(localizations.translate('dashboard')),
         onTap: () => Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => MainScreen())),
+          context,
+          MaterialPageRoute(builder: (context) => MainScreen()),
+        ),
       ),
       ListTile(
         leading: Icon(Icons.bookmark),
         title: Text(localizations.translate('shortlist')),
         onTap: () => Navigator.push(
-            context, MaterialPageRoute(builder: (context) => ShortlistsPage())),
+          context,
+          MaterialPageRoute(builder: (context) => ShortlistsPage()),
+        ),
       ),
       ListTile(
         leading: Icon(Icons.person),
         title: Text(localizations.translate('profile')),
         onTap: () => Navigator.push(
-            context, MaterialPageRoute(builder: (context) => ProfilePage1())),
+          context,
+          MaterialPageRoute(builder: (context) => ProfilePage1()),
+        ),
       ),
       ListTile(
         leading: Icon(Icons.notifications),
         title: Text(localizations.translate('plans')),
-        onTap: () => Navigator.push(context,
-            MaterialPageRoute(builder: (context) =>SubscriptionPaymentPage())),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => SubscriptionPaymentPage()),
+        ),
       ),
       ListTile(
         leading: Icon(Icons.language, color: Colors.blue),
@@ -227,14 +241,18 @@ Widget _buildSidebarItems(
         leading: Icon(Icons.pending_actions),
         title: Text(localizations.translate('pending_counts')),
         onTap: () => Navigator.push(
-            context, MaterialPageRoute(builder: (context) => PendingCountsPage())),
+          context,
+          MaterialPageRoute(builder: (context) => PendingCountsPage()),
+        ),
       ),
-      
+
       ListTile(
         leading: Icon(Icons.delete),
         title: Text(localizations.translate('profileStatus')),
-        onTap: () => Navigator.push(context,
-            MaterialPageRoute(builder: (context) => ChangeStatusPage())),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ChangeStatusPage()),
+        ),
       ),
       // ListTile(
       //   leading: Icon(Icons.insert_drive_file_rounded),
@@ -242,13 +260,15 @@ Widget _buildSidebarItems(
       //   onTap: () => Navigator.push(context,
       //       MaterialPageRoute(builder: (context) =>MyApp1())),
       // ),
-       ListTile(
+      ListTile(
         leading: Icon(Icons.insert_drive_file_rounded),
         title: Text(localizations.translate('terms')),
-        onTap: () => Navigator.push(context,
-            MaterialPageRoute(builder: (context) => TermsAndConditionsPage())),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => TermsAndConditionsPage()),
+        ),
       ),
-      
+
       ListTile(
         leading: Icon(Icons.power_settings_new),
         title: Text(localizations.translate('logout')),
@@ -257,6 +277,7 @@ Widget _buildSidebarItems(
     ],
   );
 }
+
 Widget _buildCopyrightInfo() {
   String currentYear = DateTime.now().year.toString();
 
@@ -267,17 +288,16 @@ Widget _buildCopyrightInfo() {
         children: [
           TextSpan(text: "$currentYear © Made by "),
           TextSpan(
-            text: "Mobiezy",
+            text: "Tecohighly",
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ],
       ),
-      style: TextStyle(fontSize: 14, color: Colors.grey),
+      style: TextStyle(fontSize: 14, color: Color(0xFF2d2d2d)),
       textAlign: TextAlign.center,
     ),
   );
 }
-
 
 void _showLogoutDialog(BuildContext context) {
   var localizations = AppLocalizations.of(context);
@@ -307,7 +327,10 @@ void _showLogoutDialog(BuildContext context) {
                 (Route<dynamic> route) => false, // Removes all previous routes
               );
             },
-            child: Text(localizations.translate('logout'), style: TextStyle(color: Colors.red)),
+            child: Text(
+              localizations.translate('logout'),
+              style: TextStyle(color: Colors.red),
+            ),
           ),
         ],
       );

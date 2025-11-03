@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:practice/chat/show_chats.dart';
-import 'package:practice/lang.dart';
+import 'package:buntsmatrimony/chat/show_chats.dart';
+import 'package:buntsmatrimony/lang.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dashboard.dart';
 import 'matches.dart';
@@ -50,13 +50,15 @@ class _MainScreenState extends State<MainScreen> {
   Future<void> _checkConnectivity() async {
     List<ConnectivityResult> results = await Connectivity().checkConnectivity();
     _updateConnectionStatus(
-        results.isNotEmpty ? results.first : ConnectivityResult.none);
+      results.isNotEmpty ? results.first : ConnectivityResult.none,
+    );
 
-    Connectivity()
-        .onConnectivityChanged
-        .listen((List<ConnectivityResult> results) {
+    Connectivity().onConnectivityChanged.listen((
+      List<ConnectivityResult> results,
+    ) {
       _updateConnectionStatus(
-          results.isNotEmpty ? results.first : ConnectivityResult.none);
+        results.isNotEmpty ? results.first : ConnectivityResult.none,
+      );
     });
   }
 
@@ -86,8 +88,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ],
         ),
-        content:
-             Text(localizations.translate('no_internet_msg')),
+        content: Text(localizations.translate('no_internet_msg')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -108,7 +109,8 @@ class _MainScreenState extends State<MainScreen> {
           actions: <Widget>[
             TextButton(
               style: TextButton.styleFrom(
-                  textStyle: Theme.of(context).textTheme.labelLarge),
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
               child: Text(localizations.translate('exit')),
               onPressed: () {
                 Navigator.pop(context, true);
@@ -116,7 +118,8 @@ class _MainScreenState extends State<MainScreen> {
             ),
             TextButton(
               style: TextButton.styleFrom(
-                  textStyle: Theme.of(context).textTheme.labelLarge),
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
               child: Text(localizations.translate('no')),
               onPressed: () {
                 Navigator.pop(context, false);
@@ -154,8 +157,8 @@ class _MainScreenState extends State<MainScreen> {
         drawer: CustomSidebar(),
         body: matriId == null
             ? Center(
-                child:
-                    CircularProgressIndicator()) // Show loading until matriId is available
+                child: CircularProgressIndicator(),
+              ) // Show loading until matriId is available
             : IndexedStack(
                 index: _selectedIndex,
                 children: [

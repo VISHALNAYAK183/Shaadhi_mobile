@@ -2,8 +2,8 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
-import 'package:practice/lang.dart';
-import 'package:practice/main_screen.dart';
+import 'package:buntsmatrimony/lang.dart';
+import 'package:buntsmatrimony/main_screen.dart';
 import 'api_service.dart';
 import 'dashboard_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -87,48 +87,55 @@ class _FilterDialogState extends State<FilterDialog> {
     _cityList = await ApiService.fetchcity();
     setState(() {});
   }
-  
+
   Future<void> _onSearch() async {
-  try {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    // Get all selected filter values
-    String countryId = prefs.getString("selected_country_id") ?? "";
-    String stateId = prefs.getString("selected_state_id") ?? "";
-    String cityId = prefs.getString("selected_city_id") ?? "";
-    
-    // 🔥 Fix the list retrieval
-    List<String> subCasteList = prefs.getStringList("selected_sub_caste") ?? [];
-    List<String> educationList = prefs.getStringList("selected_education") ?? [];
+      // Get all selected filter values
+      String countryId = prefs.getString("selected_country_id") ?? "";
+      String stateId = prefs.getString("selected_state_id") ?? "";
+      String cityId = prefs.getString("selected_city_id") ?? "";
 
-    int maritalStatus = prefs.getInt("selected_marital_status") ?? 1;
-    double minAge = prefs.getDouble("selected_min_age") ?? 18;
-    double maxAge = prefs.getDouble("selected_max_age") ?? 40;
-    double minHeight = prefs.getDouble("selected_min_height") ?? 50;
-    double maxHeight = prefs.getDouble("selected_max_height") ?? 250;
-    
-    await prefs.setString("matriId", widget.matriId);
+      // 🔥 Fix the list retrieval
+      List<String> subCasteList =
+          prefs.getStringList("selected_sub_caste") ?? [];
+      List<String> educationList =
+          prefs.getStringList("selected_education") ?? [];
 
-    // Call API with selected filters
-    List<searchpartner> filteredProfiles = await ApiService.fetchpartner();
+      int maritalStatus = prefs.getInt("selected_marital_status") ?? 1;
+      double minAge = prefs.getDouble("selected_min_age") ?? 18;
+      double maxAge = prefs.getDouble("selected_max_age") ?? 40;
+      double minHeight = prefs.getDouble("selected_min_height") ?? 50;
+      double maxHeight = prefs.getDouble("selected_max_height") ?? 250;
 
-    Navigator.pop(context);
-  } catch (e) {
-    print("Error fetching filtered profiles: $e");
+      await prefs.setString("matriId", widget.matriId);
+
+      // Call API with selected filters
+      List<searchpartner> filteredProfiles = await ApiService.fetchpartner();
+
+      Navigator.pop(context);
+    } catch (e) {
+      print("Error fetching filtered profiles: $e");
+    }
   }
-}
 
   Future<void> _saveFilters() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     // Save selected subcastes
-    await prefs.setStringList("selected_sub_caste",
-        _selectedSubCasteList.map((sc) => sc.id).toList());
+    await prefs.setStringList(
+      "selected_sub_caste",
+      _selectedSubCasteList.map((sc) => sc.id).toList(),
+    );
 
     // Save selected education
-    await prefs.setStringList("selected_education",
-        _selectedEducationList.map((ed) => ed.id).toList());
+    await prefs.setStringList(
+      "selected_education",
+      _selectedEducationList.map((ed) => ed.id).toList(),
+    );
   }
+
   @override
   Widget build(BuildContext context) {
     var localizations = AppLocalizations.of(context);
@@ -147,49 +154,48 @@ class _FilterDialogState extends State<FilterDialog> {
             ),
 
             // Subcaste Dropdown
-             MultiSelectDialogField(
-                
-                items: _subCasteList
-                    .map((sc) => MultiSelectItem(sc, sc.sub_caste))
-                    .toList(),
-                buttonText: Text(localizations.translate('sub_caste')),
-                chipDisplay: MultiSelectChipDisplay(),
-                onConfirm: (values) {
-                  setState(() => _selectedSubCasteList =
-                      List<searchsubcaste>.from(values));
-                  _saveFilters();
-                },
-                initialValue: _selectedSubCasteList,
-                buttonIcon: Icon(Icons.arrow_drop_down, color: Colors.black),
-                dialogWidth: MediaQuery.of(context).size.width *
-                    0.85, 
-                searchable:
-                    true, 
-                searchHint:
-                    "Search Subcaste...",
-                title: Text(
-                    ""),
-              ),
+            MultiSelectDialogField(
+              items: _subCasteList
+                  .map((sc) => MultiSelectItem(sc, sc.sub_caste))
+                  .toList(),
+              buttonText: Text(localizations.translate('sub_caste')),
+              chipDisplay: MultiSelectChipDisplay(),
+              onConfirm: (values) {
+                setState(
+                  () =>
+                      _selectedSubCasteList = List<searchsubcaste>.from(values),
+                );
+                _saveFilters();
+              },
+              initialValue: _selectedSubCasteList,
+              buttonIcon: Icon(Icons.arrow_drop_down, color: Colors.black),
+              dialogWidth: MediaQuery.of(context).size.width * 0.85,
+              searchable: true,
+              searchHint: "Search Subcaste...",
+              title: Text(""),
+            ),
 
-              SizedBox(height: 10),
-              MultiSelectDialogField(
-                items: _educationList
-                    .map((ed) => MultiSelectItem(ed, ed.name))
-                    .toList(),
-                buttonText: Text(localizations.translate('education')),
-                chipDisplay: MultiSelectChipDisplay(),
-                onConfirm: (values) {
-                  setState(() => _selectedEducationList =
-                      List<searcheducation>.from(values));
-                  _saveFilters();
-                },
-                buttonIcon: Icon(Icons.arrow_drop_down, color: Colors.black),
-                dialogWidth: MediaQuery.of(context).size.width * 0.85, 
-                searchable: true, 
-                searchHint:
-                    "Search Education...", 
-                title: Text(""), 
-              ),
+            SizedBox(height: 10),
+            MultiSelectDialogField(
+              items: _educationList
+                  .map((ed) => MultiSelectItem(ed, ed.name))
+                  .toList(),
+              buttonText: Text(localizations.translate('education')),
+              chipDisplay: MultiSelectChipDisplay(),
+              onConfirm: (values) {
+                setState(
+                  () => _selectedEducationList = List<searcheducation>.from(
+                    values,
+                  ),
+                );
+                _saveFilters();
+              },
+              buttonIcon: Icon(Icons.arrow_drop_down, color: Colors.black),
+              dialogWidth: MediaQuery.of(context).size.width * 0.85,
+              searchable: true,
+              searchHint: "Search Education...",
+              title: Text(""),
+            ),
 
             SizedBox(height: 10),
 
@@ -201,61 +207,69 @@ class _FilterDialogState extends State<FilterDialog> {
                 setState(() => _selectedMaritalStatus = value);
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 await prefs.setInt(
-                    "selected_marital_status", maritalStatusMap[value] ?? 1);
+                  "selected_marital_status",
+                  maritalStatusMap[value] ?? 1,
+                );
               },
               items: maritalStatusMap.keys.map((ms) {
                 return DropdownMenuItem(value: ms, child: Text(ms));
               }).toList(),
-              decoration: InputDecoration(labelText: localizations.translate('marital_status')),
+              decoration: InputDecoration(
+                labelText: localizations.translate('marital_status'),
+              ),
             ),
             SizedBox(height: 10),
 
             // Country Dropdown
             DropdownSearch<searchcountry>(
-                popupProps: PopupProps.menu(showSearchBox: true),
-                items: _countryList,
-                itemAsString: (c) => c.country_name,
-                dropdownDecoratorProps: DropDownDecoratorProps(
-                  dropdownSearchDecoration: InputDecoration(labelText:localizations.translate('country')),
+              popupProps: PopupProps.menu(showSearchBox: true),
+              items: _countryList,
+              itemAsString: (c) => c.country_name,
+              dropdownDecoratorProps: DropDownDecoratorProps(
+                dropdownSearchDecoration: InputDecoration(
+                  labelText: localizations.translate('country'),
                 ),
-                onChanged: (searchcountry? value) async {
-                  if (value == null) return;
-                  setState(() {
-                    _selectedCountry = value;
-                    _selectedState = null;
-                    _selectedCity = null;
-                    _stateList =
-                        []; // Clear the state list before fetching new states
-                  });
+              ),
+              onChanged: (searchcountry? value) async {
+                if (value == null) return;
+                setState(() {
+                  _selectedCountry = value;
+                  _selectedState = null;
+                  _selectedCity = null;
+                  _stateList =
+                      []; // Clear the state list before fetching new states
+                });
 
-                  SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
-                  await prefs.setString(
-                      "selected_country_id", value.country_id);
-                  await prefs.setString(
-                      "selected_country_name", value.country_name);
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                await prefs.setString("selected_country_id", value.country_id);
+                await prefs.setString(
+                  "selected_country_name",
+                  value.country_name,
+                );
 
-                  print("Country ID: ${value.country_id}");
+                print("Country ID: ${value.country_id}");
 
-                  // **Fetch states dynamically based on selected country**
-                  List<searchstate> fetchedStates =
-                      await ApiService.fetchstate();
-                  setState(() {
-                    _stateList = fetchedStates
-                        .where((state) => state.country_id == value.country_id)
-                        .toList();
-                  });
+                // **Fetch states dynamically based on selected country**
+                List<searchstate> fetchedStates = await ApiService.fetchstate();
+                setState(() {
+                  _stateList = fetchedStates
+                      .where((state) => state.country_id == value.country_id)
+                      .toList();
+                });
 
-                  print("States fetched: ${_stateList.length}");
-                }),
+                print("States fetched: ${_stateList.length}");
+              },
+            ),
             DropdownSearch<searchstate>(
               popupProps: PopupProps.menu(
                 showSearchBox: true,
                 searchFieldProps: TextFieldProps(
                   decoration: InputDecoration(
                     hintText: "Search here...",
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 10,
+                    ),
                     isDense: true,
                   ),
                 ),
@@ -265,10 +279,11 @@ class _FilterDialogState extends State<FilterDialog> {
               selectedItem: _stateList.firstWhere(
                 (s) => s.state_id == _selectedState?.state_id,
                 orElse: () => searchstate(
-                    state_id: "",
-                    state_name: localizations.translate('state'),
-                    state_code: "",
-                    country_id: ""),
+                  state_id: "",
+                  state_name: localizations.translate('state'),
+                  state_code: "",
+                  country_id: "",
+                ),
               ),
               dropdownDecoratorProps: DropDownDecoratorProps(
                 dropdownSearchDecoration: InputDecoration(labelText: ""),
@@ -301,8 +316,10 @@ class _FilterDialogState extends State<FilterDialog> {
                 searchFieldProps: TextFieldProps(
                   decoration: InputDecoration(
                     hintText: "Search here...",
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 10,
+                    ),
                     isDense: true,
                   ),
                 ),
@@ -312,10 +329,11 @@ class _FilterDialogState extends State<FilterDialog> {
               selectedItem: _cityList.firstWhere(
                 (c) => c.city_id == _selectedCity?.city_id,
                 orElse: () => searchcity(
-                    city_id: "",
-                    city_name: localizations.translate('city'),
-                    state_id: "",
-                    country_id: ""),
+                  city_id: "",
+                  city_name: localizations.translate('city'),
+                  state_id: "",
+                  country_id: "",
+                ),
               ),
               dropdownDecoratorProps: DropDownDecoratorProps(
                 dropdownSearchDecoration: InputDecoration(labelText: ""),
@@ -335,10 +353,11 @@ class _FilterDialogState extends State<FilterDialog> {
 
             // Age Range Selector
             Text(
-  localizations.translate('age_range')
-      .replaceAll('{min}', _selectedMinAge.round().toString())
-      .replaceAll('{max}', _selectedMaxAge.round().toString()),
-),
+              localizations
+                  .translate('age_range')
+                  .replaceAll('{min}', _selectedMinAge.round().toString())
+                  .replaceAll('{max}', _selectedMaxAge.round().toString()),
+            ),
             RangeSlider(
               values: RangeValues(_selectedMinAge, _selectedMaxAge),
               min: 18,
@@ -358,10 +377,11 @@ class _FilterDialogState extends State<FilterDialog> {
 
             // Height Range Selector
             Text(
-  localizations.translate('height_range')
-      .replaceAll('{min}', _selectedMinheight.round().toString())
-      .replaceAll('{max}', _selectedMaxheight.round().toString()),
-),
+              localizations
+                  .translate('height_range')
+                  .replaceAll('{min}', _selectedMinheight.round().toString())
+                  .replaceAll('{max}', _selectedMaxheight.round().toString()),
+            ),
             RangeSlider(
               values: RangeValues(_selectedMinheight, _selectedMaxheight),
               min: 50,
@@ -374,9 +394,13 @@ class _FilterDialogState extends State<FilterDialog> {
                 });
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 await prefs.setDouble(
-                    "selected_min_height", _selectedMinheight);
+                  "selected_min_height",
+                  _selectedMinheight,
+                );
                 await prefs.setDouble(
-                    "selected_max_height", _selectedMaxheight);
+                  "selected_max_height",
+                  _selectedMaxheight,
+                );
               },
             ),
             SizedBox(height: 20),
@@ -391,11 +415,15 @@ class _FilterDialogState extends State<FilterDialog> {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFFC3A38C),
+                backgroundColor: Color(0xFFea4a57),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5)),
+                  borderRadius: BorderRadius.circular(5),
+                ),
               ),
-              child: Text(localizations.translate('search'), style: TextStyle(color: Colors.white)),
+              child: Text(
+                localizations.translate('search'),
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         ),

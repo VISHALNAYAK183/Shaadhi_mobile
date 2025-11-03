@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:practice/api_service.dart';
-import 'package:practice/chat/chats.dart';
-import 'package:practice/lang.dart';
+import 'package:buntsmatrimony/api_service.dart';
+import 'package:buntsmatrimony/chat/chats.dart';
+import 'package:buntsmatrimony/lang.dart';
 import 'chatuser_model.dart';
 
 class ChatListPage extends StatefulWidget {
@@ -45,8 +45,10 @@ class _ChatListPageState extends State<ChatListPage> {
                   backgroundImage: NetworkImage(user.profilePhoto),
                   onBackgroundImageError: (_, __) => Icon(Icons.person),
                 ),
-                title: Text(user.name,
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                title: Text(
+                  user.name,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 subtitle: Text("Matri ID: ${user.matriId}"),
                 trailing: user.newMessage == '1'
                     ? Icon(Icons.circle, color: Colors.green, size: 10)
@@ -59,10 +61,12 @@ class _ChatListPageState extends State<ChatListPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => ChatScreen(
-                            matriId: user.matriId,
-                            profile: user.profilePhoto,
-                            name: user.name)),
+                      builder: (context) => ChatScreen(
+                        matriId: user.matriId,
+                        profile: user.profilePhoto,
+                        name: user.name,
+                      ),
+                    ),
                   );
                 },
               );

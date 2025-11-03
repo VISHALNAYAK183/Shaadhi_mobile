@@ -4,8 +4,8 @@
 // import 'api_service.dart';
 // import 'dashboard_model.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:practice/checkProfiles.dart';
-// import 'package:practice/inapp/subscription_list_screen.dart';
+// import 'package:buntsmatrimony/checkProfiles.dart';
+// import 'package:buntsmatrimony/inapp/subscription_list_screen.dart';
 // import 'dart:async';
 // import 'package:intl/intl.dart';
 // import 'profile_view.dart';
@@ -133,11 +133,11 @@
 //                         },
 //                         style: ElevatedButton.styleFrom(
 //                           backgroundColor: _isMatriSearch == true
-//                               ? Color(0xFFC3A38C)
+//                               ? Color(0xFFea4a57)
 //                               : Colors.white,
 //                           foregroundColor: _isMatriSearch == true
 //                               ? Colors.white
-//                               : Color(0xFFC3A38C),
+//                               : Color(0xFFea4a57),
 //                           shape: RoundedRectangleBorder(
 //                               borderRadius: BorderRadius.circular(6)),
 //                         ),
@@ -153,11 +153,11 @@
 //                         },
 //                         style: ElevatedButton.styleFrom(
 //                           backgroundColor: _isMatriSearch == false
-//                               ? Color(0xFFC3A38C) // Active button color
+//                               ? Color(0xFFea4a57) // Active button color
 //                               : Colors.white, // Default unselected color
 //                           foregroundColor: _isMatriSearch == false
 //                               ? Colors.white // Text color for selected
-//                               : Color(0xFFC3A38C), // Text color for unselected
+//                               : Color(0xFFea4a57), // Text color for unselected
 //                           shape: RoundedRectangleBorder(
 //                             borderRadius: BorderRadius.circular(6),
 //                           ),
@@ -791,7 +791,7 @@
 //                   await prefs.setDouble("selected_min_age", _selectedMinAge);
 //                   await prefs.setDouble("selected_max_age", _selectedMaxAge);
 //                 },
-//                 activeColor: Color(0xFFC3A38C), // Your main color
+//                 activeColor: Color(0xFFea4a57), // Your main color
 //                 inactiveColor:
 //                     Colors.white, // Change the inactive side to white
 //               ),
@@ -821,9 +821,9 @@
 //                   await prefs.setDouble(
 //                       "selected_max_height", _selectedMaxheight);
 //                 },
-//                 activeColor: Color(0xFFC3A38C), // Apply the specified color
+//                 activeColor: Color(0xFFea4a57), // Apply the specified color
 //                 inactiveColor: Colors.white,
-//                 //  thumbColor: Color(0xFFC3A38C),
+//                 //  thumbColor: Color(0xFFea4a57),
 //               ),
 
 //               Center(
@@ -831,7 +831,7 @@
 //                   onPressed: _onSearch,
 //                   style: ElevatedButton.styleFrom(
 //                     backgroundColor:
-//                         Color(0xFFC3A38C), // Apply the specified color
+//                         Color(0xFFea4a57), // Apply the specified color
 //                     shape: RoundedRectangleBorder(
 //                       borderRadius:
 //                           BorderRadius.circular(5), // Reduce border radius
