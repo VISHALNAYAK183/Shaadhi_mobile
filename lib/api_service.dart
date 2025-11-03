@@ -114,32 +114,55 @@ class ApiService {
     }
   }
 
-  static Future<List<AdditionalImagesData>> fetchAdditionalImages() async {
+ static Future<List<AdditionalImagesData>> fetchAdditionalImages() async {
+  try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? matriId = prefs.getString('matriId');
-    String? token = prefs.getString("token");
+    String? token = prefs.getString('token');
+
+    if (matriId == null || token == null) {
+      throw Exception("Missing matriId or token in SharedPreferences");
+    }
+
     final response = await http.post(
       Uri.parse("$_baseUrl/edit_image.php"),
       headers: {
         "Content-Type": "application/json",
         "Authorization": "Bearer $token",
       },
-      body: jsonEncode({"type": "get_image", "matri_id": matriId}),
+      body: jsonEncode({
+        "type": "get_image",
+        "matri_id": matriId,
+      }),
     );
 
     if (response.statusCode == 200) {
-      Map<String, dynamic> jsonData = json.decode(response.body);
-      List<dynamic>? imagesList = jsonData['dataout'];
+      final Map<String, dynamic> jsonData = json.decode(response.body);
 
+    
+      if (jsonData.containsKey('token') && jsonData['token'] != null) {
+        await prefs.setString('token', jsonData['token']);
+      }
+
+      final List<dynamic>? imagesList = jsonData['dataout'];
       if (imagesList == null) return [];
 
       return imagesList
           .map((image) => AdditionalImagesData.fromJson(image))
           .toList();
-    } else {
-      throw Exception("Failed to load additional images");
+    } 
+    else if (response.statusCode == 401) {
+   
+      throw Exception("Session expired. Please log in again.");
+    } 
+    else {
+      throw Exception("Failed to load additional images: ${response.statusCode}");
     }
+  } catch (e) {
+    print("Error fetching additional images: $e");
+    rethrow;
   }
+}
 
   //Search Prefernce
   static Future<SearchData> fetchsearchData(
@@ -1078,22 +1101,52 @@ class ApiService {
   }
 
   //Images
-  static Future<List<searchimages>> fetchimages(String matriIdTo) async {
+ static Future<List<searchimages>> fetchimages(String matriIdTo) async {
+  try {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString("token");
+
+    if (token == null) {
+      throw Exception("Token not found. Please log in again.");
+    }
+
     final response = await http.post(
       Uri.parse("$_baseUrl/edit_image.php"),
-      headers: _headers,
-      body: jsonEncode({"type": "get_image", "matri_id": matriIdTo}),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      },
+      body: jsonEncode({
+        "type": "get_image",
+        "matri_id": matriIdTo,
+      }),
     );
+
+    print("API Response Code: ${response.statusCode}");
+    print("API Response Body: ${response.body}");
 
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
-      final List<dynamic> data = jsonData['dataout'] ?? [];
 
-      return await searchimages.fromJsonList(data);
+     
+      if (jsonData["token"] != null) {
+        await prefs.setString("token", jsonData["token"]);
+        await prefs.setString("token_expiry", jsonData["token_expiry"]);
+      }
+
+      final List<dynamic> data = jsonData["dataout"] ?? [];
+     return await searchimages.fromJsonList(data);
+    } else if (response.statusCode == 401) {
+      throw Exception("Session expired. Please log in again.");
     } else {
-      throw Exception("Failed to load image data");
+      throw Exception("Failed to load image data. (${response.statusCode})");
     }
+  } catch (e) {
+    print("Error fetching images: $e");
+    return [];
   }
+}
+
 
   static Future<ShortlistData> fetchShortlistedProfiles(
     BuildContext context,
