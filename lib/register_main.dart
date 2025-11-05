@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:buntsmatrimony/auth_screen.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:buntsmatrimony/api_services.dart';
@@ -348,7 +349,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => LoginScreen(),
+                              builder: (context) => AuthScreen(),
                             ),
                           );
                         },

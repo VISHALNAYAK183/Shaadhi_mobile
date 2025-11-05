@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:buntsmatrimony/auth_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:buntsmatrimony/chat/chatuser_model.dart';
@@ -54,7 +55,7 @@ class ApiService {
           TextButton(
             onPressed: () {
               Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (_) => LoginScreen()),
+                MaterialPageRoute(builder: (_) => AuthScreen()),
                 (Route<dynamic> route) => false,
               );
             },

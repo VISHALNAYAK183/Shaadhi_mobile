@@ -1,3 +1,4 @@
+import 'package:buntsmatrimony/auth_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:buntsmatrimony/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,7 +26,7 @@ Future<void> handleSessionExpiry(BuildContext context) async {
               onPressed: () {
                 // 3️⃣ Navigate back to Login page & remove all previous routes
                 Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => LoginScreen()),
+                  MaterialPageRoute(builder: (_) => AuthScreen()),
                   (Route<dynamic> route) => false,
                 );
               },

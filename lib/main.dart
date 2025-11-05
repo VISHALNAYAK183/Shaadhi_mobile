@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
                   );
                 } else {
                   return snapshot.data ??
-                      LoginScreen(); // Navigate based on login status
+                      AuthScreen(); // Navigate based on login status
                 }
               },
             ),

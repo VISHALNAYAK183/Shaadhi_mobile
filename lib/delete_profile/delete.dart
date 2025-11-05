@@ -1,3 +1,4 @@
+import 'package:buntsmatrimony/auth_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:buntsmatrimony/api_service.dart';
@@ -183,7 +184,7 @@ class _ChangeStatusPageState extends State<ChangeStatusPage> {
                     await prefs.clear();
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()),
+                      MaterialPageRoute(builder: (context) => AuthScreen()),
                     );
                   } else {
                     _showMessage("Error changing profile status.");

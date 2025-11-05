@@ -1,3 +1,4 @@
+import 'package:buntsmatrimony/auth_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:buntsmatrimony/dashboard.dart';
 import 'package:buntsmatrimony/delete_profile/delete.dart';
@@ -323,7 +324,7 @@ void _showLogoutDialog(BuildContext context) {
               Navigator.of(context).pop();
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => LoginScreen()),
+                MaterialPageRoute(builder: (context) => AuthScreen()),
                 (Route<dynamic> route) => false, // Removes all previous routes
               );
             },
