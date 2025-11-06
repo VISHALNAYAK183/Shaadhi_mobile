@@ -16,7 +16,7 @@ class _ChatListPageState extends State<ChatListPage> {
   @override
   void initState() {
     super.initState();
-    _chatUsers = ApiService.fetchChatUsers();
+    _chatUsers = ApiService.fetchChatUsers(context);
   }
 
   @override

@@ -18,6 +18,7 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
+  final Color _signColor = Color(0xFFea4a57);
   bool isMatriSearch = true;
   List<searchcategory1> searchResults = [];
   int _currentPage = 1;
@@ -727,83 +728,94 @@ class _SearchPageState extends State<SearchPage> {
             // }
           },
           child: Container(
-            margin: const EdgeInsets.symmetric(
-              horizontal: 8,
-              vertical: 10,
-            ), // gap between cards
-            child: Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(
-                  20,
-                ), // smoother round corners
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: Image.network(
-                          isValidImageUrl(profile.url)
-                              ? profile.url
-                              : (profile.gender == 2
-                                  ? "assets/1.png"
-                                  : "assets/2.png"),
-                          height: 180, // slightly increased height
-                          width: 160,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Image.asset(
+            width: 110,
+            margin: const EdgeInsets.only(right: 12),
+            color: Colors.transparent,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: isValidImageUrl(profile.url)
+                          ? Image.network(
+                              profile.url,
+                              width: 110,
+                              height: 120,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Image.asset(
+                                  profile.gender == 2
+                                      ? "assets/1.png"
+                                      : "assets/2.png",
+                                  width: 110,
+                                  height: 120,
+                                  fit: BoxFit.cover,
+                                );
+                              },
+                            )
+                          : Image.asset(
                               profile.gender == 2
                                   ? "assets/1.png"
                                   : "assets/2.png",
-                              height: 180,
-                              width: 160,
+                              width: 110,
+                              height: 120,
                               fit: BoxFit.cover,
-                            );
-                          },
+                            ),
+                    ),
+
+                    // ✅ Verification Icon
+                    if (profile.planStatus == "Paid")
+                      Positioned(
+                        top: 6,
+                        right: 6,
+                        child: Image.asset(
+                          "assets/verification_new.png",
+                          width: 20,
+                          height: 20,
                         ),
                       ),
-                      if (profile.planStatus == "Paid")
-                        Positioned(
-                          top: 8,
-                          right: 8,
-                          child: Image.asset(
-                            "assets/verification_new.png",
-                            width: 28,
-                            height: 28,
-                          ),
-                        ),
-                    ],
+                  ],
+                ),
+
+                const SizedBox(height: 6),
+
+                // ✅ Name
+                Text(
+                  profile.firstName,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: _signColor,
+                    fontWeight: FontWeight.bold,
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "${(profile.firstName + " " + profile.lastName).length > 15 ? (profile.firstName + " " + profile.lastName).substring(0, 12) + "..." : profile.firstName + " " + profile.lastName}",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+
+                const SizedBox(height: 2),
+
+                // ✅ Age + Matri ID same UI pattern
+                Row(
+                  children: [
+                    Text(
+                      "${profile.age}yrs",
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF2d2d2d),
+                      ),
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    "Age: ${profile.age}",
-                    style: const TextStyle(fontSize: 11),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    " ${profile.matriId} ",
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red,
+                    const SizedBox(width: 4),
+                    Text(
+                      profile.matriId,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF2d2d2d),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                ],
-              ),
+                  ],
+                ),
+              ],
             ),
           ),
         );
@@ -938,76 +950,85 @@ class _SearchPageState extends State<SearchPage> {
           onTap: () async {
             await _maxLimit.checkProfileView(profile.matriId, context);
           },
-          child: Card(
-            elevation: 0, // remove shadow
-            color: Colors.transparent, // no background border color
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(0),
-            ),
+          child: Container(
+            width: 110,
+            margin: const EdgeInsets.only(right: 12),
+            color: Colors.transparent,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start, // left aligned
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Stack(
                   children: [
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(0),
+                      borderRadius: BorderRadius.circular(20),
                       child: Image.network(
                         isValidImageUrl(profile.url)
                             ? profile.url
                             : (profile.gender == 2
                                 ? "assets/1.png"
                                 : "assets/2.png"),
-                        height: 200,
-                        width: double.infinity,
+                        width: 110,
+                        height: 120,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return Image.asset(
                             profile.gender == 2
                                 ? "assets/1.png"
                                 : "assets/2.png",
-                            height: 200,
-                            width: double.infinity,
+                            width: 110,
+                            height: 120,
                             fit: BoxFit.cover,
                           );
                         },
                       ),
                     ),
+
+                    // ✅ Verification Icon (Same Position & Size)
                     if (profile.planStatus == "Paid")
                       Positioned(
-                        top: 8,
-                        right: 8,
+                        top: 6,
+                        right: 6,
                         child: Image.asset(
                           "assets/verification_new.png",
-                          width: 28,
-                          height: 28,
+                          width: 20,
+                          height: 20,
                         ),
                       ),
                   ],
                 ),
-                const SizedBox(height: 5),
+
+                const SizedBox(height: 6),
+
+                // ✅ Name (Same styling)
                 Text(
-                  "${(profile.firstName + " " + profile.lastName).length > 15 ? (profile.firstName + " " + profile.lastName).substring(0, 12) + "..." : profile.firstName + " " + profile.lastName}",
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
+                  profile.firstName,
+                  style: TextStyle(
                     fontSize: 13,
+                    color: _signColor,
+                    fontWeight: FontWeight.bold,
                   ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
-                const SizedBox(height: 3),
+
+                const SizedBox(height: 2),
+
+                // ✅ Age & Matri ID (Same UI pattern)
                 Row(
                   children: [
                     Text(
-                      "${profile.age} yrs, ",
+                      "${profile.age}yrs",
                       style: const TextStyle(
                         fontSize: 12,
-                        color: Colors.black87,
+                        color: Color(0xFF2d2d2d),
                       ),
                     ),
+                    const SizedBox(width: 4),
                     Text(
-                      "${profile.matriId}",
+                      profile.matriId,
                       style: const TextStyle(
                         fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
+                        color: Color(0xFF2d2d2d),
                       ),
                     ),
                   ],

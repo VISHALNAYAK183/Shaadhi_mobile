@@ -39,7 +39,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _loadMessages() async {
     try {
-      List<Messages> fetchedMessages = await ApiService.fetchChats(
+      List<Messages> fetchedMessages = await ApiService.fetchChats(context,
         widget.matriId,
       );
       setState(() {
@@ -69,7 +69,7 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() {
       _sendLoading = true;
     });
-    String messageResponce = await ApiService.initateChats(
+    String messageResponce = await ApiService.initateChats(context,
       widget.matriId,
       _messageController.text.trim(),
     );

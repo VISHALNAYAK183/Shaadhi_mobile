@@ -752,104 +752,115 @@ class ApiService {
     }
   }
 
-  static Future<List<ChatUser>> fetchChatMessage(String matriIdBy) async {
+ static Future<List<ChatUser>> fetchChatMessage(
+    BuildContext context, String matriIdBy) async {
+  try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? matriId = prefs.getString('matriId');
-    final response = await http.post(
-      Uri.parse("$_baseUrl/message.php"),
-      headers: _headers,
-      body: jsonEncode({
-        "type": "messages",
-        "matri_id_by": matriIdBy,
-        "matri_id_to": matriId,
-      }),
-    );
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body)['dataout'];
-      return data.map((e) => ChatUser.fromJson(e, _baseUrl)).toList();
-    } else {
-      throw Exception("Failed to load state data");
-    }
-  }
 
-  static Future<List<ChatUser>> fetchChatUsers() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? matriId = prefs.getString('matriId');
-    String? token = prefs.getString("token");
-    final response = await http.post(
-      Uri.parse("$_baseUrl/message.php"),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer $token",
-      },
-      body: jsonEncode({"type": "chat_list", "matri_id": matriId}),
-    );
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body)['dataout'];
-      return data.map((e) => ChatUser.fromJson(e, _baseUrl)).toList();
-    } else {
-      throw Exception("Failed to load state data");
-    }
-  }
+    final response = await _post(context, "message.php", {
+      "type": "messages",
+      "matri_id_by": matriIdBy,
+      "matri_id_to": matriId,
+    });
 
-  static Future<List<Messages>> fetchChats(String reciverId) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? matriId = prefs.getString('matriId');
-    String? token = prefs.getString("token");
-    final response = await http.post(
-      Uri.parse("$_baseUrl/message.php"),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer $token",
-      },
-      body: jsonEncode({
-        "type": "messages",
-        "matri_id_by": matriId,
-        "matri_id_to": reciverId,
-      }),
-    );
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body)['dataout'];
-      return data.map((e) => Messages.fromJson(e, _baseUrl)).toList();
-    } else {
-      throw Exception("Failed to load state data");
-    }
-  }
+    final decodedJson = json.decode(response.body);
 
-  static Future<String> initateChats(String reciverId, String message) async {
+    final newToken = decodedJson["newToken"] ?? decodedJson["token"];
+    if (newToken != null) prefs.setString("token", newToken);
+
+    final List<dynamic> data = decodedJson['dataout'] ?? [];
+    return data.map((e) => ChatUser.fromJson(e, _baseUrl)).toList();
+
+  } catch (e) {
+    debugPrint("fetchChatMessage Error: $e");
+    rethrow;
+  }
+}
+
+static Future<List<ChatUser>> fetchChatUsers(BuildContext context) async {
+  try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? matriId = prefs.getString('matriId');
-    String? token = prefs.getString("token");
-    final response = await http.post(
-      Uri.parse("$_baseUrl/message.php"),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer $token",
-      },
-      body: jsonEncode({
-        "type": "chat_initated",
-        "matri_id_by": matriId,
-        "matri_id_to": reciverId,
-        "message": message,
-      }),
-    );
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      if (data["message"]["p_out_mssg_flg"] == "Y") {
-        return "Y";
-      } else if (data["message"]["p_out_mssg_flg"] == "N") {
-        if (data["message"]["p_out_mssg"] == 'Max count') {
-          return "Max";
-        } else {
-          return "N";
-        }
-      } else {
-        return "N";
-      }
-    } else {
-      throw Exception("Failed to load state data");
-    }
+
+    final response = await _post(context, "message.php", {
+      "type": "chat_list",
+      "matri_id": matriId,
+    });
+
+    final decodedJson = json.decode(response.body);
+
+    final newToken = decodedJson["newToken"] ?? decodedJson["token"];
+    if (newToken != null) prefs.setString("token", newToken);
+
+    final List<dynamic> data = decodedJson['dataout'] ?? [];
+    return data.map((e) => ChatUser.fromJson(e, _baseUrl)).toList();
+  } catch (e) {
+    debugPrint("fetchChatUsers Error: $e");
+    rethrow;
   }
+}
+
+
+  static Future<List<Messages>> fetchChats(
+    BuildContext context, String reciverId) async {
+  try {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? matriId = prefs.getString('matriId');
+
+    final response = await _post(context, "message.php", {
+      "type": "messages",
+      "matri_id_by": matriId,
+      "matri_id_to": reciverId,
+    });
+
+    final decodedJson = json.decode(response.body);
+
+    final newToken = decodedJson["newToken"] ?? decodedJson["token"];
+    if (newToken != null) prefs.setString("token", newToken);
+
+    final List<dynamic> data = decodedJson['dataout'] ?? [];
+    return data.map((e) => Messages.fromJson(e, _baseUrl)).toList();
+  } catch (e) {
+    debugPrint(" fetchChats Error: $e");
+    rethrow;
+  }
+}
+
+static Future<String> initateChats(
+    BuildContext context, String reciverId, String message) async {
+  try {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? matriId = prefs.getString('matriId');
+
+    final response = await _post(context, "message.php", {
+      "type": "chat_initated",
+      "matri_id_by": matriId,
+      "matri_id_to": reciverId,
+      "message": message,
+    });
+
+    final decodedJson = json.decode(response.body);
+
+    final newToken = decodedJson["newToken"] ?? decodedJson["token"];
+    if (newToken != null) prefs.setString("token", newToken);
+
+    if (decodedJson["message"]["p_out_mssg_flg"] == "Y") {
+      return "Y";
+    } else if (decodedJson["message"]["p_out_mssg_flg"] == "N") {
+      return (decodedJson["message"]["p_out_mssg"] == 'Max count')
+          ? "Max"
+          : "N";
+    } else {
+      return "N";
+    }
+
+  } catch (e) {
+    debugPrint(" initateChats Error: $e");
+    rethrow;
+  }
+}
+
 
   //State
 
