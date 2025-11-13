@@ -10,45 +10,45 @@ import 'package:buntsmatrimony/register_main.dart';
 import 'package:buntsmatrimony/support.dart';
 import 'package:buntsmatrimony/tearms.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:crypto/crypto.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthScreen extends StatefulWidget {
+  const AuthScreen({Key? key}) : super(key: key);
+
   @override
   State<AuthScreen> createState() => _AuthScreenState();
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  // Page
-  final PageController _controller = PageController();
-  int _currentIndex = 0;
-
-  // Colors
-  final Color _signColor = const Color(0xFFea4a57);
-  final Color _backgroundColor = const Color.fromARGB(255, 255, 255, 255);
-
-  // Common
-  bool _isOffline = false;
-  bool _termsAccepted = true;
-
-  // Password Login
-  final TextEditingController _mobileController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  // UI toggles
   bool _showPassword = false;
-  bool _isLoginLoading = false;
+  bool _showOtpSection = false;
 
-  // OTP Login
+  // Inputs
   final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  // OTP inputs: 4 boxes as requested
   final List<TextEditingController> _otpControllers =
       List.generate(4, (_) => TextEditingController());
   final List<FocusNode> _otpFocusNodes = List.generate(4, (_) => FocusNode());
-  bool _showOtpSection = false;
+
+  // Colors
+  Color primary = const Color(0xFFE3425B);
+  Color primaryDark = const Color(0xFFea4a57);
+
+  // Network / state
+  bool _isOffline = false;
+  bool _termsAccepted = true;
+  bool _isLoginLoading = false;
+  bool _isSendingOtp = false;
   bool _otpGenerated = false;
   bool _isOtpLoading = false;
-  bool _isSendingOtp = false;
-  String? _storedOtpHash; // server returns actual OTP in your response['data']['Otp']
+
+  // OTP storage (server returns OTP in response['data']['Otp'])
+  String? _storedOtpHash;
 
   // Countdown
   int _countdown = 30;
@@ -60,39 +60,31 @@ class _AuthScreenState extends State<AuthScreen> {
     super.initState();
     _checkInternet();
     // Listen for connectivity changes
-    Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> res) {
-      setState(() {
-        _isOffline =
-            !res.contains(ConnectivityResult.mobile) &&
-            !res.contains(ConnectivityResult.wifi);
-      });
-    });
+ Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) {
+  setState(() {
+    _isOffline = !(results.contains(ConnectivityResult.mobile) ||
+        results.contains(ConnectivityResult.wifi));
+  });
+});
+
   }
 
   @override
   void dispose() {
-    _controller.dispose();
-    _mobileController.dispose();
-    _passwordController.dispose();
     _phoneController.dispose();
-    for (final c in _otpControllers) {
-      c.dispose();
-    }
-    for (final f in _otpFocusNodes) {
-      f.dispose();
-    }
+    _passwordController.dispose();
+    for (final c in _otpControllers) c.dispose();
+    for (final f in _otpFocusNodes) f.dispose();
     _timer?.cancel();
     super.dispose();
   }
 
   // ================== Helpers ==================
-
   Future<void> _checkInternet() async {
     final result = await Connectivity().checkConnectivity();
     setState(() {
-      _isOffline =
-          !result.contains(ConnectivityResult.mobile) &&
-          !result.contains(ConnectivityResult.wifi);
+      _isOffline = !(result == ConnectivityResult.mobile ||
+          result == ConnectivityResult.wifi);
     });
   }
 
@@ -114,7 +106,7 @@ class _AuthScreenState extends State<AuthScreen> {
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(localizations.translate('ok'),
-                style: TextStyle(color: _signColor, fontSize: 16)),
+                style: TextStyle(color: primaryDark, fontSize: 16)),
           ),
         ],
       ),
@@ -166,6 +158,7 @@ class _AuthScreenState extends State<AuthScreen> {
     });
   }
 
+  // ================== Password Login ==================
   Future<void> _login() async {
     final localizations = AppLocalizations.of(context);
 
@@ -181,7 +174,7 @@ class _AuthScreenState extends State<AuthScreen> {
       return;
     }
 
-    final mobile = _mobileController.text.trim();
+    final mobile = _phoneController.text.trim();
     final password = _passwordController.text.trim();
 
     if (mobile.isEmpty || password.isEmpty) {
@@ -220,6 +213,7 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
+  // ================== OTP Flow ==================
   Future<void> _generateOtp() async {
     final phone = _phoneController.text.trim();
     if (phone.isEmpty || phone.length != 10) {
@@ -309,13 +303,11 @@ class _AuthScreenState extends State<AuthScreen> {
       return;
     }
 
-
     setState(() => _isOtpLoading = true);
 
     try {
-     
       final response = await ApiService.checkNumber(_phoneController.text.trim());
-    
+
       print("OTP Login API Response: $response");
 
       if (response.containsKey('dataout') &&
@@ -359,13 +351,11 @@ class _AuthScreenState extends State<AuthScreen> {
       } else {
         final message = (response['dataout'] != null &&
                 response['dataout'].isNotEmpty)
-            ? (response['dataout'][0]['p_out_mssg'] ??
-                "OTP verification failed.")
+            ? (response['dataout'][0]['p_out_mssg'] ?? "OTP verification failed.")
             : "OTP verification failed.";
         _showMessage(message);
       }
     } catch (e) {
-    
       print("OTP Login Error: $e");
       _showMessage("Error: $e");
     } finally {
@@ -373,431 +363,495 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
- 
+  // Helper to clear OTP fields
+  void _clearOtpFields() {
+    for (final c in _otpControllers) c.clear();
+    _otpFocusNodes[0].requestFocus();
+  }
+
+  Widget _buildOtpInputs() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: List.generate(4, (index) {
+        return SizedBox(
+          width: 55,
+          child: TextField(
+            controller: _otpControllers[index],
+            focusNode: _otpFocusNodes[index],
+            maxLength: 1,
+            textAlign: TextAlign.center,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              counterText: '',
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: primary),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: primary),
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            onChanged: (value) {
+              if (value.isNotEmpty && index < 3) {
+                FocusScope.of(context).requestFocus(_otpFocusNodes[index + 1]);
+              } else if (value.isEmpty && index > 0) {
+                FocusScope.of(context).requestFocus(_otpFocusNodes[index - 1]);
+              }
+            },
+          ),
+        );
+      }),
+    );
+  }
+
+  // ================== Build UI ==================
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+
     final localizations = AppLocalizations.of(context);
-    final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: _backgroundColor,
-      resizeToAvoidBottomInset: true,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              const SizedBox(height: 50),
-
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.asset(
-                  'assets/buntslogo.jpg',
-                  height: screenHeight * 0.20,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
+      body: Stack(
+        children: [
+          /// Background Image
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("assets/background.jpg"),
+                fit: BoxFit.cover,
+                alignment: Alignment(-0.4, 0),
               ),
+            ),
+          ),
 
-              // PageView: Password / OTP
-              SizedBox(
-                height: screenHeight * 0.52,
-                child: PageView(
-                  controller: _controller,
-                  onPageChanged: (i) => setState(() => _currentIndex = i),
-                  children: [
-                    _buildPasswordLogin(localizations),
-                    _buildOtpLogin(localizations),
-                  ],
-                ),
-              ),
+          /// Light overlay
+          Container(color: Colors.white.withOpacity(0.55)),
 
-              const SizedBox(height: 12),
-
-              // Toggle
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 100),
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(25),
-                  border: Border.all(color: _signColor),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() => _currentIndex = 0);
-                          _controller.animateToPage(
-                            0,
-                            duration: const Duration(milliseconds: 400),
-                            curve: Curves.easeInOut,
-                          );
-                        },
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          decoration: BoxDecoration(
-                            color: _currentIndex == 0 ? _signColor : Colors.transparent,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: Center(
-                            child: Text(
-                              "Password",
-                              style: TextStyle(
-                                color: _currentIndex == 0 ? Colors.white : Colors.black87,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ),
+          /// Main Content
+          SafeArea(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  /// Header (centered logo)
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.98),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.25),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
                         ),
-                      ),
+                      ],
                     ),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() => _currentIndex = 1);
-                          _controller.animateToPage(
-                            1,
-                            duration: const Duration(milliseconds: 400),
-                            curve: Curves.easeInOut,
-                          );
-                        },
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          decoration: BoxDecoration(
-                            color: _currentIndex == 1 ? _signColor : Colors.transparent,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: Center(
-                            child: Text(
-                              "OTP",
-                              style: TextStyle(
-                                color: _currentIndex == 1 ? Colors.white : Colors.black87,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+                    alignment: Alignment.center,
+                    child: Image.asset("assets/buntslogo.jpg", height: 80),
+                  ),
 
-              // Terms
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: CheckboxListTile(
-                  contentPadding: EdgeInsets.zero,
-                  visualDensity: VisualDensity.compact,
-                  title: RichText(
-                    text: TextSpan(
-                      text: localizations.translate('agree'),
-                      style: TextStyle(color: _signColor),
+                  /// Body
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: width * 0.05, vertical: 20),
+                    child: Column(
                       children: [
-                        TextSpan(
-                          text: localizations.translate('terms_and_conditions'),
-                          style: const TextStyle(decoration: TextDecoration.underline),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => TermsAndConditionsPage(),
+                        /// Login Card
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(22),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.88),
+                            borderRadius: BorderRadius.circular(18),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.5),
+                                blurRadius: 20,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Login with Password",
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 20,
                                 ),
-                              );
-                            },
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                "Sign in to your account",
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontSize: 13,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                              const SizedBox(height: 14),
+
+                              /// Phone / Matri ID
+                              TextField(
+                                controller: _phoneController,
+                                decoration: InputDecoration(
+                                  hintText: "Enter your phone / Matri ID",
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 10),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide:
+                                        const BorderSide(color: Colors.black12),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+
+                              /// Password
+                              TextField(
+                                controller: _passwordController,
+                                obscureText: !_showPassword,
+                                decoration: InputDecoration(
+                                  hintText: "Enter your password",
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _showPassword
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                      color: primary,
+                                    ),
+                                    onPressed: () =>
+                                        setState(() => _showPassword = !_showPassword),
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide:
+                                        const BorderSide(color: Colors.black12),
+                                  ),
+                                ),
+                              ),
+
+                              /// Forgot Password
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (_) => ForgetPasswordPage()));
+                                  },
+                                  child: Text(
+                                    "Forgot Password?",
+                                    style: TextStyle(
+                                      fontFamily: 'Inter',
+                                      color: primary,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              /// LOGIN Button
+                              SizedBox(
+                                width: width * 0.5,
+                                child: ElevatedButton(
+                                  onPressed: _isLoginLoading ? null : _login,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: primary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    elevation: 6,
+                                  ),
+                                  child: _isLoginLoading
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor:
+                                                AlwaysStoppedAnimation(Colors.white),
+                                          ),
+                                        )
+                                      : const Text(
+                                          "LOGIN",
+                                          style: TextStyle(
+                                            fontFamily: 'Inter',
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                ),
+                              ),
+
+                              const SizedBox(height: 12),
+                              Row(
+                                children: const [
+                                  Expanded(child: Divider(color: Colors.black)),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 8.0),
+                                    child: Text("OR"),
+                                  ),
+                                  Expanded(child: Divider(color: Colors.black)),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+
+                              Text(
+                                "Login with OTP",
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 20,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              const Text(
+                                "Quick and secure access",
+                                style: TextStyle(color: Colors.black54),
+                              ),
+                              const SizedBox(height: 14),
+
+                              /// OTP Phone Input
+                              TextField(
+                                controller: _phoneController,
+                                keyboardType: TextInputType.phone,
+                                decoration: InputDecoration(
+                                  hintText: "Enter 10-digit phone number",
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide:
+                                        const BorderSide(color: Colors.black12),
+                                  ),
+                                ),
+                                onChanged: (_) {
+                                  setState(() {
+                                    _showOtpSection = false;
+                                    _otpGenerated = false;
+                                    _storedOtpHash = null;
+                                    for (final c in _otpControllers) c.clear();
+                                  });
+                                },
+                              ),
+                              const SizedBox(height: 10),
+
+                              SizedBox(
+                                width: width * 0.5,
+                                child: ElevatedButton(
+                                  onPressed: (_isSendingOtp || _isOtpLoading)
+                                      ? null
+                                      : (_otpGenerated ? _loginWithOtp : _generateOtp),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: primary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: (_isSendingOtp || _isOtpLoading)
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              valueColor:
+                                                  AlwaysStoppedAnimation(Colors.white)),
+                                        )
+                                      : Text(
+                                          _otpGenerated ? "Verify & Login" : "Generate OTP",
+                                          style: const TextStyle(
+                                            fontFamily: 'Inter',
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                ),
+                              ),
+
+                              if (_showOtpSection) ...[
+                                const SizedBox(height: 14),
+                                _buildOtpInputs(),
+                                const SizedBox(height: 10),
+
+                                // Resend / timer
+                                _canResendOtp
+                                    ? GestureDetector(
+                                        onTap:
+                                            _isSendingOtp ? null : _generateOtp,
+                                        child: Text(
+                                          "Resend OTP",
+                                          style: TextStyle(
+                                            color: primary,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            decoration: TextDecoration.underline,
+                                          ),
+                                        ),
+                                      )
+                                    : Text(
+                                        "Resend OTP in ${_countdown}s",
+                                        style: TextStyle(color: primary, fontSize: 12),
+                                      ),
+                              ],
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        /// "Don't have an account?" Section
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Don't have an account? ",
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                                color: Colors.black,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => SignUpPage()),
+                                );
+                              },
+                              child: Text(
+                                "Register",
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                  color: primary, // same as button color
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        // Terms & Support
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                          child: Row(
+                            children: [
+                              Checkbox(
+                                value: _termsAccepted,
+                                onChanged: (val) =>
+                                    setState(() => _termsAccepted = val ?? false),
+                                activeColor: primary,
+                              ),
+                              Expanded(
+                                child: RichText(
+                                  text: TextSpan(
+                                    text: "I agree to the ",
+                                    style: TextStyle(
+                                        fontFamily: 'Inter', color: Colors.black),
+                                    children: [
+                                      TextSpan(
+                                        text: "terms and privacy policy",
+                                        style: TextStyle(
+                                          fontFamily: 'Inter',
+                                          color: primary,
+                                          fontWeight: FontWeight.w600,
+                                          decoration: TextDecoration.underline,
+                                        ),
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) =>
+                                                    TermsAndConditionsPage(),
+                                              ),
+                                            );
+                                          },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 6),
+                        Text.rich(
+                          TextSpan(
+                            text: "For any Query / Support ",
+                            style: TextStyle(
+                                fontFamily: 'Inter', color: Colors.black),
+                            children: [
+                              TextSpan(
+                                text: "Click here",
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  color: primary,
+                                  fontWeight: FontWeight.w600,
+                                  decoration: TextDecoration.underline,
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (_) => ContactFormPage()),
+                                    );
+                                  },
+                              ),
+                            ],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        /// Kannada Text
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Image.asset(
+                            "assets/kannadaText.png",
+                            height: height * 0.24,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+
+                        const SizedBox(height: 15),
+
+                        Transform.translate(
+                          offset: const Offset(100, -30),
+                          child: Transform.rotate(
+                            angle: 4.6,
+                            child: Align(
+                              alignment: Alignment.bottomRight,
+                              child: Image.asset(
+                                "assets/Buntslove.png",
+                                height: height * 0.25,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  value: _termsAccepted,
-                  onChanged: (v) => setState(() => _termsAccepted = v ?? false),
-                  controlAffinity: ListTileControlAffinity.leading,
-                ),
+                ],
               ),
-
-              // Bottom links
-              Row(
-  mainAxisAlignment: MainAxisAlignment.center,
-  children: [
-    //Flexible(
-      // child: Text(
-      //   localizations.translate('dont have account'),
-      //   textAlign: TextAlign.center,
-      //   overflow: TextOverflow.visible,
-      // ),
-  //  ),
-    const SizedBox(width: 6),
-    GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => SignUpPage()),
-        );
-      },
-      child: Flexible(
-        child: Text(
-          localizations.translate('new_account'),
-          style: TextStyle(
-            color: _signColor,
-            fontWeight: FontWeight.bold,
-          ),
-          textAlign: TextAlign.center,
-          overflow: TextOverflow.visible,
-        ),
-      ),
-    ),
-  ],
-),
-
-
-              const SizedBox(height: 8),
-
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => ContactFormPage()),
-                  );
-                },
-                child: Text(localizations.translate('query_support'),
-                    style: TextStyle(color: _signColor)),
-              ),
-
-              const SizedBox(height: 20),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-
-  Widget _buildPasswordLogin(AppLocalizations localizations) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 30),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(localizations.translate('login_other'),
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: _signColor)),
-          const SizedBox(height: 16),
-
-          TextField(
-            controller: _mobileController,
-            keyboardType: TextInputType.text,
-            decoration: InputDecoration(
-              hintText: localizations.translate('login'),
-              filled: true,
-              fillColor: Colors.white,
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(50),
-                borderSide: BorderSide(color: _signColor),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(50),
-                borderSide: BorderSide(color: _signColor),
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          TextField(
-            controller: _passwordController,
-            obscureText: !_showPassword,
-            decoration: InputDecoration(
-              hintText: localizations.translate('password'),
-              filled: true,
-              fillColor: Colors.white,
-              suffixIcon: IconButton(
-                icon: Icon(_showPassword ? Icons.visibility : Icons.visibility_off,
-                    color: _signColor),
-                onPressed: () => setState(() => _showPassword = !_showPassword),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(50),
-                borderSide: BorderSide(color: _signColor),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(50),
-                borderSide: BorderSide(color: _signColor),
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-            ),
-          ),
-
-          const SizedBox(height: 6),
-
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => ForgetPasswordPage()));
-              },
-              child: Text(localizations.translate('forgot_password') + '?',
-                  style: TextStyle(color: _signColor, fontWeight: FontWeight.w500)),
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _signColor,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-              ),
-              onPressed: _isLoginLoading ? null : _login,
-              child: _isLoginLoading
-                  ? const SizedBox(
-                      width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2))
-                  : const Text("Login",
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  
-  Widget _buildOtpLogin(AppLocalizations localizations) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 30),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text("Login with OTP",
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: _signColor,
-              )),
-          const SizedBox(height: 16),
-
-          TextField(
-            controller: _phoneController,
-            keyboardType: TextInputType.phone,
-            decoration: InputDecoration(
-              hintText: localizations.translate('phone_number'),
-              filled: true,
-              fillColor: Colors.white,
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(50),
-                borderSide: BorderSide(color: _signColor),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(50),
-                borderSide: BorderSide(color: _signColor),
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-            ),
-            onChanged: (_) {
-          
-              setState(() {
-                _showOtpSection = false;
-                _otpGenerated = false;
-                _storedOtpHash = null;
-                for (final c in _otpControllers) c.clear();
-              });
-            },
-          ),
-
-          if (_showOtpSection) ...[
-            const SizedBox(height: 18),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(4, (index) {
-                return SizedBox(
-                  width: 55,
-                  child: TextField(
-                    controller: _otpControllers[index],
-                    focusNode: _otpFocusNodes[index],
-                    maxLength: 1,
-                    textAlign: TextAlign.center,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      counterText: '',
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: _signColor),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: _signColor),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onChanged: (value) {
-                      if (value.isNotEmpty && index < 3) {
-                        FocusScope.of(context).requestFocus(_otpFocusNodes[index + 1]);
-                      } else if (value.isEmpty && index > 0) {
-                        FocusScope.of(context).requestFocus(_otpFocusNodes[index - 1]);
-                      }
-                    },
-                  ),
-                );
-              }),
-            ),
-
-            const SizedBox(height: 10),
-
-            _canResendOtp
-                ? GestureDetector(
-                    onTap: _isSendingOtp ? null : _generateOtp,
-                    child: Text(
-                      localizations.translate('resend_otp'),
-                      style: TextStyle(
-                        color: _signColor,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  )
-                : Text(
-                    localizations
-                        .translate('otp_resend')
-                        .replaceAll('{seconds}', _countdown.toString()),
-                    style: TextStyle(color: _signColor, fontSize: 12),
-                  ),
-          ],
-
-          const SizedBox(height: 18),
-
-          SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _signColor,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-              ),
-              onPressed: _otpGenerated
-                  ? (_isOtpLoading ? null : _loginWithOtp)
-                  : (_isSendingOtp ? null : _generateOtp),
-              child: (_otpGenerated
-                      ? _isOtpLoading
-                      : _isSendingOtp)
-                  ? const SizedBox(
-                      width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2))
-                  : Text(
-                      _otpGenerated
-                          ? localizations.translate('login_otp')
-                          : localizations.translate('get_otp'),
-                      style: const TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
             ),
           ),
         ],

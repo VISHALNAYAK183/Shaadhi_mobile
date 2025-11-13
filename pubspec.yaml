@@ -33,6 +33,7 @@ dependencies:
   jwt_decoder: ^2.0.1
   smooth_page_indicator: ^1.2.1
  
+ 
 
   # Cupertino icons for iOS-style icons
   cupertino_icons: ^1.0.8
@@ -68,4 +69,7 @@ flutter:
     - assets/verification_new.png
     - assets/icon-144x144.png
     - assets/buntslogo.jpg
+    - assets/background.jpg
+    - assets/kannadaText.png
+    - assets/Buntslove.png
     
