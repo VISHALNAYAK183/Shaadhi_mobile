@@ -60,13 +60,14 @@ class _AuthScreenState extends State<AuthScreen> {
     super.initState();
     _checkInternet();
     // Listen for connectivity changes
- Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) {
-  setState(() {
-    _isOffline = !(results.contains(ConnectivityResult.mobile) ||
-        results.contains(ConnectivityResult.wifi));
-  });
-});
-
+    Connectivity()
+        .onConnectivityChanged
+        .listen((List<ConnectivityResult> results) {
+      setState(() {
+        _isOffline = !(results.contains(ConnectivityResult.mobile) ||
+            results.contains(ConnectivityResult.wifi));
+      });
+    });
   }
 
   @override
@@ -96,9 +97,12 @@ class _AuthScreenState extends State<AuthScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Row(
           children: [
-            const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28),
+            const Icon(Icons.warning_amber_rounded,
+                color: Colors.red, size: 28),
             const SizedBox(width: 8),
-            Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(title,
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ],
         ),
         content: Text(message, style: const TextStyle(fontSize: 16)),
@@ -114,7 +118,8 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _saveLoginData(
@@ -306,7 +311,8 @@ class _AuthScreenState extends State<AuthScreen> {
     setState(() => _isOtpLoading = true);
 
     try {
-      final response = await ApiService.checkNumber(_phoneController.text.trim());
+      final response =
+          await ApiService.checkNumber(_phoneController.text.trim());
 
       print("OTP Login API Response: $response");
 
@@ -349,10 +355,11 @@ class _AuthScreenState extends State<AuthScreen> {
           MaterialPageRoute(builder: (_) => MainScreen()),
         );
       } else {
-        final message = (response['dataout'] != null &&
-                response['dataout'].isNotEmpty)
-            ? (response['dataout'][0]['p_out_mssg'] ?? "OTP verification failed.")
-            : "OTP verification failed.";
+        final message =
+            (response['dataout'] != null && response['dataout'].isNotEmpty)
+                ? (response['dataout'][0]['p_out_mssg'] ??
+                    "OTP verification failed.")
+                : "OTP verification failed.";
         _showMessage(message);
       }
     } catch (e) {
@@ -405,7 +412,6 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  // ================== Build UI ==================
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -528,8 +534,8 @@ class _AuthScreenState extends State<AuthScreen> {
                                           : Icons.visibility_off,
                                       color: primary,
                                     ),
-                                    onPressed: () =>
-                                        setState(() => _showPassword = !_showPassword),
+                                    onPressed: () => setState(
+                                        () => _showPassword = !_showPassword),
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
@@ -547,7 +553,8 @@ class _AuthScreenState extends State<AuthScreen> {
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (_) => ForgetPasswordPage()));
+                                            builder: (_) =>
+                                                ForgetPasswordPage()));
                                   },
                                   child: Text(
                                     "Forgot Password?",
@@ -579,8 +586,8 @@ class _AuthScreenState extends State<AuthScreen> {
                                           height: 20,
                                           child: CircularProgressIndicator(
                                             strokeWidth: 2,
-                                            valueColor:
-                                                AlwaysStoppedAnimation(Colors.white),
+                                            valueColor: AlwaysStoppedAnimation(
+                                                Colors.white),
                                           ),
                                         )
                                       : const Text(
@@ -599,7 +606,8 @@ class _AuthScreenState extends State<AuthScreen> {
                                 children: const [
                                   Expanded(child: Divider(color: Colors.black)),
                                   Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 8.0),
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 8.0),
                                     child: Text("OR"),
                                   ),
                                   Expanded(child: Divider(color: Colors.black)),
@@ -652,7 +660,9 @@ class _AuthScreenState extends State<AuthScreen> {
                                 child: ElevatedButton(
                                   onPressed: (_isSendingOtp || _isOtpLoading)
                                       ? null
-                                      : (_otpGenerated ? _loginWithOtp : _generateOtp),
+                                      : (_otpGenerated
+                                          ? _loginWithOtp
+                                          : _generateOtp),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: primary,
                                     shape: RoundedRectangleBorder(
@@ -666,10 +676,13 @@ class _AuthScreenState extends State<AuthScreen> {
                                           child: CircularProgressIndicator(
                                               strokeWidth: 2,
                                               valueColor:
-                                                  AlwaysStoppedAnimation(Colors.white)),
+                                                  AlwaysStoppedAnimation(
+                                                      Colors.white)),
                                         )
                                       : Text(
-                                          _otpGenerated ? "Verify & Login" : "Generate OTP",
+                                          _otpGenerated
+                                              ? "Verify & Login"
+                                              : "Generate OTP",
                                           style: const TextStyle(
                                             fontFamily: 'Inter',
                                             color: Colors.white,
@@ -695,13 +708,15 @@ class _AuthScreenState extends State<AuthScreen> {
                                             color: primary,
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,
-                                            decoration: TextDecoration.underline,
+                                            decoration:
+                                                TextDecoration.underline,
                                           ),
                                         ),
                                       )
                                     : Text(
                                         "Resend OTP in ${_countdown}s",
-                                        style: TextStyle(color: primary, fontSize: 12),
+                                        style: TextStyle(
+                                            color: primary, fontSize: 12),
                                       ),
                               ],
                             ],
@@ -727,16 +742,27 @@ class _AuthScreenState extends State<AuthScreen> {
                               onTap: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (_) => SignUpPage()),
+                                  MaterialPageRoute(
+                                      builder: (_) => SignUpPage()),
                                 );
                               },
-                              child: Text(
-                                "Register",
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                  color: primary, // same as button color
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 14, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: primary, // button background color
+                                  borderRadius: BorderRadius.circular(
+                                      20), // rounded button
+                                ),
+                                child: Text(
+                                  "Register",
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                    color: Colors
+                                        .white, // white text inside button
+                                  ),
                                 ),
                               ),
                             ),
@@ -752,8 +778,8 @@ class _AuthScreenState extends State<AuthScreen> {
                             children: [
                               Checkbox(
                                 value: _termsAccepted,
-                                onChanged: (val) =>
-                                    setState(() => _termsAccepted = val ?? false),
+                                onChanged: (val) => setState(
+                                    () => _termsAccepted = val ?? false),
                                 activeColor: primary,
                               ),
                               Expanded(
@@ -761,7 +787,8 @@ class _AuthScreenState extends State<AuthScreen> {
                                   text: TextSpan(
                                     text: "I agree to the ",
                                     style: TextStyle(
-                                        fontFamily: 'Inter', color: Colors.black),
+                                        fontFamily: 'Inter',
+                                        color: Colors.black),
                                     children: [
                                       TextSpan(
                                         text: "terms and privacy policy",
@@ -818,35 +845,49 @@ class _AuthScreenState extends State<AuthScreen> {
                           ),
                           textAlign: TextAlign.center,
                         ),
+   SizedBox(
+  height: height * 0.27,
+  child: Row(
+    children: [
+      /// Kannada text (unchanged)
+      Padding(
+        padding: const EdgeInsets.only(left: 0),
+        child: Image.asset(
+          "assets/kannadaText.png",
+          height: height * 0.15,
+          fit: BoxFit.contain,
+        ),
+      ),
 
-                        const SizedBox(height: 20),
+      /// BuntsLove shifted to the RIGHT
+      Expanded(
+        child: Align(
+          alignment: Alignment.centerRight,
+          child: OverflowBox(
+            maxWidth: double.infinity,
+            alignment: Alignment.centerRight,
+            child: Transform.translate(
+              offset: const Offset(80, 0),   // ⬅️ SHIFT RIGHT (increase if needed)
+              child: Transform.rotate(
+                angle: 4.6,
+                child: Image.asset(
+                  "assets/Buntslove.png",
+                  height: height * 6.35,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ],
+  ),
+),
 
-                        /// Kannada Text
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Image.asset(
-                            "assets/kannadaText.png",
-                            height: height * 0.24,
-                            fit: BoxFit.contain,
-                          ),
-                        ),
 
-                        const SizedBox(height: 15),
 
-                        Transform.translate(
-                          offset: const Offset(100, -30),
-                          child: Transform.rotate(
-                            angle: 4.6,
-                            child: Align(
-                              alignment: Alignment.bottomRight,
-                              child: Image.asset(
-                                "assets/Buntslove.png",
-                                height: height * 0.25,
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                          ),
-                        ),
+
+
                       ],
                     ),
                   ),
