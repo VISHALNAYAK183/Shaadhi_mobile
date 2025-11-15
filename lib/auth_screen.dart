@@ -22,24 +22,25 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  // UI toggles
+  
   bool _showPassword = false;
   bool _showOtpSection = false;
 
-  // Inputs
-  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _loginPhoneController = TextEditingController();
+final TextEditingController _otpPhoneController = TextEditingController();
+
   final TextEditingController _passwordController = TextEditingController();
 
-  // OTP inputs: 4 boxes as requested
+ 
   final List<TextEditingController> _otpControllers =
       List.generate(4, (_) => TextEditingController());
   final List<FocusNode> _otpFocusNodes = List.generate(4, (_) => FocusNode());
 
-  // Colors
+
   Color primary = const Color(0xFFE3425B);
   Color primaryDark = const Color(0xFFea4a57);
 
-  // Network / state
+
   bool _isOffline = false;
   bool _termsAccepted = true;
   bool _isLoginLoading = false;
@@ -47,7 +48,6 @@ class _AuthScreenState extends State<AuthScreen> {
   bool _otpGenerated = false;
   bool _isOtpLoading = false;
 
-  // OTP storage (server returns OTP in response['data']['Otp'])
   String? _storedOtpHash;
 
   // Countdown
@@ -72,7 +72,8 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   void dispose() {
-    _phoneController.dispose();
+    _loginPhoneController.dispose();
+    _otpPhoneController.dispose();
     _passwordController.dispose();
     for (final c in _otpControllers) c.dispose();
     for (final f in _otpFocusNodes) f.dispose();
@@ -80,7 +81,7 @@ class _AuthScreenState extends State<AuthScreen> {
     super.dispose();
   }
 
-  // ================== Helpers ==================
+
   Future<void> _checkInternet() async {
     final result = await Connectivity().checkConnectivity();
     setState(() {
@@ -145,8 +146,6 @@ class _AuthScreenState extends State<AuthScreen> {
   void loginEntry(String id) {
     ApiService.loginEntry(id);
   }
-
-  // ================== Countdown ==================
   void _startCountdown() {
     setState(() {
       _countdown = 30;
@@ -163,7 +162,6 @@ class _AuthScreenState extends State<AuthScreen> {
     });
   }
 
-  // ================== Password Login ==================
   Future<void> _login() async {
     final localizations = AppLocalizations.of(context);
 
@@ -179,7 +177,7 @@ class _AuthScreenState extends State<AuthScreen> {
       return;
     }
 
-    final mobile = _phoneController.text.trim();
+    final mobile = _loginPhoneController.text.trim();
     final password = _passwordController.text.trim();
 
     if (mobile.isEmpty || password.isEmpty) {
@@ -191,7 +189,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
     try {
       final response = await ApiService.loginUser(mobile, password);
-      // ignore: avoid_print
+ 
       print("Final API Response in Login: $response");
 
       if (response.containsKey('token')) {
@@ -218,9 +216,8 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
-  // ================== OTP Flow ==================
   Future<void> _generateOtp() async {
-    final phone = _phoneController.text.trim();
+    final phone = _otpPhoneController.text.trim();
     if (phone.isEmpty || phone.length != 10) {
       _showMessage("Please enter a valid 10-digit phone number.");
       return;
@@ -231,13 +228,13 @@ class _AuthScreenState extends State<AuthScreen> {
     });
 
     try {
-      // Verify if number exists
+     
       final response = await ApiService.checkNumber(phone);
 
       if (response['dataout'] != null &&
           response['dataout'].isNotEmpty &&
           response['dataout'][0]['p_out_mssg_flg'] == "Y") {
-        // Send OTP
+        
         await _sendOtp(phone);
 
         setState(() {
@@ -250,7 +247,6 @@ class _AuthScreenState extends State<AuthScreen> {
         _showMessage("This number is not registered.");
       }
     } catch (e) {
-      // ignore: avoid_print
       print("Error: $e");
       _showMessage("Login Failed");
     } finally {
@@ -263,14 +259,14 @@ class _AuthScreenState extends State<AuthScreen> {
   Future<void> _sendOtp(String phone) async {
     try {
       final response = await ApiService.SendOtp(phone);
-      // ignore: avoid_print
+   
       print("Send OTP API Response: $response");
 
       if (response.containsKey('message') &&
           response['message']['p_out_mssg_flg']?.toString() == "Y") {
         if (response.containsKey('data') && response['data'] is Map) {
           _storedOtpHash = response['data']['Otp']?.toString();
-          // ignore: avoid_print
+     
           print("Stored OTP from server: $_storedOtpHash");
         } else {
           _showMessage("OTP data is missing in response.");
@@ -312,7 +308,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
     try {
       final response =
-          await ApiService.checkNumber(_phoneController.text.trim());
+          await ApiService.checkNumber(_otpPhoneController.text.trim());
 
       print("OTP Login API Response: $response");
 
@@ -325,7 +321,7 @@ class _AuthScreenState extends State<AuthScreen> {
           return;
         }
 
-        // Decode JWT
+       
         final parts = token.split('.');
         if (parts.length != 3) {
           throw Exception("Invalid JWT token format");
@@ -340,7 +336,6 @@ class _AuthScreenState extends State<AuthScreen> {
         final String matriId = data["matri_id"] ?? '';
         final String phone = data["phone"].toString();
 
-        // Save token & user data
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString("token", token);
         await prefs.setInt("id", id);
@@ -370,7 +365,6 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
-  // Helper to clear OTP fields
   void _clearOtpFields() {
     for (final c in _otpControllers) c.clear();
     _otpFocusNodes[0].requestFocus();
@@ -422,7 +416,7 @@ class _AuthScreenState extends State<AuthScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          /// Background Image
+        
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -433,15 +427,15 @@ class _AuthScreenState extends State<AuthScreen> {
             ),
           ),
 
-          /// Light overlay
+         
           Container(color: Colors.white.withOpacity(0.55)),
 
-          /// Main Content
+       
           SafeArea(
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  /// Header (centered logo)
+                
                   Container(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
@@ -458,13 +452,13 @@ class _AuthScreenState extends State<AuthScreen> {
                     child: Image.asset("assets/buntslogo.jpg", height: 80),
                   ),
 
-                  /// Body
+              
                   Padding(
                     padding: EdgeInsets.symmetric(
                         horizontal: width * 0.05, vertical: 20),
                     child: Column(
                       children: [
-                        /// Login Card
+                      
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(22),
@@ -501,9 +495,9 @@ class _AuthScreenState extends State<AuthScreen> {
                               ),
                               const SizedBox(height: 14),
 
-                              /// Phone / Matri ID
+                             
                               TextField(
-                                controller: _phoneController,
+                                controller: _loginPhoneController,
                                 decoration: InputDecoration(
                                   hintText: "Enter your phone / Matri ID",
                                   filled: true,
@@ -519,7 +513,6 @@ class _AuthScreenState extends State<AuthScreen> {
                               ),
                               const SizedBox(height: 10),
 
-                              /// Password
                               TextField(
                                 controller: _passwordController,
                                 obscureText: !_showPassword,
@@ -545,7 +538,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                 ),
                               ),
 
-                              /// Forgot Password
+                          
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: TextButton(
@@ -568,7 +561,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                 ),
                               ),
 
-                              /// LOGIN Button
+                             
                               SizedBox(
                                 width: width * 0.5,
                                 child: ElevatedButton(
@@ -630,9 +623,8 @@ class _AuthScreenState extends State<AuthScreen> {
                               ),
                               const SizedBox(height: 14),
 
-                              /// OTP Phone Input
                               TextField(
-                                controller: _phoneController,
+                                controller: _otpPhoneController,
                                 keyboardType: TextInputType.phone,
                                 decoration: InputDecoration(
                                   hintText: "Enter 10-digit phone number",
@@ -697,7 +689,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                 _buildOtpInputs(),
                                 const SizedBox(height: 10),
 
-                                // Resend / timer
+                              
                                 _canResendOtp
                                     ? GestureDetector(
                                         onTap:
@@ -725,7 +717,6 @@ class _AuthScreenState extends State<AuthScreen> {
 
                         const SizedBox(height: 20),
 
-                        /// "Don't have an account?" Section
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -750,9 +741,9 @@ class _AuthScreenState extends State<AuthScreen> {
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 14, vertical: 6),
                                 decoration: BoxDecoration(
-                                  color: primary, // button background color
+                                  color: primary,
                                   borderRadius: BorderRadius.circular(
-                                      20), // rounded button
+                                      20),
                                 ),
                                 child: Text(
                                   "Register",
@@ -761,7 +752,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14,
                                     color: Colors
-                                        .white, // white text inside button
+                                        .white,
                                   ),
                                 ),
                               ),
@@ -771,7 +762,6 @@ class _AuthScreenState extends State<AuthScreen> {
 
                         const SizedBox(height: 20),
 
-                        // Terms & Support
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 6.0),
                           child: Row(
@@ -849,7 +839,7 @@ class _AuthScreenState extends State<AuthScreen> {
   height: height * 0.27,
   child: Row(
     children: [
-      /// Kannada text (unchanged)
+     
       Padding(
         padding: const EdgeInsets.only(left: 0),
         child: Image.asset(
@@ -859,7 +849,6 @@ class _AuthScreenState extends State<AuthScreen> {
         ),
       ),
 
-      /// BuntsLove shifted to the RIGHT
       Expanded(
         child: Align(
           alignment: Alignment.centerRight,
@@ -867,7 +856,7 @@ class _AuthScreenState extends State<AuthScreen> {
             maxWidth: double.infinity,
             alignment: Alignment.centerRight,
             child: Transform.translate(
-              offset: const Offset(80, 0),   // ⬅️ SHIFT RIGHT (increase if needed)
+              offset: const Offset(80, 0), 
               child: Transform.rotate(
                 angle: 4.6,
                 child: Image.asset(
